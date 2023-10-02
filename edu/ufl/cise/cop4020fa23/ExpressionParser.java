@@ -99,12 +99,7 @@ public class ExpressionParser implements IParser {
 		super();
 		this.lexer = lexer;
 		t = lexer.next();
-		// FIRST: determine wether sentence is legal
-		// Try to start with binary expressions
-
 	}
-
-
 	@Override
 	public AST parse() throws PLCCompilerException {
 		Expr e = expr();
@@ -116,6 +111,7 @@ public class ExpressionParser implements IParser {
 
 	// psuedocode of recursive functions
 	// TODO: resolve clashing methods, implement the return chain so the recursion has an actual output
+	// TODO: figure out how information is passed up through recursion
 	private Expr expr() throws PLCCompilerException {
 		IToken firstToken = t;
 		Expr e;
@@ -246,7 +242,7 @@ public class ExpressionParser implements IParser {
 			case LSQUARE -> {
 				ExpandedPixelSelector(firstToken, e);
 			}
-			case default -> {
+			default -> {
 				error(); // replace with more specific error
 			}
 		};
