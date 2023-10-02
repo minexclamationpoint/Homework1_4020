@@ -25,7 +25,7 @@ import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 import edu.ufl.cise.cop4020fa23.exceptions.SyntaxException;
 
 class ExpressionParserTest_starter {
-
+	// TODO: create custom tests
 	/**
 	 * Constructs a scanner and parser for the given input string, scans and parses
 	 * the input and returns and AST.
@@ -120,7 +120,7 @@ class ExpressionParserTest_starter {
 	 * Returns the given AST cast to BinaryExpr.
 	 *
 	 * @param e
-	 * @param op Kind of expected operator
+	 * @param expectedOp Kind of expected operator
 	 * @return
 	 */
 	BinaryExpr checkBinaryExpr(AST e, Kind expectedOp) {

@@ -15,7 +15,7 @@ import edu.ufl.cise.cop4020fa23.exceptions.LexicalException;
  * Factory class providing static methods to create and return various components of the compiler
  */
 public class ComponentFactory {
-
+	// TODO: finish revising Lexer and implement it into the program
 		public static ILexer makeLexer(String input) {
 			return new Lexer(input);
 		}
