@@ -234,7 +234,11 @@ public class ExpressionParser implements IParser {
 		if(t.kind() == COLON){
 			s = ChannelSelector();
 		}
-		return new PostfixExpr(e.firstToken, e, p, s);
+		if(p != null && s != null){
+			return new PostfixExpr(e.firstToken, e, p, s);
+		} else {
+			return e;
+		}
 	}
 	private Expr PrimaryExpr(Expr e) throws PLCCompilerException {
 		switch (t.kind()) {
