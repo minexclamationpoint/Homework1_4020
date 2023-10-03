@@ -220,6 +220,7 @@ class ExpressionParserTest_starter {
 
 	@Test
 	void test4() throws PLCCompilerException {
+		//lexer lexing newline character, turning reserved word into ident
 		String input = """
 				a:red
 

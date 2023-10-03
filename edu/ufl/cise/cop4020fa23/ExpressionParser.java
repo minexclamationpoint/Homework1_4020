@@ -130,29 +130,31 @@ public class ExpressionParser implements IParser {
 		return e;
 	}
 
-	private Expr ConditionalExpr(Expr e) throws PLCCompilerException {
-		// slightly different syntax as the rest of the program, shouldn't be too much of a problem
-		Expr e1 = expr(e);
-		if(t.kind() == RARROW){
-			t = lexer.next();
-		} else {
-			throw new UnsupportedOperationException("THE PARSER ERRORS HAVE NOT BEEN IMPLEMENTED YET"); // replace with specific error
-		}
-		Expr e2 = expr(e);
-		if(t.kind() == COMMA){
-			t = lexer.next();
-		} else {
-			throw new UnsupportedOperationException("THE PARSER ERRORS HAVE NOT BEEN IMPLEMENTED YET"); // replace with more specific error
-		}
-		Expr e3 = expr(e);
-		return new ConditionalExpr(e.firstToken, e1, e2, e3);
-	}
+private Expr ConditionalExpr(Expr e) throws PLCCompilerException {
+    Expr e1 = expr(e);
+	IToken firstToken = t;
+    if(t.kind() == RARROW){
+        t = lexer.next();
+    } else {
+        throw new SyntaxException("Expected '->' token at " + t.sourceLocation()); // replace with specific error
+    }
+    Expr e2 = expr(e);
+    if(t.kind() == COMMA){
+        t = lexer.next();
+    } else {
+        throw new SyntaxException("Expected ',' token at " + t.sourceLocation()); // replace with more specific error
+    }
+    Expr e3 = expr(e);
+    return new ConditionalExpr(firstToken, e1, e2, e3);
+}
+
 	private Expr LogicalOrExpr(Expr e) throws PLCCompilerException {
 		Expr e1 = LogicalAndExpr(e);
+		IToken firstToken = t;
 		if(t.kind() == BITOR || t.kind() == OR){
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(e.firstToken, e1, op, LogicalOrExpr(e));
+			e = new BinaryExpr(firstToken, e1, op, LogicalOrExpr(e));
 		} else {
 			return e1;
 		}
@@ -160,10 +162,11 @@ public class ExpressionParser implements IParser {
 	}
 	private Expr LogicalAndExpr(Expr e) throws PLCCompilerException {
 		Expr e1 = ComparisonExpr(e);
+		IToken firstToken = t;
 		if(t.kind() == BITAND || t.kind() == AND){
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(e.firstToken, e1, op, ComparisonExpr(e));
+			e = new BinaryExpr(firstToken, e1, op, ComparisonExpr(e));
 		} else {
 			return e1;
 		}
@@ -171,10 +174,11 @@ public class ExpressionParser implements IParser {
 	}
 	private Expr ComparisonExpr(Expr e) throws PLCCompilerException {
 		Expr e1 = PowExpr(e);
+		IToken firstToken = t;
 		if(t.kind() == LT || t.kind() == GT|| t.kind() == EQ|| t.kind() == LE || t.kind() == GE){
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(e.firstToken, e1, op, PowExpr(e));
+			e = new BinaryExpr(firstToken, e1, op, PowExpr(e));
 		} else {
 			return e1;
 		}
@@ -182,20 +186,22 @@ public class ExpressionParser implements IParser {
 	}
 	private Expr PowExpr(Expr e) throws PLCCompilerException {
 		e = AdditiveExpr(e);
+		IToken firstToken = t;
 		if(t.kind() == EXP){
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(e.firstToken, e, op, PowExpr(e));
+			e = new BinaryExpr(firstToken, e, op, PowExpr(e));
 		}
 		return e;
 	}
 	private Expr AdditiveExpr(Expr e) throws PLCCompilerException {
 		// everything that uses BinaryExpr() should function roughly identically, just with different conditionals
 		Expr e1 = MultiplicativeExpr(e);
+		IToken firstToken = t;
 		if(t.kind() == PLUS || t.kind() == MINUS){
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(e.firstToken, e1, op, AdditiveExpr(e));
+			e = new BinaryExpr(firstToken, e1, op, AdditiveExpr(e));
 		} else {
 			return e1;
 		}
@@ -204,10 +210,11 @@ public class ExpressionParser implements IParser {
 	private Expr MultiplicativeExpr(Expr e) throws PLCCompilerException {
 		// might be a bad way of handling binary expressions?
 		Expr e1 = UnaryExpr(e);
+		IToken firstToken = t;
 		if (t.kind() == TIMES || t.kind() == DIV || t.kind() == MOD) {
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(e.firstToken, e1, op, MultiplicativeExpr(e));
+			e = new BinaryExpr(firstToken, e1, op, MultiplicativeExpr(e));
 		} else {
 			return e1;
 		}
@@ -226,6 +233,7 @@ public class ExpressionParser implements IParser {
 	}
 	private Expr PostfixExpr(Expr e) throws PLCCompilerException {
 		e = PrimaryExpr(e);
+		IToken firstToken = t;
 		PixelSelector p = null; // unsure if this is best practice
 		ChannelSelector s = null;
 		if(t.kind() == LSQUARE){
@@ -234,8 +242,8 @@ public class ExpressionParser implements IParser {
 		if(t.kind() == COLON){
 			s = ChannelSelector();
 		}
-		if(p != null && s != null){
-			return new PostfixExpr(e.firstToken, e, p, s);
+		if(p != null || s != null){
+			return new PostfixExpr(firstToken, e, p, s);
 		} else {
 			return e;
 		}
@@ -274,7 +282,7 @@ public class ExpressionParser implements IParser {
 				e = ExpandedPixelSelector();
 			}
 			default -> {
-				throw new UnsupportedOperationException("THE PARSER ERRORS HAVE NOT BEEN IMPLEMENTED YET"); // replace with more specific error
+				throw new SyntaxException("Unexpected token encountered: " + t.kind());
 			}
 		};
 		return e;
@@ -287,7 +295,7 @@ public class ExpressionParser implements IParser {
 			t = color;
 			return newSelector;
 		} else {
-			throw new UnsupportedOperationException("THE PARSER ERRORS HAVE NOT BEEN IMPLEMENTED YET"); // replace with more specific error
+			throw new SyntaxException(color.sourceLocation(), "Expected a color channel token (RES_blue, RES_green, or RES_red)"); // replace with more specific error
 		}
 	}
 	private PixelSelector PixelSelector() throws PLCCompilerException{
@@ -299,11 +307,11 @@ public class ExpressionParser implements IParser {
 			t = lexer.next();
 			eY = expr();
 		} else {
-			throw new UnsupportedOperationException("THE PARSER ERRORS HAVE NOT BEEN IMPLEMENTED YET"); // replace with more specific error
+			throw new SyntaxException("Expected ',' token at " + t.sourceLocation()); // replace with more specific error
 		}
 		t = lexer.next();
-		if(t.kind() != RSQUARE){
-			throw new UnsupportedOperationException("THE PARSER ERRORS HAVE NOT BEEN IMPLEMENTED YET"); // replace with more specific error
+		if (t.kind() != RSQUARE) {
+			throw new SyntaxException("Expected ']' token at " + t.sourceLocation()); // replace with specific error
 		}
 		return new PixelSelector(firstToken, eX, eY);
 	}
@@ -314,21 +322,21 @@ public class ExpressionParser implements IParser {
 		Expr eR = expr();
 		Expr eG;
 		Expr eB;
-		if(t.kind() == COMMA){
+		if (t.kind() == COMMA) {
 			t = lexer.next();
 			eG = expr();
 		} else {
-			throw new UnsupportedOperationException("THE PARSER ERRORS HAVE NOT BEEN IMPLEMENTED YET"); // replace with more specific error
+			throw new SyntaxException(t.sourceLocation(), "Expected ',' token after the red component expression.");
 		}
-		if(t.kind() == COMMA){
+		if (t.kind() == COMMA) {
 			t = lexer.next();
 			eB = expr();
 		} else {
-			throw new UnsupportedOperationException("THE PARSER ERRORS HAVE NOT BEEN IMPLEMENTED YET"); // replace with more specific error
+			throw new SyntaxException(t.sourceLocation(), "Expected ',' token after the green component expression.");
 		}
 		t = lexer.next();
-		if(t.kind() != RSQUARE) {
-			throw new UnsupportedOperationException("THE PARSER ERRORS HAVE NOT BEEN IMPLEMENTED YET"); // replace with more specific error
+		if (t.kind() != RSQUARE) {
+			throw new SyntaxException(t.sourceLocation(), "Expected ']' token to close the pixel selector expression.");
 		}
 		return new ExpandedPixelExpr(firstToken, eR, eG, eB);
 	}
