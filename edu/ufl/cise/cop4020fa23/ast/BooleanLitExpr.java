@@ -40,7 +40,7 @@ public class BooleanLitExpr extends Expr {
 		return true;
 	}
 
-	public Object getText() {
+	public String getText() {
 		return firstToken.text();
 	}
 
