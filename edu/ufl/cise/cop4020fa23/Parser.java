@@ -48,10 +48,10 @@ public class Parser implements IParser {
 			name = t;
 			t = lexer.next();
 		} else {
-			throw new SyntaxException(t.sourceLocation(), "Expected 'IDENT' token as name for program expression.");
+			throw new SyntaxException(t.sourceLocation(), "Expected 'IDENT' at " + t.sourceLocation());
 		}
 		if(t.kind() != LPAREN){
-			throw new SyntaxException(t.sourceLocation(), "Expected 'LPAREN' token to enclose ParamList");
+			throw new SyntaxException(t.sourceLocation(), "Expected 'LPAREN' at " + t.sourceLocation());
 		}
 		t = lexer.next();
 		List<NameDef> params = ParamList();
@@ -66,28 +66,45 @@ public class Parser implements IParser {
 	private Block Block() throws PLCCompilerException {
 		IToken firstToken = t;
 		if(t.kind() != BLOCK_OPEN){
-			throw new SyntaxException(t.sourceLocation(), "Expected 'BLOCK_OPEN' token to enclose Block");
+			throw new SyntaxException(t.sourceLocation(), "Expected 'BLOCK_OPEN' at " + t.sourceLocation());
 		}
-		List<Block.BlockElem> elems = new ArrayList<Block.BlockElem>();
+		List<Block.BlockElem> elems = new ArrayList<>();
 		AST newElem = null;
         do {
-            if(t.kind() == IDENT){
-				newElem = Statement();
-			} else {
-				newElem = Declaration();
+			switch (t.kind()) {
+				case IDENT -> {
+					newElem = Statement();
+				} case RES_image, RES_pixel, RES_int, RES_string, RES_void, RES_boolean -> {
+					newElem = Declaration();
+				} default -> {
+					continue;
+				}
 			}
+			elems.add((Block.BlockElem) newElem);
         } while (t.kind() == SEMI);
 		if(t.kind() != BLOCK_CLOSE){
 			throw new SyntaxException(t.sourceLocation(), "Unmatched block tokens");
 		}
-		throw new UnsupportedOperationException();
+        return new Block(firstToken, elems);
 	}
 
 	private List<NameDef> ParamList() throws PLCCompilerException {
+		//image | pixel | int | string | void | boolean
+		List<AST> list = new ArrayList<>();
+		if(t.kind() == RES_image || t.kind() == RES_pixel || t.kind() == RES_int || t.kind() == RES_string || t.kind() == RES_void || t.kind() == RES_boolean){
+			list.add(NameDef());
+			if(t.kind() == COMMA){
+				t = lexer.next();
+			} else {
+				throw new SyntaxException(t.sourceLocation(), "Expected ',' token at " + t.sourceLocation());
+			}
+		} else {
+			return null;
+		}
 		throw new UnsupportedOperationException();
 	}
 
-	private Expr NameDef() throws PLCCompilerException {
+	private AST NameDef() throws PLCCompilerException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -136,7 +153,7 @@ public class Parser implements IParser {
 		Expr e1 = null;
 		Expr e2 = null;
 		e1 = LogicalAndExpr();
-		if (t.kind() == BITOR || t.kind() == OR) {
+		while (t.kind() == BITOR || t.kind() == OR) {
 			IToken op = t;
 			t = lexer.next();
 			e2 = LogicalAndExpr();
@@ -284,7 +301,6 @@ public class Parser implements IParser {
 				throw new SyntaxException("Unexpected token encountered: " + t.kind());
 			}
 		}
-		;
 		return e;
 	}
 
