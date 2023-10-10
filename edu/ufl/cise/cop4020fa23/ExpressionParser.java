@@ -84,33 +84,58 @@ Dimension  ::=  [ Expr , Expr ]
  */
 
 public class ExpressionParser implements IParser {
-	
+
 	final ILexer lexer;
 	private IToken t;
 
 	/**
 	 * @param lexer
-	 * @throws LexicalException 
+	 * @throws LexicalException
 	 */
 	public ExpressionParser(ILexer lexer) throws LexicalException {
 		super();
 		this.lexer = lexer;
 		t = lexer.next();
 	}
+
 	@Override
 	public AST parse() throws PLCCompilerException {
 		// idk if this might need changing....?
 		// EDIT: needs changing to properly handle EOF I think, but also idk if more is needed as well.
+        return expr();
+	}
+
+	// TODO: create a copy of this file and rename that copy to Parser.java
+	// TODO: import modified version of componentfactory, new AST class, Parser.java and ParserTest_starter.java
+	// TODO: complete grammar
+	/*private Expr Program() throws PLCCompilerException {
 		return expr();
 	}
 
-	// TODO: Implement proper error statements (Arsen I'm talking to you)
-	// TODO: Test and revise (Arsen I'm still talking to you (lol))
-	// TODO: check if the parser properly handles EOF
+	private Expr Block() throws PLCCompilerException {
+		return expr();
+	}
+
+	private Expr ParamList() throws PLCCompilerException {
+		return expr();
+	}
+
+	private Expr NameDef() throws PLCCompilerException {
+		return expr();
+	}
+
+	private Expr Type() throws PLCCompilerException {
+		return expr();
+	}
+
+	private Expr Declaration() throws PLCCompilerException {
+		return expr();
+	}*/
+	//TODO: functions above this card are unfinished
 	private Expr expr() throws PLCCompilerException {
 		// Starter statement, called outside of
-		Expr e = null; // not sure if this is best practice
-		if(t.kind() == QUESTION){
+		Expr e = null;
+		if (t.kind() == QUESTION) {
 			t = lexer.next();
 			e = ConditionalExpr(e);
 		} else {
@@ -121,7 +146,7 @@ public class ExpressionParser implements IParser {
 
 	private Expr expr(Expr e) throws PLCCompilerException {
 		// helper function for recursion with expr(), only called within the ExpressionParser() class
-		if(t.kind() == QUESTION){
+		if (t.kind() == QUESTION) {
 			t = lexer.next();
 			e = ConditionalExpr(e);
 		} else {
@@ -130,96 +155,107 @@ public class ExpressionParser implements IParser {
 		return e;
 	}
 
-private Expr ConditionalExpr(Expr e) throws PLCCompilerException {
-    Expr e1 = expr(e);
-	IToken firstToken = t;
-    if(t.kind() == RARROW){
-        t = lexer.next();
-    } else {
-        throw new SyntaxException("Expected '->' token at " + t.sourceLocation()); // replace with specific error
-    }
-    Expr e2 = expr(e);
-    if(t.kind() == COMMA){
-        t = lexer.next();
-    } else {
-        throw new SyntaxException("Expected ',' token at " + t.sourceLocation()); // replace with more specific error
-    }
-    Expr e3 = expr(e);
-    return new ConditionalExpr(firstToken, e1, e2, e3);
-}
+	private Expr ConditionalExpr(Expr e) throws PLCCompilerException {
+		IToken firstToken = t;
+		Expr e1 = expr(e);
+		if (t.kind() == RARROW) {
+			t = lexer.next();
+		} else {
+			throw new SyntaxException("Expected '->' token at " + t.sourceLocation()); // replace with specific error
+		}
+		Expr e2 = expr(e);
+		if (t.kind() == COMMA) {
+			t = lexer.next();
+		} else {
+			throw new SyntaxException("Expected ',' token at " + t.sourceLocation()); // replace with more specific error
+		}
+		Expr e3 = expr(e);
+		return new ConditionalExpr(firstToken, e1, e2, e3);
+	}
 
 	private Expr LogicalOrExpr(Expr e) throws PLCCompilerException {
-		Expr e1 = LogicalAndExpr(e);
 		IToken firstToken = t;
-		if(t.kind() == BITOR || t.kind() == OR){
+		Expr e1 = null;
+		Expr e2 = null;
+		e1 = LogicalAndExpr(e);
+		if (t.kind() == BITOR || t.kind() == OR) {
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(firstToken, e1, op, LogicalOrExpr(e));
-		} else {
-			return e1;
+			e2 = LogicalAndExpr(e);
+			e1 = new BinaryExpr(firstToken, e1, op, e2);
 		}
-		return e;
+		return e1;
 	}
+
 	private Expr LogicalAndExpr(Expr e) throws PLCCompilerException {
-		Expr e1 = ComparisonExpr(e);
 		IToken firstToken = t;
-		if(t.kind() == BITAND || t.kind() == AND){
+		Expr e1 = null;
+		Expr e2 = null;
+		e1 = ComparisonExpr(e);
+		while (t.kind() == BITAND || t.kind() == AND) {
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(firstToken, e1, op, ComparisonExpr(e));
-		} else {
-			return e1;
+			e2 = ComparisonExpr(e);
+			e1 = new BinaryExpr(firstToken, e1, op, e2);
 		}
-		return e;
+		return e1;
 	}
+
 	private Expr ComparisonExpr(Expr e) throws PLCCompilerException {
-		Expr e1 = PowExpr(e);
 		IToken firstToken = t;
-		if(t.kind() == LT || t.kind() == GT|| t.kind() == EQ|| t.kind() == LE || t.kind() == GE){
+		Expr e1 = null;
+		Expr e2 = null;
+		e1 = PowExpr(e);
+		while(t.kind() == LT || t.kind() == GT || t.kind() == EQ || t.kind() == LE || t.kind() == GE){
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(firstToken, e1, op, PowExpr(e));
-		} else {
-			return e1;
+			e2 = PowExpr(e);
+			e1 = new BinaryExpr(firstToken, e1, op, e2);
 		}
-		return e;
+		return e1;
 	}
+
 	private Expr PowExpr(Expr e) throws PLCCompilerException {
-		e = AdditiveExpr(e);
 		IToken firstToken = t;
-		if(t.kind() == EXP){
+		e = AdditiveExpr(e);
+		if (t.kind() == EXP) {
 			IToken op = t;
 			t = lexer.next();
 			e = new BinaryExpr(firstToken, e, op, PowExpr(e));
 		}
 		return e;
 	}
+
 	private Expr AdditiveExpr(Expr e) throws PLCCompilerException {
 		// everything that uses BinaryExpr() should function roughly identically, just with different conditionals
-		Expr e1 = MultiplicativeExpr(e);
 		IToken firstToken = t;
-		if(t.kind() == PLUS || t.kind() == MINUS){
+		Expr e1 = null;
+		Expr e2 = null;
+		e1 = MultiplicativeExpr(e);
+		while (t.kind() == PLUS || t.kind() == MINUS) {
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(firstToken, e1, op, AdditiveExpr(e));
-		} else {
-			return e1;
+			e2 = MultiplicativeExpr(e);
+			e1 = new BinaryExpr(firstToken, e1, op, e2);
 		}
-		return e;
+		return e1;
 	}
+
 	private Expr MultiplicativeExpr(Expr e) throws PLCCompilerException {
 		// might be a bad way of handling binary expressions?
-		Expr e1 = UnaryExpr(e);
 		IToken firstToken = t;
-		if (t.kind() == TIMES || t.kind() == DIV || t.kind() == MOD) {
+		Expr e1 = null;
+		Expr e2 = null;
+		e1 = UnaryExpr(e);
+		while (t.kind() == TIMES || t.kind() == DIV || t.kind() == MOD) {
 			IToken op = t;
 			t = lexer.next();
-			e = new BinaryExpr(firstToken, e1, op, MultiplicativeExpr(e));
-		} else {
-			return e1;
+			e2 = UnaryExpr(e);
+			e1 = new BinaryExpr(firstToken, e1, op, e2);
 		}
-		return e;
+		return e1;
 	}
+
 	private Expr UnaryExpr(Expr e) throws PLCCompilerException {
 		if (t.kind() == BANG || t.kind() == MINUS || t.kind() == RES_width || t.kind() == RES_height) {
 			IToken op = t;
@@ -231,23 +267,25 @@ private Expr ConditionalExpr(Expr e) throws PLCCompilerException {
 		}
 
 	}
+
 	private Expr PostfixExpr(Expr e) throws PLCCompilerException {
-		e = PrimaryExpr(e);
 		IToken firstToken = t;
+		e = PrimaryExpr(e);
 		PixelSelector p = null; // unsure if this is best practice
 		ChannelSelector s = null;
-		if(t.kind() == LSQUARE){
+		if (t.kind() == LSQUARE) {
 			p = PixelSelector();
 		}
-		if(t.kind() == COLON){
+		if (t.kind() == COLON) {
 			s = ChannelSelector();
 		}
-		if(p != null || s != null){
+		if (p != null || s != null) {
 			return new PostfixExpr(firstToken, e, p, s);
 		} else {
 			return e;
 		}
 	}
+
 	private Expr PrimaryExpr(Expr e) throws PLCCompilerException {
 		switch (t.kind()) {
 			case STRING_LIT -> {
@@ -263,7 +301,7 @@ private Expr ConditionalExpr(Expr e) throws PLCCompilerException {
 				t = lexer.next();
 			}
 			case IDENT -> {
-				e= new IdentExpr(t);
+				e = new IdentExpr(t);
 				t = lexer.next();
 			}
 			case CONST -> {
@@ -274,9 +312,11 @@ private Expr ConditionalExpr(Expr e) throws PLCCompilerException {
 				// LPAREN is consumed and not counted as a part of the grammar, not sure if doing so is correct
 				t = lexer.next();
 				e = expr(e); // should I call expr(e) here or just expr()? can't quite tell
-			}
-			case RPAREN -> {
-				t = lexer.next();
+				if (t.kind() != RPAREN) {
+					throw new SyntaxException("Unmatched parentheses");
+				} else {
+					t = lexer.next();
+				}
 			}
 			case LSQUARE -> {
 				e = ExpandedPixelSelector();
@@ -284,37 +324,43 @@ private Expr ConditionalExpr(Expr e) throws PLCCompilerException {
 			default -> {
 				throw new SyntaxException("Unexpected token encountered: " + t.kind());
 			}
-		};
+		}
+		;
 		return e;
 	}
+
 	private ChannelSelector ChannelSelector() throws PLCCompilerException { // oh the non-ll(1) of it all
+		IToken firstToken = t;
 		IToken color = lexer.next(); // I really don't know what to do to "fix" the grammar so it isn't ll(1). this should work though
 		ChannelSelector newSelector = null;
-		if(color.kind() == RES_blue || color.kind() == RES_green || color.kind() == RES_red) {
-			newSelector = new ChannelSelector(t, color); //ChannelSelector extends AST, not Expr. Idk if this is a mistake or not?
+		if (color.kind() == RES_blue || color.kind() == RES_green || color.kind() == RES_red) {
+			newSelector = new ChannelSelector(firstToken, color); //ChannelSelector extends AST, not Expr. Idk if this is a mistake or not?
 			t = color;
 			return newSelector;
 		} else {
 			throw new SyntaxException(color.sourceLocation(), "Expected a color channel token (RES_blue, RES_green, or RES_red)"); // replace with more specific error
 		}
 	}
-	private PixelSelector PixelSelector() throws PLCCompilerException{
+
+	private PixelSelector PixelSelector() throws PLCCompilerException {
 		IToken firstToken = t;
 		t = lexer.next();
 		Expr eX = expr();
 		Expr eY;
-		if(t.kind() == COMMA){
+		if (t.kind() == COMMA) {
 			t = lexer.next();
 			eY = expr();
 		} else {
 			throw new SyntaxException("Expected ',' token at " + t.sourceLocation()); // replace with more specific error
 		}
-		t = lexer.next();
 		if (t.kind() != RSQUARE) {
 			throw new SyntaxException("Expected ']' token at " + t.sourceLocation()); // replace with specific error
+		} else {
+			t = lexer.next();
 		}
 		return new PixelSelector(firstToken, eX, eY);
 	}
+
 	// may have unnecessary lexer.next() calls
 	private Expr ExpandedPixelSelector() throws PLCCompilerException {
 		IToken firstToken = t;
@@ -340,7 +386,33 @@ private Expr ConditionalExpr(Expr e) throws PLCCompilerException {
 		}
 		return new ExpandedPixelExpr(firstToken, eR, eG, eB);
 	}
+	//TODO: functions below this comment are unfinished
+	/*private Dimension Dimension() throws PLCCompilerException {
+		IToken firstToken = t;
+		t = lexer.next();
+		Expr eX = expr();
+		Expr eY;
+		if (t.kind() == COMMA) {
+			t = lexer.next();
+			eY = expr();
+		} else {
+			throw new SyntaxException("Expected ',' token at " + t.sourceLocation()); // replace with more specific error
+		}
+		if (t.kind() != RSQUARE) {
+			throw new SyntaxException("Expected ']' token at " + t.sourceLocation()); // replace with specific error
+		} else {
+			t = lexer.next();
+		}
+		return new Dimension(firstToken, eX, eY);
+	}
+	private Expr Statement() throws PLCCompilerException {
+		return expr();
+	}
+	private Expr GuardedBlock() throws PLCCompilerException {
+		return expr();
+	}
+	private Expr BlockStatement() throws PLCCompilerException {
+		return expr();
+	}*/
 }
-
-
 
