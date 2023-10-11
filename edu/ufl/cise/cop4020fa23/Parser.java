@@ -28,6 +28,7 @@ public class Parser implements IParser {
 	public Parser(ILexer lexer) throws LexicalException {
 		super();
 		this.lexer = lexer;
+		t = lexer.next();
 	}
 
 
@@ -56,8 +57,9 @@ public class Parser implements IParser {
 		t = lexer.next();
 		List<NameDef> params = ParamList();
 		if(t.kind() != RPAREN){
-			throw new SyntaxException(t.sourceLocation(), "Unmatched parentheses");
+			throw new SyntaxException(t.sourceLocation(), "Expected 'RPAREN' at " + t.sourceLocation());
 		}
+		t = lexer.next();
 		Block block = Block();
 		e = new Program(firstToken, type, name, params, block);
 		return e;
@@ -70,18 +72,23 @@ public class Parser implements IParser {
 		}
 		List<Block.BlockElem> elems = new ArrayList<>();
 		AST newElem = null;
-        do {
+		t = lexer.next();
+        while(t.kind() == IDENT || t.kind() == RES_image || t.kind() == RES_pixel || t.kind() ==  RES_int || t.kind() ==  RES_string || t.kind() ==  RES_void || t.kind() ==  RES_boolean) {
 			switch (t.kind()) {
 				case IDENT -> {
 					newElem = Statement();
+					elems.add((Block.BlockElem) newElem);
 				} case RES_image, RES_pixel, RES_int, RES_string, RES_void, RES_boolean -> {
 					newElem = Declaration();
-				} default -> {
-					continue;
+					elems.add((Block.BlockElem) newElem);
+				}
+				case SEMI -> {
+					t = lexer.next();
+				}
+				default -> {
 				}
 			}
-			elems.add((Block.BlockElem) newElem);
-        } while (t.kind() == SEMI);
+        }
 		if(t.kind() != BLOCK_CLOSE){
 			throw new SyntaxException(t.sourceLocation(), "Unmatched block tokens");
 		}
@@ -90,30 +97,58 @@ public class Parser implements IParser {
 
 	private List<NameDef> ParamList() throws PLCCompilerException {
 		//image | pixel | int | string | void | boolean
-		List<AST> list = new ArrayList<>();
+		List<NameDef> list = new ArrayList<>();
 		if(t.kind() == RES_image || t.kind() == RES_pixel || t.kind() == RES_int || t.kind() == RES_string || t.kind() == RES_void || t.kind() == RES_boolean){
 			list.add(NameDef());
-			if(t.kind() == COMMA){
+			while (t.kind() == COMMA){
 				t = lexer.next();
-			} else {
-				throw new SyntaxException(t.sourceLocation(), "Expected ',' token at " + t.sourceLocation());
+				list.add(NameDef());
 			}
-		} else {
-			return null;
-		}
-		throw new UnsupportedOperationException();
-	}
+        }
+        return list;
+    }
 
-	private AST NameDef() throws PLCCompilerException {
-		throw new UnsupportedOperationException();
+	private NameDef NameDef() throws PLCCompilerException {
+		IToken firstToken = t;
+		IToken type;
+		Dimension dim = null;
+		if(t.kind() == IDENT){
+			type = t;
+			t = lexer.next();
+		} else {
+			type = Type();
+		}
+		if(t.kind() == LSQUARE) {
+			dim = Dimension();
+		}
+		if(t.kind() != IDENT){
+			throw new SyntaxException(t.sourceLocation(), "Expected 'IDENT' token at " +t.sourceLocation());
+		}
+		IToken ident = t;
+		t = lexer.next();
+		return new NameDef(firstToken, type, dim, ident);
 	}
 
 	private IToken Type() throws PLCCompilerException {
-		throw new UnsupportedOperationException();
+		IToken type = null;
+		if(t.kind() == RES_image || t.kind() == RES_pixel || t.kind() == RES_int || t.kind() ==  RES_string || t.kind() ==  RES_void || t.kind() == RES_boolean) {
+			type = t;
+			t = lexer.next();
+			return type;
+		}
+		throw new SyntaxException(t.sourceLocation(), "Unexpected token encountered: " + t.kind());
 	}
 
-	private Expr Declaration() throws PLCCompilerException {
-		throw new UnsupportedOperationException();
+	private AST Declaration() throws PLCCompilerException {
+		IToken firstToken = t;
+		NameDef e1 = NameDef();
+		Expr e2 = null;
+		if(t.kind() == ASSIGN){
+			t = lexer.next();
+			e2 = expr();
+		}
+		t = lexer.next();
+		return new Declaration(firstToken, e1, e2);
 	}
 	//TODO: functions above this comment are unfinished
 	// TODO: see if the passing of argument (Expr e) is even needed. I don't think it's actually necessary
@@ -294,12 +329,8 @@ public class Parser implements IParser {
 					t = lexer.next();
 				}
 			}
-			case LSQUARE -> {
-				e = ExpandedPixelSelector();
-			}
-			default -> {
-				throw new SyntaxException("Unexpected token encountered: " + t.kind());
-			}
+			case LSQUARE -> e = ExpandedPixelSelector();
+			default -> throw new SyntaxException("Unexpected token encountered: " + t.kind());
 		}
 		return e;
 	}
@@ -322,17 +353,15 @@ public class Parser implements IParser {
 		t = lexer.next();
 		Expr eX = expr();
 		Expr eY;
-		if (t.kind() == COMMA) {
-			t = lexer.next();
-			eY = expr();
-		} else {
+		if (t.kind() != COMMA) {
 			throw new SyntaxException("Expected ',' token at " + t.sourceLocation()); // replace with more specific error
 		}
+		t = lexer.next();
+		eY = expr();
 		if (t.kind() != RSQUARE) {
 			throw new SyntaxException("Expected ']' token at " + t.sourceLocation()); // replace with specific error
-		} else {
-			t = lexer.next();
 		}
+			t = lexer.next();
 		return new PixelSelector(firstToken, eX, eY);
 	}
 
@@ -343,18 +372,16 @@ public class Parser implements IParser {
 		Expr eR = expr();
 		Expr eG;
 		Expr eB;
-		if (t.kind() == COMMA) {
-			t = lexer.next();
-			eG = expr();
-		} else {
+		if (t.kind() != COMMA) {
 			throw new SyntaxException(t.sourceLocation(), "Expected ',' token after the red component expression.");
 		}
-		if (t.kind() == COMMA) {
-			t = lexer.next();
-			eB = expr();
-		} else {
+		t = lexer.next();
+		eG = expr();
+		if (t.kind() != COMMA) {
 			throw new SyntaxException(t.sourceLocation(), "Expected ',' token after the green component expression.");
 		}
+		t = lexer.next();
+		eB = expr();
 		t = lexer.next();
 		if (t.kind() != RSQUARE) {
 			throw new SyntaxException(t.sourceLocation(), "Expected ']' token to close the pixel selector expression.");
@@ -368,27 +395,98 @@ public class Parser implements IParser {
 		t = lexer.next();
 		Expr eX = expr();
 		Expr eY;
-		if (t.kind() == COMMA) {
-			t = lexer.next();
-			eY = expr();
-		} else {
-			throw new SyntaxException("Expected ',' token at " + t.sourceLocation()); // replace with more specific error
+		if (t.kind() != COMMA) {
+			throw new SyntaxException("Expected ',' token at " + t.sourceLocation());
 		}
+		t = lexer.next();
+		eY = expr();
 		if (t.kind() != RSQUARE) {
 			throw new SyntaxException("Expected ']' token at " + t.sourceLocation()); // replace with specific error
-		} else {
-			t = lexer.next();
 		}
+		t = lexer.next();
 		return new Dimension(firstToken, eX, eY);
 	}
+	private LValue LValue() throws PLCCompilerException {
+		if(t.kind() != IDENT){
+			throw new SyntaxException("Expected 'IDENT' token at " + t.sourceLocation());
+		}
+		IToken firstToken = t;
+		t = lexer.next();
+		PixelSelector pix = null;
+		ChannelSelector chan = null;
+		if(t.kind() == LSQUARE){
+			pix = PixelSelector();
+		}
+		if(t.kind() == COLON){
+			chan = ChannelSelector();
+		}
+		return new LValue(firstToken, firstToken, pix, chan);
+	}
 	private AST Statement() throws PLCCompilerException {
-		throw new UnsupportedOperationException();
+		IToken firstToken = t;
+		switch (t.kind()) {
+			case IDENT -> {
+				LValue e = LValue();
+				return new AssignmentStatement(firstToken, e, expr());
+			}
+			case RES_write -> {
+				t = lexer.next();
+				return new WriteStatement(firstToken, expr());
+			}
+			case RES_do -> {
+				t = lexer.next();
+				List<GuardedBlock> list = new ArrayList<>();
+				list.add(GuardedBlock());
+				if(t.kind() != RSQUARE){
+					throw new SyntaxException("Expected 'RSQUARE' token at " + t.sourceLocation());
+				}
+				t = lexer.next();
+				if(t.kind() != LSQUARE){
+					throw new SyntaxException("Expected 'LSQUARE' token at " + t.sourceLocation());
+				}
+				t = lexer.next();
+				while(t.kind() != RES_od){
+					list.add(GuardedBlock());
+				}
+				//TODO: could need an error to throw if od is never detected, not sure
+				return new DoStatement(firstToken, list);
+			}
+			case RES_if -> {
+				t = lexer.next();
+				List<GuardedBlock> list = new ArrayList<>();
+				list.add(GuardedBlock());
+				if(t.kind() != RSQUARE){
+					throw new SyntaxException("Expected 'RSQUARE' token at " + t.sourceLocation());
+				}
+				t = lexer.next();
+				if(t.kind() != LSQUARE){
+					throw new SyntaxException("Expected 'LSQUARE' token at " + t.sourceLocation());
+				}
+				t = lexer.next();
+				while(t.kind() != RES_fi){
+					list.add(GuardedBlock());
+				}
+				//TODO: could need an error to throw if od is never detected, not sure
+				return new IfStatement(firstToken, list);
+			}
+			case RETURN -> {
+				t = lexer.next();
+				return new ReturnStatement(firstToken, expr());
+			}
+			case BLOCK_OPEN -> {
+				return new StatementBlock(firstToken, Block());
+			}
+			default -> throw new SyntaxException("Unexpected token encountered: " + t.kind());
+		}
 	}
-	private Expr GuardedBlock() throws PLCCompilerException {
-		throw new UnsupportedOperationException();
+	private GuardedBlock GuardedBlock() throws PLCCompilerException {
+		IToken firstToken = t;
+		Expr e = expr();
+		if(t.kind() != RARROW){
+			throw new SyntaxException("Expected 'RARROW' token at " + t.sourceLocation());
+		}
+		t = lexer.next();
+		Block block = Block();
+		return new GuardedBlock(firstToken, e, block);
 	}
-	private Expr BlockStatement() throws PLCCompilerException {
-		throw new UnsupportedOperationException();
-	}
-
 }
