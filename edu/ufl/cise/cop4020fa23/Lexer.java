@@ -147,7 +147,7 @@ public class Lexer implements ILexer {
 				{
 					ch = input.charAt(pos);
 				} else {
-					System.out.println("meow");
+					
 					break outer;
 				}
 
