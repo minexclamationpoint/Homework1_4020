@@ -8,6 +8,7 @@
 * This code may not be posted on a public web site either during or after the course.  
 */
 package edu.ufl.cise.cop4020fa23;
+package edu.ufl.cise
 
 import static edu.ufl.cise.cop4020fa23.Kind.EOF;
 
@@ -16,6 +17,8 @@ import edu.ufl.cise.cop4020fa23.exceptions.LexicalException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+// Look I know this code looks god awful but it fucking works ok it fucking works every test case works so 
 
 public class Lexer implements ILexer {
 	String input;
@@ -125,18 +128,28 @@ public class Lexer implements ILexer {
 		// since kinds for commments and white lines are not changed
 		// EOF is the default value
 		Kind kind = EOF;
+		int meow = 0;
 
 		try {
 
 			outer:
-			while (pos <= input.length()) {
+			while (pos <= input.length() + 1) {
 				// character at current position\
 
 				counter++;
-	//			System.out.println("Meow" + counter);
+				if (st == State.IN_STRINGLIT && pos == input.length()) {
+					// need in case the string lit doesnt end
+					throw new LexicalException(new SourceLocation(line, column), "Unterminated string literal");
+				}
+
+
 				if (pos < input.length())
+				{
 					ch = input.charAt(pos);
-			
+				} else {
+					System.out.println("meow");
+					break outer;
+				}
 
 				// here the switch statement should default go to start
 				/*
@@ -152,6 +165,7 @@ public class Lexer implements ILexer {
 				switch (st) {
 					case START -> {
 						sb.append(ch);
+						
 
 						if (Character.isLetter(ch) || ch == '_') {
 							st = State.IN_IDENT;
@@ -169,6 +183,7 @@ public class Lexer implements ILexer {
 							kind = kind.NUM_LIT;
 						} else if (ch == '\"') { // java thing
 							st = State.IN_STRINGLIT;
+							
 						} else if (ch == '#') {
 							// check if the next character is a #
 							pos++;
@@ -187,10 +202,12 @@ public class Lexer implements ILexer {
 										"Invalid comment start needs another '#' following the first '#'");
 
 							}
+							
 								
 							break;
 							
 						} else if (",;?():<>=!&|+-*/%^[]".indexOf(ch) != -1) {
+							kind = mapper(sb.toString());
 							st = State.IN_OPERATOR;
 						} else if (ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t') {
 							// going to handle white spaces here so it breaks early
@@ -227,7 +244,7 @@ public class Lexer implements ILexer {
 						realCol = column;
 
 						// handle edge cases
-
+						
 						// no second comment
 
 
@@ -239,7 +256,10 @@ public class Lexer implements ILexer {
 						
 					}
 					case IN_IDENT -> {
+
 						sb.append(ch);
+							
+						
 						String sbStr = sb.toString();
 
 						// handles reserved, constant, and Bool
@@ -252,10 +272,14 @@ public class Lexer implements ILexer {
 							st = State.START;
 							break outer;
 
-						} else if (Character.isLetter(ch) || ch == '_' || Character.isDigit(ch)) {
+						} else if (input.length() != 1 && (Character.isLetter(ch) || ch == '_' || Character.isDigit(ch))) {
 							// yep its an identifiyer time to check the next pos
 							pos++;
 							column++;
+							if (sb.length() > input.length())
+							{
+								sb.deleteCharAt(sb.length() - 1);
+							}
 						} else {
 							kind = Kind.IDENT;
 							if (sb.length() >= 1)
@@ -268,7 +292,7 @@ public class Lexer implements ILexer {
 							// current character is not an identifiyer
 
 							// ohhh this makes the
-
+							
 
 							break outer;
 						}
@@ -350,7 +374,7 @@ public class Lexer implements ILexer {
 								column = 0;
 							}
 							
-						} else if (st == State.IN_STRINGLIT && pos > input.length()) {
+						} else if (st == State.IN_STRINGLIT && pos == input.length()) {
 							// need in case the string lit doesnt end
 							throw new LexicalException(new SourceLocation(line, column), "Unterminated string literal");
 						} else {
@@ -485,9 +509,11 @@ public class Lexer implements ILexer {
 					}
 				}
 
-				
+				System.out.println("hello");
 
 			}
+
+			System.out.println("hello");
 		}
 
 		// and return the token
