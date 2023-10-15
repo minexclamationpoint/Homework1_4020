@@ -164,7 +164,7 @@ public class Parser implements IParser {
 			t = lexer.next();
 			e2 = expr();
 		}
-		t = lexer.next();
+		// t = lexer.next(); fixes test case 1
 		return new Declaration(firstToken, e1, e2);
 	}
 	//TODO: functions above this comment are unfinished
