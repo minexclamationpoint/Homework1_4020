@@ -64,35 +64,52 @@ public class Parser implements IParser {
 		e = new Program(firstToken, type, name, params, block);
 		return e;
 	}
+	// helpers
+	private boolean isStartOfDeclaration(Kind kind) {
+		return kind == RES_image || kind == RES_pixel || kind == RES_int || 
+			   kind == RES_string || kind == RES_void || kind == RES_boolean;
+	}
+
+	private boolean isStartOfStatement(Kind kind) {
+		return kind == IDENT || kind == RES_write || kind == RES_do || 
+			   kind == RES_if || kind == BLOCK_OPEN;
+	}
+	
+	
 
 	private Block Block() throws PLCCompilerException {
 		IToken firstToken = t;
-		if(t.kind() != BLOCK_OPEN){
+		if (t.kind() != BLOCK_OPEN) {
 			throw new SyntaxException(t.sourceLocation(), "Expected 'BLOCK_OPEN' at " + t.sourceLocation());
 		}
 		List<Block.BlockElem> elems = new ArrayList<>();
 		AST newElem = null;
 		t = lexer.next();
-        while(t.kind() == IDENT || t.kind() == RES_image || t.kind() == RES_pixel || t.kind() ==  RES_int || t.kind() ==  RES_string || t.kind() ==  RES_void || t.kind() ==  RES_boolean) {
-			switch (t.kind()) {
-				case IDENT -> {
-					newElem = Statement();
-					elems.add((Block.BlockElem) newElem);
-				} case RES_image, RES_pixel, RES_int, RES_string, RES_void, RES_boolean -> {
-					newElem = Declaration();
-					elems.add((Block.BlockElem) newElem);
-				}
-				case SEMI -> {
-					t = lexer.next();
-				}
-				default -> {
-				}
+		while (t.kind() != BLOCK_CLOSE) {
+			if (isStartOfDeclaration(t.kind())) {
+				newElem = Declaration();
+				elems.add((Block.BlockElem) newElem);
+			} else if (isStartOfStatement(t.kind())) {
+				newElem = Statement();
+				
+				elems.add((Block.BlockElem) newElem);
+				
+			
+			} else {
+				throw new SyntaxException(t.sourceLocation(), "Unexpected token in block: " + t.kind());
 			}
-        }
-		if(t.kind() != BLOCK_CLOSE){
+			if (t.kind() != SEMI) {
+				throw new SyntaxException(t.sourceLocation(), "Expected semicolon after Declaration or Statement");
+			}
+			t = lexer.next();  // Move past the SEMI token
+			
+			
+		}
+		if (t.kind() != BLOCK_CLOSE) {
 			throw new SyntaxException(t.sourceLocation(), "Unmatched block tokens");
 		}
-        return new Block(firstToken, elems);
+		t = lexer.next();  // Move past the BLOCK_CLOSE token
+		return new Block(firstToken, elems);
 	}
 
 	private List<NameDef> ParamList() throws PLCCompilerException {
@@ -368,6 +385,7 @@ public class Parser implements IParser {
 	// may have unnecessary lexer.next() calls
 	private Expr ExpandedPixelSelector() throws PLCCompilerException {
 		IToken firstToken = t;
+		
 		t = lexer.next();
 		Expr eR = expr();
 		Expr eG;
@@ -382,10 +400,11 @@ public class Parser implements IParser {
 		}
 		t = lexer.next();
 		eB = expr();
-		t = lexer.next();
+		
 		if (t.kind() != RSQUARE) {
-			throw new SyntaxException(t.sourceLocation(), "Expected ']' token to close the pixel selector expression.");
+			throw new SyntaxException(t.sourceLocation(), "asdasdasdas Expected ']' mewo meow mewo mewo meow token to close the pixel selector expression.");
 		}
+		t = lexer.next();
 		return new ExpandedPixelExpr(firstToken, eR, eG, eB);
 	}
 	//TODO: functions below this comment are unfinished
@@ -427,7 +446,9 @@ public class Parser implements IParser {
 		switch (t.kind()) {
 			case IDENT -> {
 				LValue e = LValue();
-				return new AssignmentStatement(firstToken, e, expr());
+				AST statement = new AssignmentStatement(firstToken, e, expr());
+				
+				return statement;
 			}
 			case RES_write -> {
 				t = lexer.next();
@@ -448,6 +469,7 @@ public class Parser implements IParser {
 				while(t.kind() != RES_od){
 					list.add(GuardedBlock());
 				}
+				t = lexer.next(); // hmmm
 				//TODO: could need an error to throw if od is never detected, not sure
 				return new DoStatement(firstToken, list);
 			}
@@ -466,6 +488,7 @@ public class Parser implements IParser {
 				while(t.kind() != RES_fi){
 					list.add(GuardedBlock());
 				}
+				t = lexer.next(); /// hmmmm
 				//TODO: could need an error to throw if od is never detected, not sure
 				return new IfStatement(firstToken, list);
 			}

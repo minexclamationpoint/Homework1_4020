@@ -320,6 +320,7 @@ public class ExpressionParser implements IParser {
 			}
 			case LSQUARE -> {
 				e = ExpandedPixelSelector();
+				t = lexer.next();
 			}
 			default -> {
 				throw new SyntaxException("Unexpected token encountered: " + t.kind());
@@ -380,7 +381,7 @@ public class ExpressionParser implements IParser {
 		} else {
 			throw new SyntaxException(t.sourceLocation(), "Expected ',' token after the green component expression.");
 		}
-		t = lexer.next();
+		// t = lexer.next();
 		if (t.kind() != RSQUARE) {
 			throw new SyntaxException(t.sourceLocation(), "Expected ']' token to close the pixel selector expression.");
 		}
