@@ -128,8 +128,6 @@ public class Lexer implements ILexer {
 		// since kinds for commments and white lines are not changed
 		// EOF is the default value
 		Kind kind = EOF;
-		int meow = 0;
-
 		try {
 
 			outer:
@@ -147,7 +145,6 @@ public class Lexer implements ILexer {
 				{
 					ch = input.charAt(pos);
 				} else {
-					System.out.println("meow");
 					break outer;
 				}
 
@@ -509,11 +506,7 @@ public class Lexer implements ILexer {
 					}
 				}
 
-				System.out.println("hello");
-
 			}
-
-			System.out.println("hello");
 		}
 
 		// and return the token
