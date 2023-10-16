@@ -99,7 +99,7 @@ public class Parser implements IParser {
 				throw new SyntaxException(t.sourceLocation(), "Unexpected token in block: " + t.kind());
 			}
 			if (t.kind() != SEMI) {
-				throw new SyntaxException(t.sourceLocation(), "Expected semicolon after Declaration or Statement");
+				throw new SyntaxException(t.sourceLocation(), "Expected semicolon after Declaration or Statement" + t.kind());
 			}
 			t = lexer.next();  // Move past the SEMI token
 			
@@ -359,10 +359,12 @@ public class Parser implements IParser {
 		if (color.kind() == RES_blue || color.kind() == RES_green || color.kind() == RES_red) {
 			newSelector = new ChannelSelector(firstToken, color); //ChannelSelector extends AST, not Expr. Idk if this is a mistake or not?
 			t = color;
+			t = lexer.next();
 			return newSelector;
 		} else {
 			throw new SyntaxException(color.sourceLocation(), "Expected a color channel token (RES_blue, RES_green, or RES_red)"); // replace with more specific error
 		}
+		
 	}
 
 	private PixelSelector PixelSelector() throws PLCCompilerException {
@@ -426,28 +428,41 @@ public class Parser implements IParser {
 		return new Dimension(firstToken, eX, eY);
 	}
 	private LValue LValue() throws PLCCompilerException {
-		if(t.kind() != IDENT){
+		if(t.kind() != IDENT) {
 			throw new SyntaxException("Expected 'IDENT' token at " + t.sourceLocation());
 		}
 		IToken firstToken = t;
 		t = lexer.next();
 		PixelSelector pix = null;
 		ChannelSelector chan = null;
-		if(t.kind() == LSQUARE){
+	
+		// Check for PixelSelector
+		if (t.kind() == LSQUARE) {
 			pix = PixelSelector();
 		}
-		if(t.kind() == COLON){
+		// t = lexer.next(); this cant be there
+		
+		// Check for ChannelSelector
+		if (t.kind() == COLON) {
 			chan = ChannelSelector();
 		}
+		
+		
 		return new LValue(firstToken, firstToken, pix, chan);
 	}
+	
 	private AST Statement() throws PLCCompilerException {
 		IToken firstToken = t;
 		switch (t.kind()) {
 			case IDENT -> {
 				LValue e = LValue();
+				// t = lexer.next();
+				if(t.kind() != ASSIGN){
+					throw new SyntaxException("Expected 'ASSIGN' token at " + t.sourceLocation() + t.kind());
+				}
+				t = lexer.next();
 				AST statement = new AssignmentStatement(firstToken, e, expr());
-				
+				// t = lexer.next();
 				return statement;
 			}
 			case RES_write -> {
