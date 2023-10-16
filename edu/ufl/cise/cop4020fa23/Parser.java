@@ -72,7 +72,7 @@ public class Parser implements IParser {
 
 	private boolean isStartOfStatement(Kind kind) {
 		return kind == IDENT || kind == RES_write || kind == RES_do || 
-			   kind == RES_if || kind == BLOCK_OPEN;
+			   kind == RES_if  || kind == BLOCK_OPEN || kind == RETURN;
 	}
 	
 	
@@ -473,13 +473,10 @@ public class Parser implements IParser {
 				t = lexer.next();
 				List<GuardedBlock> list = new ArrayList<>();
 				list.add(GuardedBlock());
-				if(t.kind() != RSQUARE){
-					throw new SyntaxException("Expected 'RSQUARE' token at " + t.sourceLocation());
+				if(t.kind() != BOX){
+					throw new SyntaxException("Expected 'RSQUARE' token at "+ t.kind() + t.sourceLocation());
 				}
-				t = lexer.next();
-				if(t.kind() != LSQUARE){
-					throw new SyntaxException("Expected 'LSQUARE' token at " + t.sourceLocation());
-				}
+				
 				t = lexer.next();
 				while(t.kind() != RES_od){
 					list.add(GuardedBlock());
@@ -492,12 +489,8 @@ public class Parser implements IParser {
 				t = lexer.next();
 				List<GuardedBlock> list = new ArrayList<>();
 				list.add(GuardedBlock());
-				if(t.kind() != RSQUARE){
-					throw new SyntaxException("Expected 'RSQUARE' token at " + t.sourceLocation());
-				}
-				t = lexer.next();
-				if(t.kind() != LSQUARE){
-					throw new SyntaxException("Expected 'LSQUARE' token at " + t.sourceLocation());
+				if(t.kind() != BOX){
+					throw new SyntaxException("Expected 'RSQUARE' token at "+ t.kind() + t.sourceLocation());
 				}
 				t = lexer.next();
 				while(t.kind() != RES_fi){
