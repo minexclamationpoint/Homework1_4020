@@ -34,7 +34,14 @@ public class Parser implements IParser {
 
 	@Override
 	public AST parse() throws PLCCompilerException {
-        return program();
+		if(t.kind() == EOF){
+			throw new SyntaxException(t.sourceLocation(), "NO expression to parse ");
+		}
+		AST e = program();
+		if(t.kind() != EOF){
+			throw new SyntaxException(t.sourceLocation(), "Trailing code found");
+		}
+        return e;
 	}
 
 	// TODO: create a copy of this file and rename that copy to Parser.java
