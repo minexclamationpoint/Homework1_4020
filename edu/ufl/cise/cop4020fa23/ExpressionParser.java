@@ -136,7 +136,7 @@ public class ExpressionParser implements IParser {
 	}*/
 	//TODO: functions above this card are unfinished
 	private Expr expr() throws PLCCompilerException {
-		// helper function for recursion with expr(), only called within the ExpressionParser() class
+		// Starter statement, called outside of
 		Expr e = null;
 		switch (t.kind()) {
 			case QUESTION -> {
@@ -228,7 +228,6 @@ public class ExpressionParser implements IParser {
 		while (t.kind() == PLUS || t.kind() == MINUS) {
 			IToken op = t;
 			t = lexer.next();
-			//check against the valid starts to a multiplicative expr
 			e2 = MultiplicativeExpr();
 			e1 = new BinaryExpr(firstToken, e1, op, e2);
 		}
@@ -329,7 +328,7 @@ public class ExpressionParser implements IParser {
 			t = lexer.next();
 			return newSelector;
 		} else {
-			throw new SyntaxException(t.sourceLocation(), "Expected a color channel token (RES_blue, RES_green, or RES_red)"); // replace with more specific error
+			throw new SyntaxException(t.sourceLocation(), "Expected a color channel token (RES_blue, RES_green, or RES_red)");
 		}
 	}
 

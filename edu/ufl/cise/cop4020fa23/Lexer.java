@@ -131,7 +131,7 @@ public class Lexer implements ILexer {
 		try {
 
 			outer:
-			while (pos <= input.length() + 1) {
+			while (pos <= input.length()) {
 				// character at current position\
 
 				counter++;
@@ -145,6 +145,7 @@ public class Lexer implements ILexer {
 				{
 					ch = input.charAt(pos);
 				} else {
+
 					break outer;
 				}
 

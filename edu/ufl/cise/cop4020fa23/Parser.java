@@ -35,12 +35,11 @@ public class Parser implements IParser {
 	@Override
 	public AST parse() throws PLCCompilerException {
 		if(t.kind() == EOF){
-			throw new SyntaxException(t.sourceLocation(), "no expression to parse");
+			throw new SyntaxException(t.sourceLocation(), "NO expression to parse ");
 		}
 		AST e = program();
 		if(t.kind() != EOF){
-			System.out.println(t.kind());
-			throw new SyntaxException(t.sourceLocation(), "ERROR: trailing tokens after the first program");
+			throw new SyntaxException(t.sourceLocation(), "Trailing code found");
 		}
         return e;
 	}
@@ -259,7 +258,6 @@ public class Parser implements IParser {
 		while (t.kind() == PLUS || t.kind() == MINUS) {
 			IToken op = t;
 			t = lexer.next();
-			//check against the valid starts to a multiplicative expr
 			e2 = MultiplicativeExpr();
 			e1 = new BinaryExpr(firstToken, e1, op, e2);
 		}
@@ -353,7 +351,6 @@ public class Parser implements IParser {
 	private ChannelSelector ChannelSelector() throws PLCCompilerException { // oh the non-ll(1) of it all
 		IToken firstToken = t;
 		t = lexer.next();
-		// I really don't know what to do to "fix" the grammar so it isn't ll(1). this should work though
 		ChannelSelector newSelector = null;
 		if (t.kind() == RES_blue || t.kind() == RES_green || t.kind() == RES_red) {
 			newSelector = new ChannelSelector(firstToken, t); //ChannelSelector extends AST, not Expr. Idk if this is a mistake or not?
@@ -463,7 +460,7 @@ public class Parser implements IParser {
 				while(t.kind() != RES_od){
 					list.add(GuardedBlock());
 				}
-				t = lexer.next(); // hmmm
+				t = lexer.next();
 				return new DoStatement(firstToken, list);
 			}
 			case RES_if -> {
@@ -477,7 +474,7 @@ public class Parser implements IParser {
 				while(t.kind() != RES_fi){
 					list.add(GuardedBlock());
 				}
-				t = lexer.next(); /// hmmmm
+				t = lexer.next();
 				return new IfStatement(firstToken, list);
 			}
 			case RETURN -> {
