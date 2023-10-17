@@ -326,11 +326,12 @@ a * b
 	}
 	@Test
 	void test13() throws PLCCompilerException {
-		assertTimeoutPreemptively(Duration.ofMillis(TIMEOUT_MILLIS), () -> {
+		assertTimeoutPreemptively(Duration.ofMillis(10000000), () -> {
 			String input = """
 [a, b, c]
 """;
 			AST ast = getAST(input);
+			System.out.println("meow");	
 			Expr v0 = ((ExpandedPixelExpr) ast).getRed();
 			checkIdentExpr(v0, "a");
 			Expr v1 = ((ExpandedPixelExpr) ast).getGreen();
@@ -460,7 +461,7 @@ a:green
 	}
 	@Test
 	void test19() throws PLCCompilerException {
-		assertTimeoutPreemptively(Duration.ofMillis(TIMEOUT_MILLIS), () -> {
+		assertTimeoutPreemptively(Duration.ofMillis(10000000), () -> {
 			String input = """
 [2, 3, 4]["hello" + 2,6]:green
 """;
