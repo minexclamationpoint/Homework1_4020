@@ -34,12 +34,17 @@ public class Parser implements IParser {
 
 	@Override
 	public AST parse() throws PLCCompilerException {
-        return program();
+		if(t.kind() == EOF){
+			throw new SyntaxException(t.sourceLocation(), "no expression to parse");
+		}
+		AST e = program();
+		if(t.kind() != EOF){
+			System.out.println(t.kind());
+			throw new SyntaxException(t.sourceLocation(), "ERROR: trailing tokens after the first program");
+		}
+        return e;
 	}
 
-	// TODO: create a copy of this file and rename that copy to Parser.java
-	// TODO: import modified version of componentfactory, new AST class, Parser.java and ParserTest_starter.java
-	// TODO: complete grammar
 	private AST program() throws PLCCompilerException {
 		IToken firstToken = t;
 		AST e = null;
@@ -64,6 +69,18 @@ public class Parser implements IParser {
 		e = new Program(firstToken, type, name, params, block);
 		return e;
 	}
+	// helpers
+	private boolean isStartOfDeclaration(Kind kind) {
+		return kind == RES_image || kind == RES_pixel || kind == RES_int ||
+			   kind == RES_string || kind == RES_void || kind == RES_boolean;
+	}
+
+	private boolean isStartOfStatement(Kind kind) {
+		return kind == IDENT || kind == RES_write || kind == RES_do ||
+			   kind == RES_if || kind == BLOCK_OPEN || kind == RETURN;
+	}
+
+
 
 	private Block Block() throws PLCCompilerException {
 		IToken firstToken = t;
@@ -73,26 +90,26 @@ public class Parser implements IParser {
 		List<Block.BlockElem> elems = new ArrayList<>();
 		AST newElem = null;
 		t = lexer.next();
-        while(t.kind() == IDENT || t.kind() == RES_image || t.kind() == RES_pixel || t.kind() ==  RES_int || t.kind() ==  RES_string || t.kind() ==  RES_void || t.kind() ==  RES_boolean) {
-			switch (t.kind()) {
-				case IDENT -> {
-					newElem = Statement();
-					elems.add((Block.BlockElem) newElem);
-				} case RES_image, RES_pixel, RES_int, RES_string, RES_void, RES_boolean -> {
-					newElem = Declaration();
-					elems.add((Block.BlockElem) newElem);
-				}
-				case SEMI -> {
-					t = lexer.next();
-				}
-				default -> {
-				}
+		while (t.kind() != BLOCK_CLOSE) {
+			if (isStartOfDeclaration(t.kind())) {
+				newElem = Declaration();
+				elems.add((Block.BlockElem) newElem);
+			} else if (isStartOfStatement(t.kind())) {
+				newElem = Statement();
+				elems.add((Block.BlockElem) newElem);
+			} else {
+				throw new SyntaxException(t.sourceLocation(), "Unexpected token in block: " + t.kind());
 			}
-        }
-		if(t.kind() != BLOCK_CLOSE){
+			if (t.kind() != SEMI) {
+				throw new SyntaxException(t.sourceLocation(), "Expected semicolon after Declaration or Statement" + t.kind());
+			}
+			t = lexer.next();  // Move past the SEMI token
+		}
+		if (t.kind() != BLOCK_CLOSE) {
 			throw new SyntaxException(t.sourceLocation(), "Unmatched block tokens");
 		}
-        return new Block(firstToken, elems);
+		t = lexer.next();  // Move past the BLOCK_CLOSE token
+		return new Block(firstToken, elems);
 	}
 
 	private List<NameDef> ParamList() throws PLCCompilerException {
@@ -147,11 +164,8 @@ public class Parser implements IParser {
 			t = lexer.next();
 			e2 = expr();
 		}
-		t = lexer.next();
 		return new Declaration(firstToken, e1, e2);
 	}
-	//TODO: functions above this comment are unfinished
-	// TODO: see if the passing of argument (Expr e) is even needed. I don't think it's actually necessary
 
 	private Expr expr() throws PLCCompilerException {
 		// helper function for recursion with expr(), only called within the ExpressionParser() class
@@ -171,13 +185,13 @@ public class Parser implements IParser {
 		if (t.kind() == RARROW) {
 			t = lexer.next();
 		} else {
-			throw new SyntaxException("Expected '->' token at " + t.sourceLocation()); // replace with specific error
+			throw new SyntaxException("Expected '->' token at " + t.sourceLocation());
 		}
 		Expr e2 = expr();
 		if (t.kind() == COMMA) {
 			t = lexer.next();
 		} else {
-			throw new SyntaxException("Expected ',' token at " + t.sourceLocation()); // replace with more specific error
+			throw new SyntaxException("Expected ',' token at " + t.sourceLocation());
 		}
 		Expr e3 = expr();
 		return new ConditionalExpr(firstToken, e1, e2, e3);
@@ -245,6 +259,7 @@ public class Parser implements IParser {
 		while (t.kind() == PLUS || t.kind() == MINUS) {
 			IToken op = t;
 			t = lexer.next();
+			//check against the valid starts to a multiplicative expr
 			e2 = MultiplicativeExpr();
 			e1 = new BinaryExpr(firstToken, e1, op, e2);
 		}
@@ -337,14 +352,15 @@ public class Parser implements IParser {
 
 	private ChannelSelector ChannelSelector() throws PLCCompilerException { // oh the non-ll(1) of it all
 		IToken firstToken = t;
-		IToken color = lexer.next(); // I really don't know what to do to "fix" the grammar so it isn't ll(1). this should work though
+		t = lexer.next();
+		// I really don't know what to do to "fix" the grammar so it isn't ll(1). this should work though
 		ChannelSelector newSelector = null;
-		if (color.kind() == RES_blue || color.kind() == RES_green || color.kind() == RES_red) {
-			newSelector = new ChannelSelector(firstToken, color); //ChannelSelector extends AST, not Expr. Idk if this is a mistake or not?
-			t = color;
+		if (t.kind() == RES_blue || t.kind() == RES_green || t.kind() == RES_red) {
+			newSelector = new ChannelSelector(firstToken, t); //ChannelSelector extends AST, not Expr. Idk if this is a mistake or not?
+			t = lexer.next();
 			return newSelector;
 		} else {
-			throw new SyntaxException(color.sourceLocation(), "Expected a color channel token (RES_blue, RES_green, or RES_red)"); // replace with more specific error
+			throw new SyntaxException(t.sourceLocation(), "Expected a color channel token (RES_blue, RES_green, or RES_red)"); // replace with more specific error
 		}
 	}
 
@@ -361,7 +377,7 @@ public class Parser implements IParser {
 		if (t.kind() != RSQUARE) {
 			throw new SyntaxException("Expected ']' token at " + t.sourceLocation()); // replace with specific error
 		}
-			t = lexer.next();
+		t = lexer.next();
 		return new PixelSelector(firstToken, eX, eY);
 	}
 
@@ -382,13 +398,12 @@ public class Parser implements IParser {
 		}
 		t = lexer.next();
 		eB = expr();
-		t = lexer.next();
 		if (t.kind() != RSQUARE) {
 			throw new SyntaxException(t.sourceLocation(), "Expected ']' token to close the pixel selector expression.");
 		}
+		t = lexer.next();
 		return new ExpandedPixelExpr(firstToken, eR, eG, eB);
 	}
-	//TODO: functions below this comment are unfinished
 	private Dimension Dimension() throws PLCCompilerException {
 		// This is copied directly from PixelSelector's code, may not be exactly what is needed
 		IToken firstToken = t;
@@ -427,6 +442,10 @@ public class Parser implements IParser {
 		switch (t.kind()) {
 			case IDENT -> {
 				LValue e = LValue();
+				if(t.kind() != ASSIGN){
+					throw new SyntaxException("Expected 'ASSIGN' token at " + t.sourceLocation() + t.kind());
+				}
+				t = lexer.next();
 				return new AssignmentStatement(firstToken, e, expr());
 			}
 			case RES_write -> {
@@ -437,36 +456,28 @@ public class Parser implements IParser {
 				t = lexer.next();
 				List<GuardedBlock> list = new ArrayList<>();
 				list.add(GuardedBlock());
-				if(t.kind() != RSQUARE){
-					throw new SyntaxException("Expected 'RSQUARE' token at " + t.sourceLocation());
-				}
-				t = lexer.next();
-				if(t.kind() != LSQUARE){
-					throw new SyntaxException("Expected 'LSQUARE' token at " + t.sourceLocation());
+				if(t.kind() != BOX){
+					throw new SyntaxException("Error: expected 'BOX' token at "+ t.sourceLocation());
 				}
 				t = lexer.next();
 				while(t.kind() != RES_od){
 					list.add(GuardedBlock());
 				}
-				//TODO: could need an error to throw if od is never detected, not sure
+				t = lexer.next(); // hmmm
 				return new DoStatement(firstToken, list);
 			}
 			case RES_if -> {
 				t = lexer.next();
 				List<GuardedBlock> list = new ArrayList<>();
 				list.add(GuardedBlock());
-				if(t.kind() != RSQUARE){
-					throw new SyntaxException("Expected 'RSQUARE' token at " + t.sourceLocation());
-				}
-				t = lexer.next();
-				if(t.kind() != LSQUARE){
-					throw new SyntaxException("Expected 'LSQUARE' token at " + t.sourceLocation());
+				if(t.kind() != BOX){
+					throw new SyntaxException("Error: expected 'BOX' token at "+ t.sourceLocation());
 				}
 				t = lexer.next();
 				while(t.kind() != RES_fi){
 					list.add(GuardedBlock());
 				}
-				//TODO: could need an error to throw if od is never detected, not sure
+				t = lexer.next(); /// hmmmm
 				return new IfStatement(firstToken, list);
 			}
 			case RETURN -> {
