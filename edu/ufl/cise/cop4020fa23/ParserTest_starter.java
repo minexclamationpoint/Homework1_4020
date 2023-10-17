@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -704,5 +705,107 @@ class ParserTest_starter {
 			AST ast = getAST(input);
 		});
 	}
+	@Test
+	void test15() throws PLCCompilerException {
+		String input = """
+				int f() <:
+				int a = 1 + 2 * 3;
+				:>
+				""";
+		AST ast = getAST(input);
+		Program program0 = checkProgram(ast, "int", "f");
+		List<NameDef> params1 = program0.getParams();
+		assertEquals(0, params1.size());
+		Block programBlock2 = ((Program) ast).getBlock();
+		List<BlockElem> blockElemList3 = programBlock2.getElems();
+		assertEquals(1, blockElemList3.size());
+	
+		// Check that the single block element is a Declaration
+		BlockElem blockElem4 = blockElemList3.get(0);
+		checkDec(blockElem4);
+	
+		// Check the name and type of the declared variable
+		NameDef nameDef5 = ((Declaration) blockElem4).getNameDef();
+		checkNameDef(nameDef5, "int", "a");
+	
+		// Check the initializer expression for the variable 'a'
+		Expr expr6 = ((Declaration) blockElem4).getInitializer();
+		// Assuming you have a method to check binary expressions
+		checkBinaryExpr(expr6, Kind.PLUS);
+	
+		// Check the left and right parts of the binary expression 1 + 2 * 3
+		Expr leftExpr7 = ((BinaryExpr) expr6).getLeftExpr();
+		checkNumLitExpr(leftExpr7, 1);
+	
+		// Check the right expression, which is 2 * 3
+		Expr rightExpr8 = ((BinaryExpr) expr6).getRightExpr();
+		checkBinaryExpr(rightExpr8, Kind.TIMES);
+	
+		// Check the left and right parts of the binary expression 2 * 3
+		Expr leftExpr9 = ((BinaryExpr) rightExpr8).getLeftExpr();
+		checkNumLitExpr(leftExpr9, 2);
+		Expr rightExpr10 = ((BinaryExpr) rightExpr8).getRightExpr();
+		checkNumLitExpr(rightExpr10, 3);
+	}
+	
+
+
+@Test
+void test16() throws PLCCompilerException {
+    String input = """
+            int myFunc(int x, string y) <: int z; :>
+            """;
+    AST ast = getAST(input);
+    Program program0 = checkProgram(ast, "int", "myFunc");
+
+    // Check parameters
+    List<NameDef> params1 = program0.getParams();
+    assertEquals(2, params1.size());
+    NameDef paramNameDef2 = params1.get(0);
+    checkNameDef(paramNameDef2, "int", "x");
+    NameDef paramNameDef3 = params1.get(1);
+    checkNameDef(paramNameDef3, "string", "y");
+
+    // Check block
+    Block programBlock2 = program0.getBlock();
+    List<BlockElem> blockElemList3 = programBlock2.getElems();
+    assertEquals(1, blockElemList3.size());
+    
+    // Check the declaration inside the block
+    BlockElem blockElem4 = blockElemList3.get(0);
+    checkDec(blockElem4);
+    NameDef nameDef5 = ((Declaration) blockElem4).getNameDef();
+    checkNameDef(nameDef5, "int", "z");
+}
+
+
+
+@Test
+void test18() throws PLCCompilerException {
+    String input = """
+            string f() <:
+            a = "abc" + "def";
+            :>
+            """;
+    AST ast = getAST(input);
+    Program program0 = checkProgram(ast, "string", "f");
+    List<NameDef> params1 = program0.getParams();
+    assertEquals(0, params1.size());
+    Block programBlock2 = ((Program) ast).getBlock();
+    List<BlockElem> blockElemList3 = programBlock2.getElems();
+    assertEquals(1, blockElemList3.size());
+   
+}
+
+@Test
+void test19() throws PLCCompilerException {
+    String input = "missing semicolon";
+    assertThrows(SyntaxException.class, () -> {
+        @SuppressWarnings("unused")
+        AST ast = getAST(input);
+    });
+}
+
+	
 
 }
