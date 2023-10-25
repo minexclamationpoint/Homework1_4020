@@ -15,13 +15,26 @@ import java.util.Objects;
 import edu.ufl.cise.cop4020fa23.IToken;
 import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 
+
+/**
+ * 
+ */
 public class Program extends AST {
 
 	final IToken typeToken;
 	final IToken nameToken;
 	final List<NameDef> params;
 	final Block block;
-
+	
+	Type type;
+	
+	/**
+	 * @param firstToken
+	 * @param type
+	 * @param name
+	 * @param params
+	 * @param block
+	 */
 	public Program(IToken firstToken, IToken type, IToken name, List<NameDef> params, Block block) {
 		super(firstToken);
 		this.typeToken = type;
@@ -30,10 +43,12 @@ public class Program extends AST {
 		this.block = block;
 	}
 
+
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws PLCCompilerException {
 		return v.visitProgram(this, arg);
 	}
+
 
 	@Override
 	public int hashCode() {
@@ -42,6 +57,7 @@ public class Program extends AST {
 		result = prime * result + Objects.hash(block, nameToken, params, typeToken);
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -56,30 +72,42 @@ public class Program extends AST {
 				&& Objects.equals(params, other.params) && Objects.equals(typeToken, other.typeToken);
 	}
 
+
 	public IToken getTypeToken() {
 		return typeToken;
+	}
+	
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 	public IToken getNameToken() {
 		return nameToken;
 	}
-
+	
 	public String getName() {
 		return nameToken.text();
 	}
+
 
 	public List<NameDef> getParams() {
 		return params;
 	}
 
+
 	public Block getBlock() {
 		return block;
 	}
 
+
 	@Override
 	public String toString() {
-		return "Program [type=" + typeToken + ", name=" + nameToken.text() + ", params=" + params + ", block=" + block
-				+ "]";
+		return "Program [type=" + typeToken + ", name=" + nameToken.text() + ", params=" + params + ", block=" + block + "]";
 	}
 
+	
 }

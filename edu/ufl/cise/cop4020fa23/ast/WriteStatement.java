@@ -14,10 +14,17 @@ import java.util.Objects;
 import edu.ufl.cise.cop4020fa23.IToken;
 import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 
-public class WriteStatement extends Statement {
-
+/**
+ * 
+ */
+public class WriteStatement extends Statement{
+	
 	final Expr expr;
 
+	/**
+	 * @param firstToken
+	 * @param expr
+	 */
 	public WriteStatement(IToken firstToken, Expr expr) {
 		super(firstToken);
 		this.expr = expr;
@@ -25,7 +32,7 @@ public class WriteStatement extends Statement {
 
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws PLCCompilerException {
-		return v.visitWriteStatement(this, arg);
+		return v.visitWriteStatement(this,  arg);
 	}
 
 	@Override
@@ -56,5 +63,9 @@ public class WriteStatement extends Statement {
 	public String toString() {
 		return "WriteStatement [expr=" + expr + "]";
 	}
+
+
+	
+	
 
 }

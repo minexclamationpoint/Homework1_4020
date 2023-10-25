@@ -20,7 +20,9 @@ public class LValue extends AST {
 	final IToken nameToken;
 	final PixelSelector pixelSelector;
 	final ChannelSelector channelSelector;
+	NameDef nameDef;
 
+	Type inferredType;
 	/**
 	 * @param firstToken
 	 * @param name
@@ -37,7 +39,9 @@ public class LValue extends AST {
 	public Object visit(ASTVisitor v, Object arg) throws PLCCompilerException {
 		return v.visitLValue(this, arg);
 	}
-
+	public IToken getNameToken() {
+		return nameToken;
+	}
 	public String getName() {
 		return nameToken.text();
 	}
@@ -47,6 +51,32 @@ public class LValue extends AST {
 	public ChannelSelector getChannelSelector() {
 		return channelSelector;
 	}
+	
+	public void setType(Type type) {
+		inferredType = type;
+		return;
+	}
+	
+	public Type getType() {
+		return inferredType;
+	}
 
+	public NameDef getNameDef() {
+		return nameDef;
+	}
+	public void setNameDef(NameDef nameDef) {
+		this.nameDef = nameDef;
+	}
+
+	/* precondition:  namdDef != null */
+	public Type getVarType() {
+		return nameDef.getType();
+	}
+	@Override
+	public String toString() {
+		return "LValue [nameToken=" + nameToken + ", pixelSelector=" + pixelSelector + ", channelSelector="
+				+ channelSelector + ", nameDef=" + nameDef + ", inferredType=" + inferredType + "]";
+	}
+	
 	
 }

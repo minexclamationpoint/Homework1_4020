@@ -14,19 +14,32 @@ import java.util.Objects;
 import edu.ufl.cise.cop4020fa23.IToken;
 import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 
+/**
+ * 
+ */
 public class ReturnStatement extends Statement {
-
+	
 	final Expr e;
+	
+	
 
+	/**
+	 * @param firstToken
+	 * @param e
+	 */
 	public ReturnStatement(IToken firstToken, Expr e) {
 		super(firstToken);
 		this.e = e;
 	}
 
+
+
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws PLCCompilerException {
 		return v.visitReturnStatement(this, arg);
 	}
+
+
 
 	@Override
 	public int hashCode() {
@@ -35,6 +48,8 @@ public class ReturnStatement extends Statement {
 		result = prime * result + Objects.hash(e);
 		return result;
 	}
+
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -48,13 +63,19 @@ public class ReturnStatement extends Statement {
 		return Objects.equals(e, other.e);
 	}
 
+
+
 	public Expr getE() {
 		return e;
 	}
+
+
 
 	@Override
 	public String toString() {
 		return "ReturnStatement [e=" + e + "]";
 	}
+	
+	
 
 }

@@ -11,24 +11,22 @@ package edu.ufl.cise.cop4020fa23.exceptions;
 
 import edu.ufl.cise.cop4020fa23.SourceLocation;
 
-/**
- * 
- */
+
 @SuppressWarnings("serial")
-public class SyntaxException extends PLCCompilerException {
+public class TypeCheckException extends PLCCompilerException {
 
 
-	public SyntaxException() {
-		super();
-	}
-
-	public SyntaxException(SourceLocation location, String message) {
-		super(location, message);
+	public TypeCheckException() {
 	}
 
 
-	public SyntaxException(String message) {
+	public TypeCheckException(String message) {
 		super(message);
+	}
+
+
+	public TypeCheckException(SourceLocation location, String message) {
+		super(location, message);
 	}
 
 }
