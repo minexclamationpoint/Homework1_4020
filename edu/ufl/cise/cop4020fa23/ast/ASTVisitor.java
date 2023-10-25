@@ -151,7 +151,7 @@ public interface ASTVisitor {
 
 	/**
 	 * @param returnStatement
-	 * @param object
+	 * @param arg
 	 * @return
 	 */
 	Object visitReturnStatement(ReturnStatement returnStatement, Object arg) throws PLCCompilerException;
@@ -178,7 +178,7 @@ public interface ASTVisitor {
 	Object visitWriteStatement(WriteStatement writeStatement, Object arg) throws PLCCompilerException;
 
 	/**
-	 * @param expandedPixelExpr
+	 * @param booleanLitExpr
 	 * @param arg
 	 * @return
 	 */
@@ -186,7 +186,7 @@ public interface ASTVisitor {
 	Object visitBooleanLitExpr(BooleanLitExpr booleanLitExpr, Object arg) throws PLCCompilerException;
 
 	/**
-	 * @param loopAssignmentStatement
+	 * @param constExpr
 	 * @param arg
 	 * @return
 	 */
