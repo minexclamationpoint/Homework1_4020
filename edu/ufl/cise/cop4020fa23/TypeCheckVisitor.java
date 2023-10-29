@@ -61,20 +61,22 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
-            int left = (Integer) e.left.visit(this, arg);
-            int right = (Integer ) e.right.visit(this,arg);
-            Kind opKind = e.op.getKind();
-            int val = switch(opKind){
-                case PLUS -> left + right;
-                case MINUS -> left-right;
-                case TIMES -> left * right;
-                case DIV -> left/right;
-                default -> {...}
-            }
-            return val;
+        int left = (Integer) e.left.visit(this, arg);
+        int right = (Integer ) e.right.visit(this,arg);
+        Kind opKind = e.op.getKind();
+        int val = switch(opKind){
+            case PLUS -> left + right;
+            case MINUS -> left – right;
+            case TIMES -> left * right;
+            case DIV -> left/right;
+            default -> {…}
+        }
+        return val;
+
+        return val;
         //Copied from slides
     }
-    private Type inferBinaryType(Type left, Kind op, Type right){
+    private Type inferBinaryType(Type left, Kind op){ //pass right as well?
         switch(op){
             case BITAND, BITOR ->{
                 return PIXEL;
@@ -82,7 +84,17 @@ public class TypeCheckVisitor implements ASTVisitor {
             case AND, OR, LT, GT, LE, GE, EQ ->{
                 return BOOLEAN;
             }
-            default ->
+            case EXP ->{
+                if(left == PIXEL){
+                    return PIXEL;
+                } else {
+                    return INT;
+                }
+            }
+            case PLUS, MINUS, TIMES, DIV, MOD ->{
+                return left;
+            }
+            default -> throw new UnsupportedOperationException();  //TODO: change error
         }
     }
 
