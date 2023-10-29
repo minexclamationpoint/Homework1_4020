@@ -171,22 +171,18 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
         LOGGER.info("Entering visitChannelSelector");
     
         try {
-            // Extract the color token from the ChannelSelector
-           
-    
+
             // Validate that the color is one of the allowed types (red, green, blue)
             Kind colorKind = channelSelector.color();
             if (colorKind != Kind.RES_red && colorKind != Kind.RES_blue && colorKind != Kind.RES_green) {
                 throw new TypeCheckException("Invalid color channel specified");
             }
     
-            // Here you might also want to check that the parent or associated type allows channel selection.
-            // For example, if it is not of type IMAGE or PIXEL, you might want to throw a TypeCheckException.
+
     
             LOGGER.info("Successfully processed visitChannelSelector");
     
-            // Returning the colorKind as it successfully processed the channel selection.
-            // You might want to return other types depending on your logic.
+
             return colorKind;
         } catch (TypeCheckException e) {
             LOGGER.severe("TypeCheckException in visitChannelSelector: " + e.getMessage());
@@ -233,24 +229,73 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitDeclaration(Declaration declaration, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
-        /*
-        Declaration::= NameDef Expr?
-            Condition: Expr == null
-                || Expr.type == NameDef.type
-                || (Expr.type == STRING && NameDef.type == IMAGE)
-            Declaration.type  NameDef.type
-            Note: visit Expr before NameDef
-         */
+        LOGGER.info("Entering visitDeclaration");
+    
+        try {
+            // Get the NameDef and its type
+            NameDef nameDef = declaration.getNameDef();
+            Type nameDefType = (Type) nameDef.visit(this, arg); // This should populate the type in NameDef as well
+    
+            // Get the initializer Expr and its type if it is not null
+            Expr initializer = declaration.getInitializer();
+            Type initializerType = null;
+            if (initializer != null) {
+                initializerType = (Type) initializer.visit(this, arg); // This should populate the type in Expr as well
+            }
+    
+            // Check conditions
+            if (initializerType != null) {
+                if (initializerType != nameDefType) {
+                    if (initializerType == Type.STRING && nameDefType == Type.IMAGE) {
+                        // Special case is valid, do nothing
+                    } else {
+                        throw new TypeCheckException("Type mismatch between NameDef and Expr in declaration");
+                    }
+                }
+            }
+    
+            // Successfully processed the declaration
+            LOGGER.info("Successfully processed visitDeclaration");
+            return nameDefType;  // Returning the type of NameDef
+    
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitDeclaration: " + e.getMessage());
+            throw e;
+    
+        } finally {
+            LOGGER.info("Leaving visitDeclaration");
+        }
     }
 
     @Override
     public Object visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
-        Type typeW = (Type) dimension.getWidth().visit(this, arg);
-        check(typeW == Type.INT, dimension, "image width must be int");
-        Type typeH = (Type) dimension.getHeight().visit(this, arg);
-        check(typeH == Type.INT, dimension, "image height must be int");
-        return dimension;
+        LOGGER.info("Entering visitDimension");
+    
+        try {
+            // Visit and type check the width expression
+            Type widthType = (Type) dimension.getWidth().visit(this, arg);
+            
+            // Use the check method to ensure the width type is INT
+            check(widthType == Type.INT, dimension, "Width expression must be of type INT");
+            
+            // Visit and type check the height expression
+            Type heightType = (Type) dimension.getHeight().visit(this, arg);
+            
+            // Use the check method to ensure the height type is INT
+            check(heightType == Type.INT, dimension, "Height expression must be of type INT");
+            
+            // If we've reached here, both dimensions are of correct type
+            LOGGER.info("Successfully processed visitDimension");
+            
+            return dimension;  // Return the dimension object
+    
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitDimension: " + e.getMessage());
+            throw e;
+            
+        } finally {
+            LOGGER.info("Leaving visitDimension");
+        }
     }
 
     @Override
