@@ -1,6 +1,7 @@
 package edu.ufl.cise.cop4020fa23;
 
 import edu.ufl.cise.cop4020fa23.ast.*;
+import edu.ufl.cise.cop4020fa23.ast.Block.BlockElem;
 import edu.ufl.cise.cop4020fa23.exceptions.LexicalException;
 import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 import edu.ufl.cise.cop4020fa23.exceptions.SyntaxException;
@@ -12,6 +13,8 @@ import static edu.ufl.cise.cop4020fa23.ast.Type.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import java.util.logging.Logger;
 
 /*
 Your parser returns an AST
@@ -52,8 +55,11 @@ and is implemened using the enum Type in the ast packages
 Program, NameDef, Declaration and all other Expr nodes have an attribute "type".
  */
 public class TypeCheckVisitor implements ASTVisitor {
+
+    private static final Logger LOGGER = Logger.getLogger(TypeCheckVisitor.class.getName());
+
     //vvv implemented with the symbol table class
-    //private SymbolTable st;
+    private SymbolTable st;
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
         throw new UnsupportedOperationException();
@@ -61,47 +67,34 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
-        int left = (Integer) e.left.visit(this, arg);
-        int right = (Integer ) e.right.visit(this,arg);
-        Kind opKind = e.op.getKind();
-        int val = switch(opKind){
+        Object leftOb = binaryExpr.getLeftExpr().visit(this, arg);
+        Object rightOb = binaryExpr.getRightExpr().visit(this,arg);
+        // ^ change above, only works for EXP, MINUS, TIMES, DIV, MOD when left.getType() == int
+        Kind opKind = binaryExpr.getOpKind();
+
+        int left = (Integer) leftOb;
+        int right = (Integer) rightOb;
+        return switch(opKind){
+            case EXP -> (left << right); //doesn't work for exponents over 31 but like, come on
             case PLUS -> left + right;
-            case MINUS -> left – right;
+            case MINUS -> left-right;
             case TIMES -> left * right;
             case DIV -> left/right;
-            default -> {…}
-        }
-        return val;
+            case MOD -> left%right;
+            case EQ -> left==right;
+            default -> throw new UnsupportedOperationException(); //TODO: change error
+        };
 
-        return val;
         //Copied from slides
     }
-    private Type inferBinaryType(Type left, Kind op){ //pass right as well?
-        switch(op){
-            case BITAND, BITOR ->{
-                return PIXEL;
-            }
-            case AND, OR, LT, GT, LE, GE, EQ ->{
-                return BOOLEAN;
-            }
-            case EXP ->{
-                if(left == PIXEL){
-                    return PIXEL;
-                } else {
-                    return INT;
-                }
-            }
-            case PLUS, MINUS, TIMES, DIV, MOD ->{
-                return left;
-            }
-            default -> throw new UnsupportedOperationException();  //TODO: change error
+    private Type inferBinaryType(Type left){ //pass right as well?
+        switch(left) {
+        default ->
         }
     }
 
     @Override
     public Object visitBlock(Block block, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
-        /*
         st.enterScope();
         List<BlockElem> blockElems = block.getElems();
         for (BlockElem elem : blockElems) {
@@ -109,7 +102,6 @@ public class TypeCheckVisitor implements ASTVisitor {
         }
         st.leaveScope();
         return block;
-         */
     }
 
     @Override
@@ -181,14 +173,18 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitNameDef(NameDef nameDef, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
-        /*
-        NameDef ::= Type Dimension? IDENT
-        Condition: if (Dimension != null) { type == IMAGE }
-            else Type ∈ {INT, BOOLEAN, STRING, PIXEL, IMAGE}
-        NameDef.type  type
-        symbolTable.insert(nameDef) is successful
-         */
+        Type type = nameDef.getType();  // Assuming that getType() returns the Type of the NameDef
+        Dimension dimension = nameDef.getDimension();  // Assuming that getDimension() returns the Dimension
+        if (dimension != null) {
+            if (type != Type.IMAGE) {
+                throw new TypeCheckException("Dimension can only be associated with IMAGE type");
+            }
+        } else if (!Arrays.asList(Type.INT, Type.BOOLEAN, Type.STRING, Type.PIXEL, Type.IMAGE).contains(type)) {
+            throw new TypeCheckException("Invalid type for NameDef");
+        }
+
+        st.insert(nameDef);  // Inserting the NameDef into the symbol table
+        return type;
     }
 
     @Override
@@ -210,16 +206,16 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitProgram(Program program, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
-        /*
-        Program::= Type IDENT NameDef* Block
-        Program.type  Type
-        symbolTable.enterScope()
-        check children NameDef* and Block
-        symbolTable.leave Scope()
-        Note: there are no constraints involving IDENT
-        —it is not entered into the symbol table
-         */
+        Type type = Type.kind2type(program.getTypeToken().kind());
+        program.setType(type);  // Setting the type attribute for Program
+        st.enterScope();  // Entering a new scope in the symbol table
+        List<NameDef> params = program.getParams();
+        for (NameDef param : params) {
+            param.visit(this, arg);  // Visiting each NameDef child node
+        }
+        program.getBlock().visit(this, arg);  // Visiting the Block child node
+        st.leaveScope();  // Leaving the scope in the symbol table
+        return type;
     }
 
     @Override
