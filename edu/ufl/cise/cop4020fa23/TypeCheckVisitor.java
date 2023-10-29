@@ -7,6 +7,7 @@ import edu.ufl.cise.cop4020fa23.exceptions.SyntaxException;
 import edu.ufl.cise.cop4020fa23.exceptions.TypeCheckException;
 
 import static edu.ufl.cise.cop4020fa23.Kind.*;
+import static edu.ufl.cise.cop4020fa23.ast.Type.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,22 +61,29 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
-        /*public Object visitBinaryExpr(BinaryExpr e, Object arg){
             int left = (Integer) e.left.visit(this, arg);
             int right = (Integer ) e.right.visit(this,arg);
             Kind opKind = e.op.getKind();
             int val = switch(opKind){
                 case PLUS -> left + right;
-                case MINUS -> left – right;
+                case MINUS -> left-right;
                 case TIMES -> left * right;
                 case DIV -> left/right;
                 default -> {...}
             }
             return val;
+        //Copied from slides
+    }
+    private Type inferBinaryType(Type left, Kind op, Type right){
+        switch(op){
+            case BITAND, BITOR ->{
+                return PIXEL;
+            }
+            case AND, OR, LT, GT, LE, GE, EQ ->{
+                return BOOLEAN;
+            }
+            default ->
         }
-        Copied from slides
-        */
     }
 
     @Override
