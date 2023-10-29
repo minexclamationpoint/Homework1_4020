@@ -2,7 +2,6 @@
   <artifact type="jar" name="Homework1_4020:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Homework1_4020_jar</output-path>
     <root id="archive" name="Homework1_4020.jar">
-      <element id="module-output" name="Homework1_4020" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/junit-jupiter-5.5.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/junit-jupiter-api-5.5.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/apiguardian-api-1.1.0.jar" path-in-jar="/" />
@@ -12,6 +11,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/junit-jupiter-engine-5.5.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/junit-platform-engine-1.5.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/hamcrest-2.2.jar" path-in-jar="/" />
+      <element id="module-output" name="Homework1_4020" />
     </root>
   </artifact>
 </component>

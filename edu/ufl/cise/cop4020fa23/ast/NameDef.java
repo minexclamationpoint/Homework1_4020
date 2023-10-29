@@ -26,8 +26,8 @@ public class NameDef extends AST {
 	
 	/**
 	 * @param firstToken
-	 * @param type
-	 * @param ident
+	 * @param typeToken
+	 * @param identToken
 	 * @param dimension
 	 */
 	public NameDef(IToken firstToken, IToken typeToken, Dimension dimension, IToken identToken ) {

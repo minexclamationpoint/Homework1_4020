@@ -454,10 +454,9 @@ public class Parser implements IParser {
 				t = lexer.next();
 				List<GuardedBlock> list = new ArrayList<>();
 				list.add(GuardedBlock());
-				if(t.kind() != BOX){
-					throw new SyntaxException("Error: expected 'BOX' token at "+ t.sourceLocation());
+				if(t.kind() == BOX){
+					t = lexer.next();
 				}
-				t = lexer.next();
 				while(t.kind() != RES_od){
 					list.add(GuardedBlock());
 				}
@@ -468,10 +467,9 @@ public class Parser implements IParser {
 				t = lexer.next();
 				List<GuardedBlock> list = new ArrayList<>();
 				list.add(GuardedBlock());
-				if(t.kind() != BOX){
-					throw new SyntaxException("Error: expected 'BOX' token at "+ t.sourceLocation());
+				if(t.kind() == BOX){
+					t = lexer.next();
 				}
-				t = lexer.next();
 				while(t.kind() != RES_fi){
 					list.add(GuardedBlock());
 				}
