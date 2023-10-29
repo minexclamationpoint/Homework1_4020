@@ -52,8 +52,9 @@ public class Parser implements IParser {
 		if(t.kind() == IDENT){
 			name = t;
 			t = lexer.next();
+			
 		} else {
-			throw new SyntaxException(t.sourceLocation(), "Expected 'IDENT' at " + t.sourceLocation());
+			throw new SyntaxException(t.sourceLocation(), "Expected 'IDENT' at " + t.sourceLocation() + "first token kind:" + firstToken.kind());
 		}
 		if(t.kind() != LPAREN){
 			throw new SyntaxException(t.sourceLocation(), "Expected 'LPAREN' at " + t.sourceLocation());
