@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="76a934ec-7e5e-461a-ba4d-04223bed60dc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../../../../.idea/artifacts/Homework1_4020_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../.idea/artifacts/Homework1_4020_jar.xml" afterDir="false" />
