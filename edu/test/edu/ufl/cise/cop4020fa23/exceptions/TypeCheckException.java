@@ -7,24 +7,26 @@
  * 
  * This code may not be posted on a public web site either during or after the course.  
  */
-package edu.ufl.cise.cop4020fa23.ast;
+package edu.ufl.cise.cop4020fa23.exceptions;
 
-import edu.ufl.cise.cop4020fa23.IToken;
+import edu.ufl.cise.cop4020fa23.SourceLocation;
 
-public abstract class Expr extends AST {
 
-	public Expr(IToken firstToken) {
-		super(firstToken);
+@SuppressWarnings("serial")
+public class TypeCheckException extends PLCCompilerException {
+
+
+	public TypeCheckException() {
 	}
 
-	Type type;  
 
-	public Type getType() {
-		return type;
+	public TypeCheckException(String message) {
+		super(message);
 	}
 
-	public void setType(Type type) {
-		this.type = type;
+
+	public TypeCheckException(SourceLocation location, String message) {
+		super(location, message);
 	}
-	
+
 }

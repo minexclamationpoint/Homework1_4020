@@ -56,7 +56,7 @@ public class Lexer implements ILexer {
 			return Kind.CONST;
 		}
 		// For boolean literals
-		else if (s.equalsIgnoreCase("TRUE") || s.equalsIgnoreCase("FALSE")) {
+		else if (s.equals("TRUE") || s.equals("FALSE")) {
 			return Kind.BOOLEAN_LIT;
 		} 
 		else {
@@ -92,7 +92,7 @@ public class Lexer implements ILexer {
 				case "^" -> Kind.RETURN;
 				case "->" -> Kind.RARROW;
 				case "[]" -> Kind.BOX;
-				case "EOF" -> Kind.EOF;  // For eof
+				case "" -> Kind.EOF;  // For eof
 				default -> {
 					// For idents, nums, and default error
 					if (s.matches("^[a-zA-Z_][a-zA-Z_0-9]*$")) yield Kind.IDENT;
@@ -260,9 +260,11 @@ public class Lexer implements ILexer {
 						
 						String sbStr = sb.toString();
 
+						int meow = pos + 1;
+
 						// handles reserved, constant, and Bool
-						if (reservedWords.contains(sbStr) || constantWords.contains(sbStr) || "TRUE".equals(sbStr)
-								|| "FALSE".equals(sbStr)) {
+						if ((reservedWords.contains(sbStr) || constantWords.contains(sbStr) || "TRUE".equals(sbStr)
+								|| "FALSE".equals(sbStr)) && input.charAt(meow) == ' ') {
 							kind = mapper(sbStr);
 							// this is the current pos so need to increment for next token
 							pos++;
@@ -541,6 +543,10 @@ public class Lexer implements ILexer {
 		// }
 		// just made pos = 0 for now
 		// comments and white lines should be empty
+
+
+		kind = mapper(sb.toString());
+
 		return new Token(kind, 0, sb.length(), charList, new SourceLocation(line, realCol));
 	}
 
