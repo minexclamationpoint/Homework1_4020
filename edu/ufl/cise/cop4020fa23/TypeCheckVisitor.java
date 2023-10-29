@@ -69,11 +69,14 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
     try {
         LValue lValue = assignmentStatement.getlValue();
         Expr expr = assignmentStatement.getE();
+    
 
         // Visit LValue and Expr to populate their types
         Type lValueType = (Type) lValue.visit(this, arg);
         Type exprType = (Type) expr.visit(this, arg);
-
+        LOGGER.info("Type of LValue: " + lValueType);
+        LOGGER.info("Type of Expr: " + exprType);
+        
         // Type check
         if (lValueType != exprType) {
             throw new TypeCheckException("Type mismatch in assignment statement");
@@ -158,12 +161,67 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitChannelSelector(ChannelSelector channelSelector, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering visitChannelSelector");
+    
+        try {
+            // Extract the color token from the ChannelSelector
+           
+    
+            // Validate that the color is one of the allowed types (red, green, blue)
+            Kind colorKind = channelSelector.color();
+            if (colorKind != Kind.RES_red && colorKind != Kind.RES_blue && colorKind != Kind.RES_green) {
+                throw new TypeCheckException("Invalid color channel specified");
+            }
+    
+            // Here you might also want to check that the parent or associated type allows channel selection.
+            // For example, if it is not of type IMAGE or PIXEL, you might want to throw a TypeCheckException.
+    
+            LOGGER.info("Successfully processed visitChannelSelector");
+    
+            // Returning the colorKind as it successfully processed the channel selection.
+            // You might want to return other types depending on your logic.
+            return colorKind;
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitChannelSelector: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitChannelSelector");
+        }
     }
 
     @Override
     public Object visitConditionalExpr(ConditionalExpr conditionalExpr, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering visitConditionalExpr");
+    
+        try {
+            // Visit and type check the guard expression
+            Type guardType = (Type) conditionalExpr.getGuardExpr().visit(this, arg);
+            if (guardType != Type.BOOLEAN) {
+                throw new TypeCheckException("The guard expression in a conditional must be of type BOOLEAN");
+            }
+    
+            // Visit and type check the true and false expressions
+            Type trueExprType = (Type) conditionalExpr.getTrueExpr().visit(this, arg);
+            Type falseExprType = (Type) conditionalExpr.getFalseExpr().visit(this, arg);
+    
+            // The types of trueExpr and falseExpr must be the same
+            if (trueExprType != falseExprType) {
+                throw new TypeCheckException("The true and false expressions in a conditional must have the same type");
+            }
+    
+            // Everything is fine, set the type of the ConditionalExpr to be the same as that of trueExpr
+            conditionalExpr.setType(trueExprType);
+    
+            LOGGER.info("Successfully processed visitConditionalExpr");
+            return trueExprType;
+    
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitConditionalExpr: " + e.getMessage());
+            throw e;
+    
+        } finally {
+            LOGGER.info("Leaving visitConditionalExpr");
+        }
     }
 
     @Override
