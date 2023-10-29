@@ -96,38 +96,74 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
-        /*Object leftOb = binaryExpr.getLeftExpr().visit(this, arg);
-        Object rightOb = binaryExpr.getRightExpr().visit(this,arg);
-        Type leftT = binaryExpr.getLeftExpr().getType();
-        Type rightT = binaryExpr.getRightExpr().getType();
-        Kind opKind = binaryExpr.getOpKind();
-        int left = (Integer) leftOb;
-        int right = (Integer) rightOb;
-        Type infer = inferBinaryType(leftT, opKind, rightT);
+        LOGGER.info("Entering visitBinaryExpr");
+    
+        try {
+            Type leftExprType = (Type) binaryExpr.getLeftExpr().visit(this, arg);
+            Type rightExprType = (Type) binaryExpr.getRightExpr().visit(this, arg);
 
-        switch(leftT){
-            case PIXEL -> {
-
+            Kind opKind = binaryExpr.getOpKind();
+    
+            Type resultType = inferBinaryType(leftExprType, opKind, rightExprType);
+    
+            if (resultType == null) {
+                throw new TypeCheckException("Invalid combination of types and operator in binary expression");
             }
-            default -> {
 
-            }
-        };*/
-        //Copied from slides
-        throw new UnsupportedOperationException();
+            binaryExpr.setType(resultType);
+    
+            LOGGER.info("Successfully processed visitBinaryExpr");
+            return resultType;
+    
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitBinaryExpr: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitBinaryExpr");
+        }
     }
-    /*
-    private Type inferBinaryType(Type left, Kind op, Type right){ //pass right as well?
-        IF: PIXEL, (BITAND, BITOR), PIXEL, RETURN PIXEL
-        IF: BOOLEAN, (AND, OR), BOOLEAN, RETURN BOOLEAN
-        IF: INT, (LT, GT, LE, GE) INT, RETURN BOOLEAN
-        IF: ANY, EQ, LEFT, RETURN BOOLEAN
-        IF: INT, EXP, INT, RETURN INT
-        IF: PIXEL, EXP, INT, RETURN PIXEL
-        IF: PIXEL, (MINUS TIMES DIV MOD) PIXEL, RETURN PIXEL
-        IF: PIXEL (TIMES DIV MOD) INT, RETURN PIXEL
+    private Type inferBinaryType(Type leftType, Kind op, Type rightType) throws TypeCheckException {
+        // PIXEL BITAND, BITOR PIXEL PIXEL
+        if (leftType == Type.PIXEL && (op == Kind.BITAND || op == Kind.BITOR) && rightType == Type.PIXEL) {
+            return Type.PIXEL;
+        }
+        // BOOLEAN AND, OR BOOLEAN BOOLEAN
+        else if (leftType == Type.BOOLEAN && (op == Kind.AND || op == Kind.OR) && rightType == Type.BOOLEAN) {
+            return Type.BOOLEAN;
+        }
+        // INT LT, GT, LE, GE INT BOOLEAN
+        else if (leftType == Type.INT && (op == Kind.LT || op == Kind.GT || op == Kind.LE || op == Kind.GE) && rightType == Type.INT) {
+            return Type.BOOLEAN;
+        }
+        // any EQ ExprleftExpr.type BOOLEAN
+        else if (op == Kind.EQ && leftType == rightType) {
+            return Type.BOOLEAN;
+        }
+        // INT EXP INT INT
+        else if (leftType == Type.INT && op == Kind.EXP && rightType == Type.INT) {
+            return Type.INT;
+        }
+        // PIXEL EXP INT PIXEL
+        else if (leftType == Type.PIXEL && op == Kind.EXP && rightType == Type.INT) {
+            return Type.PIXEL;
+        }
+        // PIXEL,IMAGE TIMES, DIV, MOD INT ExprleftExpr.type
+        else if ((leftType == Type.PIXEL || leftType == Type.IMAGE) && (op == Kind.TIMES || op == Kind.DIV || op == Kind.MOD) && rightType == Type.INT) {
+            return leftType;
+        }
+        // Any PLUS ExprleftExpr.type ExprleftExpr.type
+        else if (op == Kind.PLUS && leftType == rightType) {
+            return leftType;
+        }
+        // INT,PIXEL,IMAGE MINUS, TIMES, DIV, MOD ExprleftExpr.type ExprleftExpr.type
+        else if ((leftType == Type.INT || leftType == Type.PIXEL || leftType == Type.IMAGE) && (op == Kind.MINUS || op == Kind.TIMES || op == Kind.DIV || op == Kind.MOD) && leftType == rightType) {
+            return leftType;
+        }
+        else {
+            throw new TypeCheckException("Invalid combination of leftType, op, and rightType");
+        }
     }
-     */
+    
 
     @Override
     public Object visitBlock(Block block, Object arg) throws PLCCompilerException {
@@ -284,7 +320,7 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
             // Use the check method to ensure the height type is INT
             check(heightType == Type.INT, dimension, "Height expression must be of type INT");
             
-            // If we've reached here, both dimensions are of correct type
+            // Everything is fine
             LOGGER.info("Successfully processed visitDimension");
             
             return dimension;  // Return the dimension object
