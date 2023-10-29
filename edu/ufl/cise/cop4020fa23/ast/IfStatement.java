@@ -15,19 +15,32 @@ import java.util.Objects;
 import edu.ufl.cise.cop4020fa23.IToken;
 import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 
+/**
+ * 
+ */
 public class IfStatement extends Statement {
 
 	final List<GuardedBlock> guardedBlocks;
-
+	
+	
+	
+	/**
+	 * @param firstToken
+	 * @param guardedBlock
+	 */
 	public IfStatement(IToken firstToken, List<GuardedBlock> guardedBlock) {
 		super(firstToken);
 		this.guardedBlocks = guardedBlock;
 	}
 
+
+
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws PLCCompilerException {
-		return v.visitIfStatement(this, arg);
+		return v.visitIfStatement(this,arg);
 	}
+
+
 
 	@Override
 	public int hashCode() {
@@ -36,6 +49,8 @@ public class IfStatement extends Statement {
 		result = prime * result + Objects.hash(guardedBlocks);
 		return result;
 	}
+
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -49,13 +64,19 @@ public class IfStatement extends Statement {
 		return Objects.equals(guardedBlocks, other.guardedBlocks);
 	}
 
+
+
 	public List<GuardedBlock> getGuardedBlocks() {
 		return guardedBlocks;
 	}
+
+
 
 	@Override
 	public String toString() {
 		return "IfStatement [guardedBlock=" + guardedBlocks + "]";
 	}
+	
+	
 
 }

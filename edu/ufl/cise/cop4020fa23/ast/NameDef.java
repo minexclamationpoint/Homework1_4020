@@ -14,23 +14,35 @@ import java.util.Objects;
 import edu.ufl.cise.cop4020fa23.IToken;
 import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 
+/**
+ * 
+ */
 public class NameDef extends AST {
-
+	
 	final IToken typeToken;
 	final IToken identToken;
-	final Dimension dimension;
-
-	public NameDef(IToken firstToken, IToken typeToken, Dimension dimension, IToken identToken) {
+	final Dimension dimension;	
+	String javaName;
+	
+	/**
+	 * @param firstToken
+	 * @param type
+	 * @param ident
+	 * @param dimension
+	 */
+	public NameDef(IToken firstToken, IToken typeToken, Dimension dimension, IToken identToken ) {
 		super(firstToken);
 		this.typeToken = typeToken;
 		this.identToken = identToken;
 		this.dimension = dimension;
 	}
 
+
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws PLCCompilerException {
 		return v.visitNameDef(this, arg);
 	}
+
 
 	@Override
 	public int hashCode() {
@@ -39,6 +51,7 @@ public class NameDef extends AST {
 		result = prime * result + Objects.hash(dimension, identToken, typeToken);
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -53,14 +66,28 @@ public class NameDef extends AST {
 				&& Objects.equals(typeToken, other.typeToken);
 	}
 
+
+	/**
+	 * @return the type
+	 */
 	public IToken getTypeToken() {
 		return typeToken;
 	}
 
+	public Type getType() {
+		return Type.kind2type(typeToken.kind());
+	}
+
+	/**
+	 * @return the ident
+	 */
 	public IToken getIdentToken() {
 		return identToken;
 	}
 
+	/**
+	 * @return the dimension
+	 */
 	public Dimension getDimension() {
 		return dimension;
 	}
@@ -71,7 +98,20 @@ public class NameDef extends AST {
 
 	@Override
 	public String toString() {
-		return "NameDef [typeToken=" + typeToken + ", identToken=" + identToken + ", dimension=" + dimension + "]";
+		return "NameDef [type=" + getType() + ", name=" + getName() + ", dimension=" + dimension + "]";
 	}
 
+//	/**
+//	 * @param string
+//	 */
+//	public void setJavaName(String string) {
+//		javaName = string;
+//	}
+//	
+//	public String getJavaName() {
+//		if (javaName != null) return javaName;
+//		throw new IllegalStateException("javaName not initialized");
+//	}
+	
+	
 }

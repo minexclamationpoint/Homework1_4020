@@ -9,45 +9,39 @@
  */
 package edu.ufl.cise.cop4020fa23.ast;
 
-import java.util.List;
 import java.util.Objects;
 
 import edu.ufl.cise.cop4020fa23.IToken;
-import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 
 /**
  * 
  */
-public class Block extends AST {
+public class SyntheticNameDef extends NameDef {
 
-	public abstract static class BlockElem extends AST {
+	/** Declaration for implicitly declared variables.  This class is not used in the Parser */
+	
+	final String name;
 
-		public BlockElem(IToken firstToken) {
-			super(firstToken);
-		}
+	public SyntheticNameDef(String name) {
+		super(null, null, null, null);
+		this.name = name;
 	}
-
-	final List<BlockElem> elems;
-
-	/**
-	 * @param firstToken
-	 * @param elems
-	 */
-	public Block(IToken firstToken, List<BlockElem> elems) {
-		super(firstToken);
-		this.elems = elems;
-	}
-
+	
 	@Override
-	public Object visit(ASTVisitor v, Object arg) throws PLCCompilerException {
-		return v.visitBlock(this, arg);
+	public String getName() {
+		return name;
+	}
+	
+	@Override
+	public Type getType() {
+		return Type.INT;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + Objects.hash(elems);
+		result = prime * result + Objects.hash(name);
 		return result;
 	}
 
@@ -59,20 +53,24 @@ public class Block extends AST {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Block other = (Block) obj;
-		return Objects.equals(elems, other.elems);
-	}
-
-	/**
-	 * @return the elems
-	 */
-	public List<BlockElem> getElems() {
-		return elems;
+		SyntheticNameDef other = (SyntheticNameDef) obj;
+		return Objects.equals(name, other.name);
 	}
 
 	@Override
 	public String toString() {
-		return "Block [elems=" + elems + "]";
+		return "SyntheticNameDef [name=" + name + "]";
 	}
 
+	@Override
+	public 
+	IToken getIdentToken() {throw new UnsupportedOperationException();}
+	
+	@Override
+	public 
+	IToken getTypeToken() {throw new UnsupportedOperationException();}
+	
+	@Override
+	public
+	Dimension getDimension() {throw new UnsupportedOperationException();}
 }

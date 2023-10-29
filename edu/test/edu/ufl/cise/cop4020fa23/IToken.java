@@ -7,24 +7,14 @@
  * 
  * This code may not be posted on a public web site either during or after the course.  
  */
-package edu.ufl.cise.cop4020fa23.ast;
+package edu.ufl.cise.cop4020fa23;
 
-import edu.ufl.cise.cop4020fa23.IToken;
-
-public abstract class Expr extends AST {
-
-	public Expr(IToken firstToken) {
-		super(firstToken);
-	}
-
-	Type type;  
-
-	public Type getType() {
-		return type;
-	}
-
-	public void setType(Type type) {
-		this.type = type;
-	}
+/**
+ * IMPLEMENTATIONS of IToken should override equals and hashcode
+ */
+public interface IToken {
 	
+	public SourceLocation sourceLocation();
+	public Kind kind();
+	public String text();
 }

@@ -14,29 +14,53 @@ import java.util.Objects;
 import edu.ufl.cise.cop4020fa23.IToken;
 import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 
+/**
+ * 
+ */
 public class Dimension extends AST {
 
 	final Expr width;
 	final Expr height;
-
+	
+	
+	
+	/**
+	 * @param firstToken
+	 * @param width
+	 * @param height
+	 */
 	public Dimension(IToken firstToken, Expr width, Expr height) {
 		super(firstToken);
 		this.width = width;
 		this.height = height;
 	}
 
+
+
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws PLCCompilerException {
 		return v.visitDimension(this, arg);
 	}
 
+
+
+	/**
+	 * @return the width
+	 */
 	public Expr getWidth() {
 		return width;
 	}
 
+
+
+	/**
+	 * @return the height
+	 */
 	public Expr getHeight() {
 		return height;
 	}
+
+
 
 	@Override
 	public int hashCode() {
@@ -45,6 +69,8 @@ public class Dimension extends AST {
 		result = prime * result + Objects.hash(height, width);
 		return result;
 	}
+
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -58,9 +84,12 @@ public class Dimension extends AST {
 		return Objects.equals(height, other.height) && Objects.equals(width, other.width);
 	}
 
+
+
 	@Override
 	public String toString() {
 		return "Dimension [width=" + width + ", height=" + height + "]";
 	}
 
+	
 }

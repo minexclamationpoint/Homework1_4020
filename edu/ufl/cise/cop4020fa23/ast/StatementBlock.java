@@ -14,10 +14,14 @@ import java.util.Objects;
 import edu.ufl.cise.cop4020fa23.IToken;
 import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 
+/**
+ * 
+ */
 public class StatementBlock extends Statement {
 
 	final Block block;
-
+	
+	
 	/**
 	 * @param firstToken
 	 * @param block
@@ -27,10 +31,12 @@ public class StatementBlock extends Statement {
 		this.block = block;
 	}
 
+
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws PLCCompilerException {
 		return v.visitBlockStatement(this, arg);
 	}
+
 
 	@Override
 	public int hashCode() {
@@ -39,6 +45,7 @@ public class StatementBlock extends Statement {
 		result = prime * result + Objects.hash(block);
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -52,13 +59,17 @@ public class StatementBlock extends Statement {
 		return Objects.equals(block, other.block);
 	}
 
+
 	public Block getBlock() {
 		return block;
 	}
+
 
 	@Override
 	public String toString() {
 		return "StatementBlock [block=" + block + "]";
 	}
+	
+	
 
 }

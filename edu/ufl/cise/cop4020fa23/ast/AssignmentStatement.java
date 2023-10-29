@@ -77,5 +77,13 @@ public class AssignmentStatement extends Statement {
 	public Expr getE() {
 		return e;
 	}
+
+
+
+	@Override
+	public String toString() {
+		return "AssignmentStatement [lValue=" + lValue + ", e=" + e + "]";
+	}
+	
 	
 }
