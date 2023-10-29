@@ -67,31 +67,38 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
-        Object leftOb = binaryExpr.getLeftExpr().visit(this, arg);
+        /*Object leftOb = binaryExpr.getLeftExpr().visit(this, arg);
         Object rightOb = binaryExpr.getRightExpr().visit(this,arg);
-        // ^ change above, only works for EXP, MINUS, TIMES, DIV, MOD when left.getType() == int
+        Type leftT = binaryExpr.getLeftExpr().getType();
+        Type rightT = binaryExpr.getRightExpr().getType();
         Kind opKind = binaryExpr.getOpKind();
-
         int left = (Integer) leftOb;
         int right = (Integer) rightOb;
-        return switch(opKind){
-            case EXP -> (left << right); //doesn't work for exponents over 31 but like, come on
-            case PLUS -> left + right;
-            case MINUS -> left-right;
-            case TIMES -> left * right;
-            case DIV -> left/right;
-            case MOD -> left%right;
-            case EQ -> left==right;
-            default -> throw new UnsupportedOperationException(); //TODO: change error
-        };
+        Type infer = inferBinaryType(leftT, opKind, rightT);
 
+        switch(leftT){
+            case PIXEL -> {
+
+            }
+            default -> {
+
+            }
+        };*/
         //Copied from slides
+        throw new UnsupportedOperationException();
     }
-    private Type inferBinaryType(Type left){ //pass right as well?
-        switch(left) {
-        default ->
-        }
+    /*
+    private Type inferBinaryType(Type left, Kind op, Type right){ //pass right as well?
+        IF: PIXEL, (BITAND, BITOR), PIXEL, RETURN PIXEL
+        IF: BOOLEAN, (AND, OR), BOOLEAN, RETURN BOOLEAN
+        IF: INT, (LT, GT, LE, GE) INT, RETURN BOOLEAN
+        IF: ANY, EQ, LEFT, RETURN BOOLEAN
+        IF: INT, EXP, INT, RETURN INT
+        IF: PIXEL, EXP, INT, RETURN PIXEL
+        IF: PIXEL, (MINUS TIMES DIV MOD) PIXEL, RETURN PIXEL
+        IF: PIXEL (TIMES DIV MOD) INT, RETURN PIXEL
     }
+     */
 
     @Override
     public Object visitBlock(Block block, Object arg) throws PLCCompilerException {

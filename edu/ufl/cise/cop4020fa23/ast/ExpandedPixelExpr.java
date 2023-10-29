@@ -26,8 +26,8 @@ public class ExpandedPixelExpr extends Expr {
 	/**
 	 * @param firstToken
 	 * @param red
-	 * @param green
-	 * @param blue
+	 * @param grn
+	 * @param blu
 	 */
 	public ExpandedPixelExpr(IToken firstToken, Expr red, Expr grn, Expr blu) {
 		super(firstToken);
