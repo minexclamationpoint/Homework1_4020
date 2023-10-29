@@ -57,13 +57,38 @@ Program, NameDef, Declaration and all other Expr nodes have an attribute "type".
 public class TypeCheckVisitor implements ASTVisitor {
 
     private static final Logger LOGGER = Logger.getLogger(TypeCheckVisitor.class.getName());
-    
+
     //vvv implemented with the symbol table class
     private SymbolTable st;
+
     @Override
-    public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
+    LOGGER.info("Entering visit AssignmentStatement");
+    
+    try {
+        LValue lValue = assignmentStatement.getlValue();
+        Expr expr = assignmentStatement.getE();
+
+        // Visit LValue and Expr to populate their types
+        Type lValueType = (Type) lValue.visit(this, arg);
+        Type exprType = (Type) expr.visit(this, arg);
+
+        // Type check
+        if (lValueType != exprType) {
+            throw new TypeCheckException("Type mismatch in assignment statement");
+        }
+
+        // Everything is fine
+        LOGGER.info("Successfully processed visit AssignmentStatement");
+        return lValueType;
+        
+    } catch (TypeCheckException e) {
+        LOGGER.severe("TypeCheckException in visit AssignmentStatement: " + e.getMessage());
+        throw e;
+    } finally {
+        LOGGER.info("Leaving visit AssignmentStatement");
     }
+}
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
@@ -117,7 +142,28 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitBlockStatement(StatementBlock statementBlock, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering visitBlockStatement");
+    
+        try {
+            // Entering a new scope
+            st.enterScope();
+    
+            // Visit the block within the StatementBlock
+            Block block = statementBlock.getBlock();
+            block.visit(this, arg);
+    
+            // Leaving the scope
+            st.leaveScope();
+    
+            LOGGER.info("Successfully processed visitBlockStatement");
+            return null;  // BlockStatement doesn't have a type
+            
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitBlockStatement: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitBlockStatement");
+        }
     }
 
     @Override
@@ -184,19 +230,31 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitNameDef(NameDef nameDef, Object arg) throws PLCCompilerException {
-        Type type = nameDef.getType();  // Assuming that getType() returns the Type of the NameDef
-        Dimension dimension = nameDef.getDimension();  // Assuming that getDimension() returns the Dimension
-        if (dimension != null) {
-            if (type != Type.IMAGE) {
-                throw new TypeCheckException("Dimension can only be associated with IMAGE type");
+        Type type = null;  // Initialize to a default value
+        LOGGER.info("Entering visitNameDef");
+        try {
+            type = nameDef.getType();  // Assuming that getType() returns the Type of the NameDef
+            Dimension dimension = nameDef.getDimension();  // Assuming that getDimension() returns the Dimension
+            
+            if (dimension != null) {
+                if (type != Type.IMAGE) {
+                    throw new TypeCheckException("Dimension can only be associated with IMAGE type");
+                }
+            } else if (!Arrays.asList(Type.INT, Type.BOOLEAN, Type.STRING, Type.PIXEL, Type.IMAGE).contains(type)) {
+                throw new TypeCheckException("Invalid type for NameDef");
             }
-        } else if (!Arrays.asList(Type.INT, Type.BOOLEAN, Type.STRING, Type.PIXEL, Type.IMAGE).contains(type)) {
-            throw new TypeCheckException("Invalid type for NameDef");
+    
+            st.insert(nameDef);  // Inserting the NameDef into the symbol table
+            LOGGER.info("Successfully processed visitNameDef");
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitNameDef: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitNameDef");
         }
-     
-        st.insert(nameDef);  // Inserting the NameDef into the symbol table
-        return type;
+        return type;  // Return the type, which could be null if an exception was thrown
     }
+    
 
 
     @Override
@@ -265,8 +323,11 @@ public class TypeCheckVisitor implements ASTVisitor {
         throw new UnsupportedOperationException();
     }
     private void check(boolean bool, AST ast, String str) throws TypeCheckException{
-        if(!bool){
+        LOGGER.info("Entering check method");
+        if (!bool) {
+            LOGGER.severe("TypeCheckException in check: " + str);
             throw new TypeCheckException(ast.firstToken.sourceLocation(), str);
         }
+        LOGGER.info("Successfully processed check method");
     }
 }
