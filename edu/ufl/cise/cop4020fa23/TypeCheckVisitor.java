@@ -58,6 +58,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     private static final Logger LOGGER = Logger.getLogger(TypeCheckVisitor.class.getName());
 
+
     //vvv implemented with the symbol table class
     private SymbolTable st;
 
@@ -92,40 +93,29 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
-        int left = (Integer) e.left.visit(this, arg);
-        int right = (Integer ) e.right.visit(this,arg);
-        Kind opKind = e.op.getKind();
-        int val = switch(opKind){
+        Object leftOb = binaryExpr.getLeftExpr().visit(this, arg);
+        Object rightOb = binaryExpr.getRightExpr().visit(this,arg);
+        // ^ change above, only works for EXP, MINUS, TIMES, DIV, MOD when left.getType() == int
+        Kind opKind = binaryExpr.getOpKind();
+
+        int left = (Integer) leftOb;
+        int right = (Integer) rightOb;
+        return switch(opKind){
+            case EXP -> (left << right); //doesn't work for exponents over 31 but like, come on
             case PLUS -> left + right;
-            case MINUS -> left – right;
+            case MINUS -> left-right;
             case TIMES -> left * right;
             case DIV -> left/right;
-            default -> {…}
-        }
-        return val;
+            case MOD -> left%right;
+            case EQ -> left==right;
+            default -> throw new UnsupportedOperationException(); //TODO: change error
+        };
 
-        return val;
         //Copied from slides
     }
-    private Type inferBinaryType(Type left, Kind op){ //pass right as well?
-        switch(op){
-            case BITAND, BITOR ->{
-                return PIXEL;
-            }
-            case AND, OR, LT, GT, LE, GE, EQ ->{
-                return BOOLEAN;
-            }
-            case EXP ->{
-                if(left == PIXEL){
-                    return PIXEL;
-                } else {
-                    return INT;
-                }
-            }
-            case PLUS, MINUS, TIMES, DIV, MOD ->{
-                return left;
-            }
-            default -> throw new UnsupportedOperationException();  //TODO: change error
+    private Type inferBinaryType(Type left){ //pass right as well?
+        switch(left) {
+        default ->
         }
     }
 
