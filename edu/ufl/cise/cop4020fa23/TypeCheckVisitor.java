@@ -557,7 +557,9 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
     @Override
     public Object visitNameDef(NameDef nameDef, Object arg) throws PLCCompilerException {
         Type type = null;  // Initialize to a default value
-        nameDef.getDimension().visit(this, arg);
+        if(nameDef.getDimension() != null){
+            nameDef.getDimension().visit(this, arg);
+        }
         LOGGER.info("Entering visitNameDef");
         try {
             type = nameDef.getType();  // Assuming that getType() returns the Type of the NameDef
