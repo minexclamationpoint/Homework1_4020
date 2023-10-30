@@ -270,7 +270,9 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        identExpr.setNameDef(st.lookup(identExpr.getName()));
+        identExpr.setType(identExpr.getNameDef().getType());
+        return identExpr.getType();
     }
 
     @Override
@@ -282,7 +284,6 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
     public Object visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
         throw new UnsupportedOperationException();
     }
-
     @Override
     public Object visitNameDef(NameDef nameDef, Object arg) throws PLCCompilerException {
         Type type = null;  // Initialize to a default value
@@ -355,27 +356,53 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitUnaryExpr(UnaryExpr unaryExpr, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        unaryExpr.getExpr().visit(this, arg);
+        Kind opKind = unaryExpr.getOp();
+        switch(unaryExpr.getExpr().getType()){
+            case BOOLEAN -> {
+                if(opKind==BANG){
+                    bool val = (int)unaryExpr.getExpr();
+                    return ! (Boolean)unaryExpr.getExpr();
+                }
+                throw new UnsupportedOperationException("Invalid operator for unaryExpr");
+            }
+            case INT -> {
+                if(opKind==MINUS){
+                    return INT;
+                }
+            }
+            case IMAGE -> {
+                if(opKind==RES_width || opKind==RES_height){
+                    return INT;
+                }
+            }
+        }
+        return type;
     }
-
+    //If program, namedef, declaration, or part of expr, return type
+    // (conditionalExpr, BinaryExpr, unarOp Expr, PostFixExpr, PrimaryExpr,
+    // StringLitExpr, NumLitExpr[check], IdentExpr, ConstExpr[check], BooleanLitExpr[check], ExpandedPixelExpr)
+    //otherwise, return the object type
     @Override
     public Object visitWriteStatement(WriteStatement writeStatement, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
-        /*
-        PLCCompilerException {
         writeStatement.getExpr().visit(this, arg);
         return writeStatement;
-         */
     }
-
     @Override
     public Object visitBooleanLitExpr(BooleanLitExpr booleanLitExpr, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        booleanLitExpr.setType(BOOLEAN);
+        return BOOLEAN;
     }
 
     @Override
     public Object visitConstExpr(ConstExpr constExpr, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering const expression");
+        if (constExpr.getName().equals("Z")){
+            constExpr.setType(INT);
+            return INT;
+        }
+        constExpr.setType(PIXEL);
+        return PIXEL;
     }
     private void check(boolean bool, AST ast, String str) throws TypeCheckException{
         LOGGER.info("Entering check method");
