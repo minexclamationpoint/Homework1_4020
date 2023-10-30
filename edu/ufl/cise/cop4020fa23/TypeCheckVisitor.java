@@ -60,7 +60,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 
     //vvv implemented with the symbol table class
-    private SymbolTable st;
+    private SymbolTable st = new SymbolTable();
 
     @Override
 public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
@@ -336,32 +336,222 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitDoStatement(DoStatement doStatement, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering visitDoStatement");
+    
+        try {
+            // Entering a new scope
+            st.enterScope();
+    
+            // Iterate over each GuardedBlock
+            List<GuardedBlock> guardedBlocks = doStatement.getGuardedBlocks();
+            for (GuardedBlock guardedBlock : guardedBlocks) {
+                // Visit and type check the guard expression of the GuardedBlock
+                Type guardType = (Type) guardedBlock.getGuard().visit(this, arg);
+                if (guardType != Type.BOOLEAN) {
+                    throw new TypeCheckException("The guard expression in a DoStatement must be of type BOOLEAN");
+                }
+                
+                // Visit the block of the GuardedBlock
+                Block block = guardedBlock.getBlock();
+                block.visit(this, arg);
+            }
+    
+            // Leaving the scope
+            st.leaveScope();
+    
+            LOGGER.info("Successfully processed visitDoStatement");
+            return null;  // DoStatement doesn't have a type
+    
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitDoStatement: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitDoStatement");
+        }
     }
 
     @Override
     public Object visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering visitExpandedPixelExpr");
+    
+        try {
+            // Visit and type-check the red, green, and blue expressions
+            Type redType = (Type) expandedPixelExpr.getRed().visit(this, arg);
+            Type greenType = (Type) expandedPixelExpr.getGreen().visit(this, arg);
+            Type blueType = (Type) expandedPixelExpr.getBlue().visit(this, arg);
+    
+            // All of red, green, and blue expressions must be of type INT
+            if (redType != Type.INT || greenType != Type.INT || blueType != Type.INT) {
+                throw new TypeCheckException("The expressions for red, green, and blue in an ExpandedPixelExpr must be of type INT");
+            }
+    
+            // Set the type of ExpandedPixelExpr to PIXEL
+            expandedPixelExpr.setType(Type.PIXEL);
+    
+            LOGGER.info("Successfully processed visitExpandedPixelExpr");
+            return Type.PIXEL;
+    
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitExpandedPixelExpr: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitExpandedPixelExpr");
+        }
     }
 
     @Override
     public Object visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering visitGuardedBlock");
+    
+        try {
+            // Visit and type-check the guard expression
+            Expr guard = guardedBlock.getGuard();
+            Type guardType = (Type) guard.visit(this, arg);
+            if (guardType != Type.BOOLEAN) {
+                throw new TypeCheckException("The guard expression in a guarded block must be of type BOOLEAN");
+            }
+    
+            // Visit the block within the GuardedBlock
+            Block block = guardedBlock.getBlock();
+            block.visit(this, arg);
+    
+            LOGGER.info("Successfully processed visitGuardedBlock");
+            return null;  // GuardedBlock doesn't have a type
+    
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitGuardedBlock: " + e.getMessage());
+            throw e;
+    
+        } finally {
+            LOGGER.info("Leaving visitGuardedBlock");
+        }
     }
 
     @Override
     public Object visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering visitIdentExpr");
+    
+        try {
+            // Lookup the NameDef for the identifier in the symbol table
+            NameDef nameDef = st.lookup(identExpr.getName());
+            if (nameDef == null) {
+                throw new TypeCheckException("Undeclared identifier: " + identExpr.getName());
+            }
+    
+            // Set the NameDef of the IdentExpr
+            identExpr.setNameDef(nameDef);
+    
+            // Set the type of the IdentExpr based on the type of the NameDef
+            Type type = nameDef.getType();
+            identExpr.setType(type);
+    
+            LOGGER.info("Successfully processed visitIdentExpr");
+            return type;
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitIdentExpr: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitIdentExpr");
+        }
     }
 
     @Override
     public Object visitIfStatement(IfStatement ifStatement, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering visitIfStatement");
+        
+        try {
+            // Retrieve the list of guarded blocks in the if statement
+            List<GuardedBlock> guardedBlocks = ifStatement.getGuardedBlocks();
+            
+            // Loop through each guarded block
+            for (GuardedBlock guardedBlock : guardedBlocks) {
+                // Visit and type check the guard expression
+                Expr guardExpr = guardedBlock.getGuard();
+                Type guardType = (Type) guardExpr.visit(this, arg);
+                
+                if (guardType != Type.BOOLEAN) {
+                    throw new TypeCheckException("The guard expression in a GuardedBlock must be of type BOOLEAN");
+                }
+                
+                // Visit the block within the guarded block
+                Block block = guardedBlock.getBlock();
+                block.visit(this, arg);
+            }
+            
+            LOGGER.info("Successfully processed visitIfStatement");
+            return null; // IfStatement doesn't have a type
+            
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitIfStatement: " + e.getMessage());
+            throw e;
+            
+        } finally {
+            LOGGER.info("Leaving visitIfStatement");
+        }
     }
 
     @Override
     public Object visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
-        throw new UnsupportedOperationException();
+        LOGGER.info("Entering visitLValue");
+    
+        try {
+            // Lookup the NameDef of this LValue from the symbol table
+            NameDef nd = st.lookup(lValue.getName());
+            if (nd == null) {
+                throw new TypeCheckException("The identifier " + lValue.getName() + " has not been declared");
+            }
+            lValue.setNameDef(nd);
+    
+            Type varType = nd.getType();
+    
+            // Check the pixel selector and channel selector
+            
+            PixelSelector ps = lValue.getPixelSelector();
+            ChannelSelector cs = lValue.getChannelSelector();
+    
+            // Conditions for PixelSelector and ChannelSelector
+
+            if (ps != null && varType != Type.IMAGE) {
+                throw new TypeCheckException("PixelSelector is only valid for IMAGE type");
+            }
+    
+            if (cs != null && (varType != Type.IMAGE && varType != Type.PIXEL)) {
+                throw new TypeCheckException("ChannelSelector is only valid for IMAGE or PIXEL type");
+            }
+    
+            // Infer the LValue type 
+            Type inferredType = inferLValueType(varType, ps, cs);
+            lValue.setType(inferredType);
+    
+            LOGGER.info("Successfully processed visitLValue with inferredType: " + inferredType);
+            return inferredType;
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitLValue: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitLValue");
+        }
+    }
+    
+    private Type inferLValueType(Type varType, PixelSelector ps, ChannelSelector cs) throws TypeCheckException {
+        if (ps == null && cs == null) {
+            return varType;
+        }
+        if (ps != null && cs == null) {
+            return Type.PIXEL;
+        }
+        if (ps != null && cs != null) {
+            return Type.INT;
+        }
+        if (ps == null && cs != null) {
+            if (varType == Type.IMAGE) {
+                return Type.IMAGE;
+            }
+            if (varType == Type.PIXEL) {
+                return Type.INT;
+            }
+        }
+        throw new TypeCheckException("Unable to infer LValue type");
     }
 
     @Override
