@@ -169,13 +169,17 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitBlock(Block block, Object arg) throws PLCCompilerException {
+        LOGGER.info("Entering visitBlock");
+    
         st.enterScope();
         List<BlockElem> blockElems = block.getElems();
         for (BlockElem elem : blockElems) {
-            elem.visit(this, arg);
+            elem.visit(this, arg); // Passing the program type down to the block elements
         }
         st.leaveScope();
-        return block;
+    
+        LOGGER.info("Leaving visitBlock");
+        return null; // Block itself doesn't have a type
     }
 
     @Override
@@ -686,16 +690,19 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitProgram(Program program, Object arg) throws PLCCompilerException {
+        LOGGER.info("Entering visitProgram");
+    
         Type type = Type.kind2type(program.getTypeToken().kind());
         program.setType(type);  // Setting the type attribute for Program
-        
         st.enterScope();  // Entering a new scope in the symbol table
         List<NameDef> params = program.getParams();
         for (NameDef param : params) {
             param.visit(this, arg);  // Visiting each NameDef child node
         }
-        program.getBlock().visit(this, arg);  // Visiting the Block child node
+        program.getBlock().visit(this, type);  // Visiting the Block child node, passing the program type
         st.leaveScope();  // Leaving the scope in the symbol table
+    
+        LOGGER.info("Leaving visitProgram");
         return type;
     }
 
