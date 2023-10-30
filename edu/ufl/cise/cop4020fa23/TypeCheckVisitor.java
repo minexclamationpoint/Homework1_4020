@@ -65,36 +65,44 @@ public class TypeCheckVisitor implements ASTVisitor {
    // private Type currentProgramType;
 
     @Override
-public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
-    LOGGER.info("Entering visit AssignmentStatement");
-    
-    try {
-        LValue lValue = assignmentStatement.getlValue();
-        Expr expr = assignmentStatement.getE();
-    
-
-        // Visit LValue and Expr to populate their types
-        Type lValueType = (Type) lValue.visit(this, arg);
-        Type exprType = (Type) expr.visit(this, arg);
-        LOGGER.info("Type of LValue: " + lValueType);
-        LOGGER.info("Type of Expr: " + exprType);
+    public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
+        LOGGER.info("Entering visit AssignmentStatement");
         
-        // Type check
-        if (lValueType != exprType) {
-            throw new TypeCheckException("Type mismatch in assignment statement");
+        try {
+            // Entering a new scope for this assignment statement
+            st.enterScope();
+    
+            // Get the LValue and Expr from the assignment statement
+            LValue lValue = assignmentStatement.getlValue();
+            Expr expr = assignmentStatement.getE();
+    
+            // Visit LValue and Expr to populate their types
+            Type lValueType = (Type) lValue.visit(this, true); // Assuming LValue context
+            Type exprType = (Type) expr.visit(this, null); // Assuming no special context for Expr
+            LOGGER.info("Type of LValue: " + lValueType);
+            LOGGER.info("Type of Expr: " + exprType);
+    
+            // Type compatibility check
+            if (lValueType != exprType &&
+                !(lValueType == Type.PIXEL && exprType == Type.INT) &&
+                !(lValueType == Type.IMAGE && (exprType == Type.PIXEL || exprType == Type.INT || exprType == Type.STRING))) {
+                throw new TypeCheckException("Type mismatch in assignment statement");
+            }
+    
+            // Everything is fine, leaving scope
+            st.leaveScope();
+    
+            LOGGER.info("Successfully processed visit AssignmentStatement");
+            return lValueType;
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visit AssignmentStatement: " + e.getMessage());
+            throw e;
+        } finally {
+            // Make sure to leave the scope in case of an exception
+            st.leaveScope();
+            LOGGER.info("Leaving visit AssignmentStatement");
         }
-
-        // Everything is fine
-        LOGGER.info("Successfully processed visit AssignmentStatement");
-        return lValueType;
-        
-    } catch (TypeCheckException e) {
-        LOGGER.severe("TypeCheckException in visit AssignmentStatement: " + e.getMessage());
-        throw e;
-    } finally {
-        LOGGER.info("Leaving visit AssignmentStatement");
     }
-}
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
@@ -601,41 +609,65 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
-        //not sure if this is :ok:
-        Type typeX = (Type) pixelSelector.xExpr().visit(this, arg);
-        Type typeY = (Type) pixelSelector.yExpr().visit(this, arg);
-        if((Boolean) arg){
-            IToken tokenD = new Token(EOF, 0, 0, null, null);
-            IdentExpr dummy = new IdentExpr(tokenD);
-            if(pixelSelector.xExpr() instanceof  IdentExpr){
-                dummy = (IdentExpr) pixelSelector.xExpr();
-                if(st.lookup(dummy.getName()) == null){
-                    SyntheticNameDef name = new SyntheticNameDef(dummy.getName());
-                    st.insert(name);
+        LOGGER.info("Entering visitPixelSelector");
+    
+        // Declare scopeEntered to keep track of whether we enter a new scope
+        boolean scopeEntered = false;
+    
+        try {
+            // Checking if we are in an LValue context (left-hand side of assignment)
+            boolean inLValueContext = (Boolean) arg;
+    
+            // If we are in an LValue context and the identifiers x and y are not declared,
+            // we enter a new scope and add synthetic definitions for x and y
+            if (inLValueContext) {
+                if (st.lookup("x") == null) {
+                    SyntheticNameDef nameX = new SyntheticNameDef("x");
+                    st.enterScope();
+                    st.insert(nameX);
+                    scopeEntered = true;
                 }
-            } else if(!(pixelSelector.xExpr() instanceof NumLitExpr)){
-                throw new TypeCheckException("expected IdentExpr or NumLitExpr xExpr");
-            }
-
-            if(pixelSelector.yExpr() instanceof  IdentExpr){
-                dummy = (IdentExpr) pixelSelector.yExpr();
-                if(st.lookup(dummy.getName()) == null){
-                    SyntheticNameDef name = new SyntheticNameDef(dummy.getName());
-                    st.insert(name);
+                if (st.lookup("y") == null) {
+                    SyntheticNameDef nameY = new SyntheticNameDef("y");
+                    if (!scopeEntered) {
+                        st.enterScope();
+                    }
+                    st.insert(nameY);
+                    scopeEntered = true;
                 }
-            } else if(!(pixelSelector.yExpr() instanceof NumLitExpr)){
-                throw new TypeCheckException("expected IdentExpr or NumLitExpr yExpr");
             }
+    
+            // Now visit the x and y expressions
+            Type typeX = (Type) pixelSelector.xExpr().visit(this, arg);
+            Type typeY = (Type) pixelSelector.yExpr().visit(this, arg);
+    
+            // Check that the types are INT
+            if (typeX != Type.INT || typeY != Type.INT) {
+                throw new TypeCheckException("Expected type INT for component expressions");
+            }
+    
+            LOGGER.info("Successfully processed visitPixelSelector");
+            return pixelSelector;
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitPixelSelector: " + e.getMessage());
+            throw e;
+        } finally {
+            // If we entered a new scope, we should leave it
+            if (scopeEntered) {
+                st.leaveScope();
+            }
+            LOGGER.info("Leaving visitPixelSelector");
         }
-        if(typeX != INT || typeY != INT){
-            throw new TypeCheckException("expected type INT for component expressions");
-        }
-        return pixelSelector;
     }
+    
     @Override
     public Object visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
         postfixExpr.primary().setType((Type) postfixExpr.primary().visit(this, arg));
-        Type pixelType = (Type) postfixExpr.pixel().visit(this, false); //idk,,,,,
+        Object pixelVisitResult = postfixExpr.pixel().visit(this, false);
+        if (!(pixelVisitResult instanceof Type)) {
+            throw new TypeCheckException("Expected Type from PixelSelector visit");
+        }
+        Type pixelType = (Type) pixelVisitResult;
         postfixExpr.setType(inferPostfixExprType(postfixExpr.primary().getType(), postfixExpr.pixel(), postfixExpr.channel()));
         return postfixExpr.getType();
     }
