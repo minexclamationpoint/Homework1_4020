@@ -611,15 +611,11 @@ public class TypeCheckVisitor implements ASTVisitor {
     public Object visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
         LOGGER.info("Entering visitPixelSelector");
     
-        // Declare scopeEntered to keep track of whether we enter a new scope
         boolean scopeEntered = false;
     
         try {
-            // Checking if we are in an LValue context (left-hand side of assignment)
             boolean inLValueContext = (Boolean) arg;
     
-            // If we are in an LValue context and the identifiers x and y are not declared,
-            // we enter a new scope and add synthetic definitions for x and y
             if (inLValueContext) {
                 if (st.lookup("x") == null) {
                     SyntheticNameDef nameX = new SyntheticNameDef("x");
@@ -637,29 +633,27 @@ public class TypeCheckVisitor implements ASTVisitor {
                 }
             }
     
-            // Now visit the x and y expressions
+            // Visiting the x and y expressions
             Type typeX = (Type) pixelSelector.xExpr().visit(this, arg);
             Type typeY = (Type) pixelSelector.yExpr().visit(this, arg);
     
-            // Check that the types are INT
             if (typeX != Type.INT || typeY != Type.INT) {
                 throw new TypeCheckException("Expected type INT for component expressions");
             }
     
             LOGGER.info("Successfully processed visitPixelSelector");
-            return pixelSelector;
+            return Type.INT;  // Return the type of the pixel selector, which is INT
         } catch (TypeCheckException e) {
             LOGGER.severe("TypeCheckException in visitPixelSelector: " + e.getMessage());
             throw e;
         } finally {
-            // If we entered a new scope, we should leave it
             if (scopeEntered) {
                 st.leaveScope();
             }
             LOGGER.info("Leaving visitPixelSelector");
         }
     }
-    
+
     @Override
     public Object visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
         postfixExpr.primary().setType((Type) postfixExpr.primary().visit(this, arg));
