@@ -507,7 +507,7 @@ public class TypeCheckVisitor implements ASTVisitor {
     @Override
     public Object visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
         LOGGER.info("Entering visitLValue");
-
+    
         try {
             // Lookup the NameDef of this LValue from the symbol table
             NameDef nd = st.lookup(lValue.getName());
@@ -515,28 +515,31 @@ public class TypeCheckVisitor implements ASTVisitor {
                 throw new TypeCheckException("The identifier " + lValue.getName() + " has not been declared");
             }
             lValue.setNameDef(nd);
-
+    
             Type varType = nd.getType();
-
+    
             // Check the pixel selector and channel selector
-            lValue.getPixelSelector().visit(this, true);
             PixelSelector ps = lValue.getPixelSelector();
             ChannelSelector cs = lValue.getChannelSelector();
-
+    
+            if (ps != null) {
+                ps.visit(this, true);  // True indicates we are in an LValue context
+            }
+    
             // Conditions for PixelSelector and ChannelSelector
-
+    
             if (ps != null && varType != Type.IMAGE) {
                 throw new TypeCheckException("PixelSelector is only valid for IMAGE type");
             }
-
+    
             if (cs != null && (varType != Type.IMAGE && varType != Type.PIXEL)) {
                 throw new TypeCheckException("ChannelSelector is only valid for IMAGE or PIXEL type");
             }
-
+    
             // Infer the LValue type
             Type inferredType = inferLValueType(varType, ps, cs);
             lValue.setType(inferredType);
-
+    
             LOGGER.info("Successfully processed visitLValue with inferredType: " + inferredType);
             return inferredType;
         } catch (TypeCheckException e) {
@@ -546,6 +549,7 @@ public class TypeCheckVisitor implements ASTVisitor {
             LOGGER.info("Leaving visitLValue");
         }
     }
+    
 
     private Type inferLValueType(Type varType, PixelSelector ps, ChannelSelector cs) throws TypeCheckException {
         if (ps == null && cs == null) {
