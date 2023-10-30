@@ -31,9 +31,12 @@ public class SymbolTable {
     }
 
     public void leaveScope() {
+        if(scopeStack.isEmpty()) {
+            logger.warning("Attempt to leave scope when no scope has been entered");
+            return;
+        }
         int leavingScope = scopeStack.pop();
         logger.info("Leaving scope: " + leavingScope);
-
         if (!scopeStack.isEmpty()) {
             currentNum = scopeStack.peek();
         }
@@ -51,7 +54,7 @@ public class SymbolTable {
         Stack<ScopeEntry> chain = table.get(name);
         if (chain == null) {
             logger.warning("Identifier not found in any scope: " + name);
-            return null; // Identifier not found in any scope
+            return null;
         }
 
         for (int i = scopeStack.size() - 1; i >= 0; i--) {
@@ -59,12 +62,12 @@ public class SymbolTable {
             for (ScopeEntry entry : chain) {
                 if (entry.scopeSerial == currentScopeSerial) {
                     logger.info("Identifier found in scope: " + currentScopeSerial);
-                    return entry.nameDef; // Identifier found in the current scope or an enclosing scope
+                    return entry.nameDef; 
                 }
             }
         }
 
         logger.warning("Identifier not found in the current scope or any enclosing scopes: " + name);
-        return null; // Identifier not found in the current scope or any enclosing scopes
+        return null; 
     }
 }
