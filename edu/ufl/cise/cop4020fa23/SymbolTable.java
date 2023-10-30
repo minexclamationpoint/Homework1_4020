@@ -1,6 +1,7 @@
 package edu.ufl.cise.cop4020fa23;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 import edu.ufl.cise.cop4020fa23.ast.NameDef;
 import edu.ufl.cise.cop4020fa23.exceptions.TypeCheckException;
@@ -60,14 +61,33 @@ public class SymbolTable {
         for (int i = scopeStack.size() - 1; i >= 0; i--) {
             int currentScopeSerial = scopeStack.get(i);
             for (ScopeEntry entry : chain) {
+                logger.info("Comparing " + entry.scopeSerial + " with " + currentScopeSerial);
                 if (entry.scopeSerial == currentScopeSerial) {
                     logger.info("Identifier found in scope: " + currentScopeSerial);
                     return entry.nameDef; 
                 }
             }
         }
+        
 
         logger.warning("Identifier not found in the current scope or any enclosing scopes: " + name);
         return null; 
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SymbolTable { \n");
+        for (Map.Entry<String, Stack<ScopeEntry>> entry : table.entrySet()) {
+            sb.append("  Identifier: ").append(entry.getKey()).append("\n");
+            Stack<ScopeEntry> stack = entry.getValue();
+            for (ScopeEntry scopeEntry : stack) {
+                sb.append("    Scope: ").append(scopeEntry.scopeSerial)
+                .append(", NameDef: ").append(scopeEntry.nameDef.toString()).append("\n");
+            }
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
 }

@@ -61,6 +61,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     //vvv implemented with the symbol table class
     private SymbolTable st = new SymbolTable();
+    
 
    // private Type currentProgramType;
 
@@ -89,8 +90,7 @@ public class TypeCheckVisitor implements ASTVisitor {
                 throw new TypeCheckException("Type mismatch in assignment statement");
             }
     
-            // Everything is fine, leaving scope
-            st.leaveScope();
+          
     
             LOGGER.info("Successfully processed visit AssignmentStatement");
             return lValueType;
@@ -387,31 +387,56 @@ public class TypeCheckVisitor implements ASTVisitor {
     @Override
     public Object visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
         LOGGER.info("Entering visitExpandedPixelExpr");
-
+    
+        boolean scopeEntered = false;
+    
         try {
+            // Check if we are in a context where the identifiers could be implicitly declared
+            if (st.lookup("x") == null) {
+                SyntheticNameDef nameX = new SyntheticNameDef("x");
+                st.enterScope();
+                st.insert(nameX);
+                scopeEntered = true;
+                LOGGER.info("Implicitly declared x");
+            }
+            if (st.lookup("y") == null) {
+                SyntheticNameDef nameY = new SyntheticNameDef("y");
+                if (!scopeEntered) {
+                    st.enterScope();
+                }
+                st.insert(nameY);
+                scopeEntered = true;
+                LOGGER.info("Implicitly declared y");
+            }
+    
             // Visit and type-check the red, green, and blue expressions
-            Type redType = (Type) expandedPixelExpr.getRed().visit(this, arg);
-            Type greenType = (Type) expandedPixelExpr.getGreen().visit(this, arg);
-            Type blueType = (Type) expandedPixelExpr.getBlue().visit(this, arg);
-
-            // All of red, green, and blue expressions must be of type INT
+            Type redType = (Type) expandedPixelExpr.getRed().visit(this, "PixelSelectorContext");
+            Type greenType = (Type) expandedPixelExpr.getGreen().visit(this, "PixelSelectorContext");
+            Type blueType = (Type) expandedPixelExpr.getBlue().visit(this, "PixelSelectorContext");
+    
+      
             if (redType != Type.INT || greenType != Type.INT || blueType != Type.INT) {
                 throw new TypeCheckException("The expressions for red, green, and blue in an ExpandedPixelExpr must be of type INT");
             }
 
-            // Set the type of ExpandedPixelExpr to PIXEL
             expandedPixelExpr.setType(Type.PIXEL);
-
+    
             LOGGER.info("Successfully processed visitExpandedPixelExpr");
             return Type.PIXEL;
-
+    
         } catch (TypeCheckException e) {
             LOGGER.severe("TypeCheckException in visitExpandedPixelExpr: " + e.getMessage());
             throw e;
         } finally {
+
+            if (scopeEntered) {
+                st.leaveScope();
+            }
             LOGGER.info("Leaving visitExpandedPixelExpr");
         }
     }
+
+    
 
     @Override
     public Object visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
@@ -444,21 +469,30 @@ public class TypeCheckVisitor implements ASTVisitor {
     @Override
     public Object visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
         LOGGER.info("Entering visitIdentExpr");
-
+        LOGGER.info("Current Symbol Table: " + st.toString());
+    
         try {
             // Lookup the NameDef for the identifier in the symbol table
             NameDef nameDef = st.lookup(identExpr.getName());
-            if (nameDef == null) {
+    
+            // Check if we are in a context where the identifier could be implicitly declared
+            // We use arg to pass the context information. It can be a String representing the context.
+            if (nameDef == null && arg != null && arg.equals("PixelSelectorContext")) {
+                nameDef = new SyntheticNameDef(identExpr.getName());  // Implicit type assumed to be INT
+                st.insert(nameDef);
+                identExpr.setNameDef(nameDef);
+                identExpr.setType(Type.INT);
+                LOGGER.info("Implicitly declared identifier: " + identExpr.getName());
+                return Type.INT;
+            } else if (nameDef == null) {
                 throw new TypeCheckException("Undeclared identifier: " + identExpr.getName());
             }
-
-            // Set the NameDef of the IdentExpr
+    
+            // Set the NameDef and Type of the IdentExpr
             identExpr.setNameDef(nameDef);
-
-            // Set the type of the IdentExpr based on the type of the NameDef
             Type type = nameDef.getType();
             identExpr.setType(type);
-
+    
             LOGGER.info("Successfully processed visitIdentExpr");
             return type;
         } catch (TypeCheckException e) {
@@ -626,6 +660,7 @@ public class TypeCheckVisitor implements ASTVisitor {
                     st.enterScope();
                     st.insert(nameX);
                     scopeEntered = true;
+                    LOGGER.info("Implicitly declared x");
                 }
                 if (st.lookup("y") == null) {
                     SyntheticNameDef nameY = new SyntheticNameDef("y");
@@ -634,30 +669,31 @@ public class TypeCheckVisitor implements ASTVisitor {
                     }
                     st.insert(nameY);
                     scopeEntered = true;
+                    LOGGER.info("Implicitly declared y");
                 }
             }
-    
-            // Visiting the x and y expressions
-            Type typeX = (Type) pixelSelector.xExpr().visit(this, arg);
-            Type typeY = (Type) pixelSelector.yExpr().visit(this, arg);
+
+            Type typeX = (Type) pixelSelector.xExpr().visit(this, "PixelSelectorContext");
+            Type typeY = (Type) pixelSelector.yExpr().visit(this, "PixelSelectorContext");
+
     
             if (typeX != Type.INT || typeY != Type.INT) {
                 throw new TypeCheckException("Expected type INT for component expressions");
             }
     
             LOGGER.info("Successfully processed visitPixelSelector");
-            return Type.INT;  // Return the type of the pixel selector, which is INT
+            return Type.INT;
         } catch (TypeCheckException e) {
             LOGGER.severe("TypeCheckException in visitPixelSelector: " + e.getMessage());
             throw e;
         } finally {
+          
             if (scopeEntered) {
                 st.leaveScope();
             }
             LOGGER.info("Leaving visitPixelSelector");
         }
     }
-
     @Override
     public Object visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
         postfixExpr.primary().setType((Type) postfixExpr.primary().visit(this, arg));
