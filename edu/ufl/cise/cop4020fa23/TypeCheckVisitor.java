@@ -62,6 +62,8 @@ public class TypeCheckVisitor implements ASTVisitor {
     //vvv implemented with the symbol table class
     private SymbolTable st = new SymbolTable();
 
+   // private Type currentProgramType;
+
     @Override
 public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
     LOGGER.info("Entering visit AssignmentStatement");
@@ -686,6 +688,7 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
     public Object visitProgram(Program program, Object arg) throws PLCCompilerException {
         Type type = Type.kind2type(program.getTypeToken().kind());
         program.setType(type);  // Setting the type attribute for Program
+        
         st.enterScope();  // Entering a new scope in the symbol table
         List<NameDef> params = program.getParams();
         for (NameDef param : params) {
@@ -698,13 +701,31 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitReturnStatement(ReturnStatement returnStatement, Object arg) throws PLCCompilerException {
-        Type type = (Type) returnStatement.getE().visit(this, arg);
-        if(type == ((Type) arg)){
-            return type;
-        } else {
-            throw new TypeCheckException("Expected equivalent type to parent program: " + ((Type) arg));
+        LOGGER.info("Entering visitReturnStatement");
+    
+        try {
+            // Visit the expression in ReturnStatement to get its type
+            Type exprType = (Type) returnStatement.getE().visit(this, arg);
+    
+            // Check if the type of the expression matches the type of the parent program (which is passed as arg)
+            if (exprType == arg) {
+                // Types match, so we can proceed
+                LOGGER.info("Successfully processed visitReturnStatement: Type matches parent program.");
+                return exprType;
+            } else {
+                // Types do not match, so we throw an exception
+                String errorMsg = "Mismatched types: Expected " + arg + " but found " + exprType;
+                LOGGER.severe("TypeCheckException in visitReturnStatement: " + errorMsg);
+                throw new TypeCheckException(errorMsg);
+            }
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitReturnStatement: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitReturnStatement");
         }
     }
+
 
     @Override
     public Object visitStringLitExpr(StringLitExpr stringLitExpr, Object arg) throws PLCCompilerException {
