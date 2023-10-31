@@ -57,6 +57,15 @@ import edu.ufl.cise.cop4020fa23.exceptions.TypeCheckException;
 class TypeCheckTest_starter {
 	static final int TIMEOUT_MILLIS = 1000;
 
+	static final boolean VERBOSE = true;
+
+
+	void show(Object obj) {
+		if (VERBOSE) {
+			System.out.println(obj);
+		}
+	}
+
 	AST getDecoratedAST(String input) throws PLCCompilerException {
 		AST ast = ComponentFactory.makeParser(input).parse();
 		ASTVisitor typeChecker = ComponentFactory.makeTypeChecker();
@@ -1101,5 +1110,168 @@ class TypeCheckTest_starter {
 			AST ast = getDecoratedAST(input);
 		});
 	}
+	@Test
+	void unitTestLValueTypeWhenPixelSelector() throws PLCCompilerException {
+		String input = """
+         image f()<:
+         string i = "url";
+         int x;
+         int y;
+         i[x,y]:red = [x,y,0]; ## i must be image
+         :>
+         """;
+		TypeCheckException e = assertThrows(TypeCheckException.class, () -> {
+			getDecoratedAST(input);
+		});
+		show("Error message from unitTestLValueTypeWhenPixelSelector: " + e.getMessage());
+	}
+
+
+	@Test
+	void unitTestLValueTypeWhenChannelSelector() throws PLCCompilerException {
+		String input = """
+         image f()<:
+         string i = "url";
+         int x;
+         int y;
+         i:red = [x,y,0]; ## i must be image or pixel
+         :>
+         """;
+		TypeCheckException e = assertThrows(TypeCheckException.class, () -> {
+			getDecoratedAST(input);
+		});
+		show("Error message from unitTestLValueTypeWhenChannelSelector: " + e.getMessage());
+	}
+
+
+	@Test
+	void unitTestLValuePixelSelectorType() throws PLCCompilerException {
+		String input = """
+         image f()<:
+         image i = "url";
+         string x;
+         string y;
+         i[x,y] = [x,y,0]; ##x and y must be int
+         :>
+         """;
+		TypeCheckException e = assertThrows(TypeCheckException.class, () -> {
+			getDecoratedAST(input);
+		});
+		show("Error message from unitTestLValuePixelSelectorType: " + e.getMessage());
+	}
+
+
+	@Test
+	void unitTestMixedSyntheticPixelSelector() throws PLCCompilerException {
+		String input = """
+         image f() <:
+            image x;
+            int z = 2;
+            x[z,y] = [y,z,z]; ## Only one of these has to have a synthetic name definition
+            ^x;
+            :>
+         """;
+		AST ast = getDecoratedAST(input);
+		Program program0 = checkProgram(ast, Type.IMAGE, "f");
+		List<NameDef> params1 = program0.getParams();
+		assertEquals(0, params1.size());
+		Block programBlock2 = ((Program) ast).getBlock();
+		List<BlockElem> blockElemList3 = programBlock2.getElems();
+		assertEquals(4, blockElemList3.size());
+		BlockElem blockElem4 = blockElemList3.get(0);
+		checkDec(blockElem4);
+		NameDef nameDef5 = ((Declaration) blockElem4).getNameDef();
+		checkNameDef(nameDef5, Type.IMAGE, "x");
+		BlockElem blockElem6 = blockElemList3.get(1);
+		NameDef nameDef7 = ((Declaration) blockElem6).getNameDef();
+		checkNameDef(nameDef7, Type.INT, "z");
+		Expr expr8 = ((Declaration) blockElem6).getInitializer();
+		checkNumLitExpr(expr8, 2);
+		BlockElem blockElem9 = blockElemList3.get(2);
+		assertThat("", blockElem9, instanceOf(AssignmentStatement.class));
+		LValue LValue10 = ((AssignmentStatement) blockElem9).getlValue();
+		assertThat("", LValue10, instanceOf(LValue.class));
+		String name11 = LValue10.getName();
+		assertEquals("x", name11);
+		PixelSelector pixel9 = LValue10.getPixelSelector();
+		Expr x12 = pixel9.xExpr();
+		checkIdentExpr(x12, "z", Type.INT);
+		Expr y13 = pixel9.yExpr();
+		checkIdentExpr(y13, "y", Type.INT);
+		assertNull(LValue10.getChannelSelector());
+		Expr expr14 = ((AssignmentStatement) blockElem9).getE();
+		Expr red15 = ((ExpandedPixelExpr) expr14).getRed();
+		checkIdentExpr(red15, "y", Type.INT);
+		Expr green16 = ((ExpandedPixelExpr) expr14).getGreen();
+		checkIdentExpr(green16, "z", Type.INT);
+		Expr blue17 = ((ExpandedPixelExpr) expr14).getBlue();
+		checkIdentExpr(blue17, "z", Type.INT);
+		BlockElem blockElem18 = blockElemList3.get(3);
+		assertThat("", blockElem18, instanceOf(ReturnStatement.class));
+		Expr returnValueExpr19 = ((ReturnStatement) blockElem18).getE();
+		checkIdentExpr(returnValueExpr19, "x", Type.IMAGE);
+	}
+
+
+	@Test
+	void unitTestVariableNotInScope1() throws PLCCompilerException {
+		String input = """
+         int f()<:
+         int i = 3;
+         do i > 0 -> <:
+            string xx = "hello";
+            write xx;
+            i = i -1;
+         :>
+         od;
+         i = 3;
+         do i > 0 -> <:
+            write xx;  ##error xx not visible here
+            i = i -1;
+         :>
+         od;
+         ^ i;
+         :>
+         """;
+		TypeCheckException e = assertThrows(TypeCheckException.class, () -> {
+			getDecoratedAST(input);
+		});
+		show("Error message from unitTestVariableNotInScope1: " + e.getMessage());
+	}
+
+
+	@Test
+	void unitTestVariableNotInScope2() throws PLCCompilerException {
+		String input = """
+         int f() <:
+            image x;
+            x[z,y] = [y,z,z];
+            ^y; ##y not visible here
+            :>
+         """;
+		TypeCheckException e = assertThrows(TypeCheckException.class, () -> {
+			getDecoratedAST(input);
+		});
+		show("Error message from unitTestVariableNotInScope2: " + e.getMessage());
+	}
+
+
+	@Test
+	void unitTestVariableAlreadyInScope() throws PLCCompilerException {
+		String input = """
+         int f() <:
+            image x;
+            int x; ## x was already defined
+            :>
+         """;
+		TypeCheckException e = assertThrows(TypeCheckException.class, () -> {
+			getDecoratedAST(input);
+		});
+		show("Error message from unitTestVariableAlreadyInScope: " + e.getMessage());
+	}
+
+
+
+
 
 }
