@@ -1269,8 +1269,31 @@ class TypeCheckTest_starter {
 		});
 		show("Error message from unitTestVariableAlreadyInScope: " + e.getMessage());
 	}
-
-
+	@Test
+	void test33() throws PLCCompilerException {
+		String input = """
+    	int f() <:
+    		image x;
+    		boolean b = TRUE;
+    		<:
+    		boolean b = TRUE;
+    		:>;
+    		do b -> <: int x = 3; int y = 4; write x+y; b = FALSE; :> od;
+    		<:
+    			int z = 4;
+    		:>;
+    		do b -> <: int x = 3; int z = 5; write x-z; b = FALSE; :> od;
+    		int y = 2;
+    		int x;
+    	:>
+		""";
+		TypeCheckException e = assertThrows(TypeCheckException.class, () -> {
+			getDecoratedAST(input);
+		});
+		show("Error message from test33: " + e.getMessage());
+		//should send an error about the int x; at the end of the program
+		//Everything before it is strangely written but it's entirely within grammar
+	}
 
 
 

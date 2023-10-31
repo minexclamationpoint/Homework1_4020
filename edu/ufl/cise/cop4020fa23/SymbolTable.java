@@ -89,4 +89,30 @@ public class SymbolTable {
         return sb.toString();
     }
 
+    public int getCurrentNum(){
+        return currentNum;
+    }
+
+    public int getScopeOfSymbol(String name) {
+        logger.info("Looking up " + name);
+        Stack<ScopeEntry> chain = table.get(name);
+        if (chain == null) {
+            logger.warning("Identifier not found in any scope: " + name);
+            return -1;
+        }
+
+        for (int i = scopeStack.size() - 1; i >= 0; i--) {
+            int currentScopeSerial = scopeStack.get(i);
+            for (ScopeEntry entry : chain) {
+                logger.info("Comparing " + entry.scopeSerial + " with " + currentScopeSerial);
+                if (entry.scopeSerial == currentScopeSerial) {
+                    logger.info("Identifier found in scope: " + currentScopeSerial);
+                    return currentScopeSerial;
+                }
+            }
+        }
+        logger.warning("Identifier not found in the current scope or any enclosing scopes: " + name);
+        return -1;
+    }
+
 }
