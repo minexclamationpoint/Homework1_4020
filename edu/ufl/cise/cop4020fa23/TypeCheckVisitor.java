@@ -76,10 +76,12 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Get the LValue and Expr from the assignment statement
             LValue lValue = assignmentStatement.getlValue();
             Expr expr = assignmentStatement.getE();
-    
             // Visit LValue and Expr to populate their types
-            Type lValueType = (Type) lValue.visit(this, true); // Assuming LValue context
-            Type exprType = (Type) expr.visit(this, null); // Assuming no special context for Expr
+            st.enterScope();
+            //entering a new scope for variable declaration
+            Type lValueType = (Type) lValue.visit(this, arg); // Assuming LValue context
+            Type exprType = (Type) expr.visit(this, arg); // Assuming no special context for Expr
+            st.leaveScope();
             LOGGER.info("Type of LValue: " + lValueType);
             LOGGER.info("Type of Expr: " + exprType);
     
@@ -93,6 +95,7 @@ public class TypeCheckVisitor implements ASTVisitor {
           
     
             LOGGER.info("Successfully processed visit AssignmentStatement");
+            st.leaveScope();
             return lValueType;
         } catch (TypeCheckException e) {
             LOGGER.severe("TypeCheckException in visit AssignmentStatement: " + e.getMessage());
@@ -282,31 +285,30 @@ public class TypeCheckVisitor implements ASTVisitor {
         LOGGER.info("Entering visitDeclaration");
     
         try {
-            // Get the NameDef and its type
-            NameDef nameDef = declaration.getNameDef();
-            Type nameDefType = (Type) nameDef.visit(this, arg); // This should populate the type in NameDef as well
-    
-            // Get the initializer Expr and its type if it is not null
+            // Get the initializer, create variables
             Expr initializer = declaration.getInitializer();
-            Type initializerType = null;
-            if (initializer != null) {
-                initializerType = (Type) initializer.visit(this, arg); // This should populate the type in Expr as well
-            }
-    
-            // Check conditions
-            if (initializerType != null) {
-                if (initializerType != nameDefType) {
-                    if (initializerType == Type.STRING && nameDefType == Type.IMAGE) {
-                        // Special case is valid, do nothing
-                    } else {
-                        throw new TypeCheckException("Type mismatch between NameDef and Expr in declaration");
+            Type initType = VOID;
+            NameDef nameDef;
+            Type nameDefType;
+            // branch whether or not initializer should be visited or not
+            if(initializer != null){
+                initType = (Type) initializer.visit(this, arg);
+                nameDef = declaration.getNameDef();
+                nameDefType = (Type) nameDef.visit(this, arg);
+                //Check conditions
+                if((initType == nameDefType) || ((initType == STRING) && (nameDefType == IMAGE))){
+                    LOGGER.info("Successfully processed visitDeclaration");
+                    if(st.lookup(declaration.getNameDef().getName()) != null){
                     }
+                    return nameDefType;
                 }
+                throw new TypeCheckException("mismatched parameters in declaration");
+            } else {
+                nameDef = declaration.getNameDef();
+                nameDefType = (Type) nameDef.visit(this, arg);
+                return nameDefType;
             }
-    
             // Successfully processed the declaration
-            LOGGER.info("Successfully processed visitDeclaration");
-            return nameDefType;  // Returning the type of NameDef
     
         } catch (TypeCheckException e) {
             LOGGER.severe("TypeCheckException in visitDeclaration: " + e.getMessage());
@@ -468,39 +470,13 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitIdentExpr");
-        LOGGER.info("Current Symbol Table: " + st.toString());
-    
-        try {
-            // Lookup the NameDef for the identifier in the symbol table
-            NameDef nameDef = st.lookup(identExpr.getName());
-    
-            // Check if we are in a context where the identifier could be implicitly declared
-            // We use arg to pass the context information. It can be a String representing the context.
-            if (nameDef == null && arg != null && arg.equals("PixelSelectorContext")) {
-                nameDef = new SyntheticNameDef(identExpr.getName());  // Implicit type assumed to be INT
-                st.insert(nameDef);
-                identExpr.setNameDef(nameDef);
-                identExpr.setType(Type.INT);
-                LOGGER.info("Implicitly declared identifier: " + identExpr.getName());
-                return Type.INT;
-            } else if (nameDef == null) {
-                throw new TypeCheckException("Undeclared identifier: " + identExpr.getName());
-            }
-    
-            // Set the NameDef and Type of the IdentExpr
-            identExpr.setNameDef(nameDef);
-            Type type = nameDef.getType();
-            identExpr.setType(type);
-    
-            LOGGER.info("Successfully processed visitIdentExpr");
-            return type;
-        } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitIdentExpr: " + e.getMessage());
-            throw e;
-        } finally {
-            LOGGER.info("Leaving visitIdentExpr");
+        NameDef nameDef = st.lookup(identExpr.getName());
+        if(nameDef == null){
+            throw new TypeCheckException("identExpr name " + identExpr.getName() + " not found within symbolTable");
         }
+        identExpr.setNameDef(nameDef);
+        identExpr.setType(identExpr.getNameDef().getType());
+        return identExpr.getType();
     }
 
     @Override
@@ -624,7 +600,9 @@ public class TypeCheckVisitor implements ASTVisitor {
             } else if (!Arrays.asList(Type.INT, Type.BOOLEAN, Type.STRING, Type.PIXEL, Type.IMAGE).contains(type)) {
                 throw new TypeCheckException("Invalid type for NameDef");
             }
-    
+            if(st.getScopeOfSymbol(nameDef.getName()) == st.getCurrentNum()){
+                throw new TypeCheckException("trying to overwrite a variable " + nameDef.getName() + " already in this scope.");
+            }
             st.insert(nameDef);  // Inserting the NameDef into the symbol table
             LOGGER.info("Successfully processed visitNameDef");
         } catch (TypeCheckException e) {
