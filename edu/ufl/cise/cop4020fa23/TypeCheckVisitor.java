@@ -303,6 +303,9 @@ public class TypeCheckVisitor implements ASTVisitor {
                 //Check conditions
                 if((initType == nameDefType) || ((initType == STRING) && (nameDefType == IMAGE))){
                     LOGGER.info("Successfully processed visitDeclaration");
+                    if(st.lookup(declaration.getNameDef().getName()) != null){
+                        System.out.println("uwu");
+                    }
                     return nameDefType;
                 }
                 throw new TypeCheckException("mismatched parameters in declaration");
@@ -600,7 +603,9 @@ public class TypeCheckVisitor implements ASTVisitor {
             } else if (!Arrays.asList(Type.INT, Type.BOOLEAN, Type.STRING, Type.PIXEL, Type.IMAGE).contains(type)) {
                 throw new TypeCheckException("Invalid type for NameDef");
             }
-    
+            if(st.lookup(nameDef.getName()) != null){
+                throw new TypeCheckException("trying to overwrite a variable " + nameDef.getName() + " already in the symbol table");
+            }
             st.insert(nameDef);  // Inserting the NameDef into the symbol table
             LOGGER.info("Successfully processed visitNameDef");
         } catch (TypeCheckException e) {
