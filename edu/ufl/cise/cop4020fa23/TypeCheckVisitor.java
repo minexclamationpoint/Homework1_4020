@@ -63,36 +63,53 @@ public class TypeCheckVisitor implements ASTVisitor {
     private SymbolTable st = new SymbolTable();
 
     @Override
-public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
-    LOGGER.info("Entering visit AssignmentStatement");
-    
-    try {
-        LValue lValue = assignmentStatement.getlValue();
-        Expr expr = assignmentStatement.getE();
-    
+    public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
+        LOGGER.info("Entering visit AssignmentStatement");
 
-        // Visit LValue and Expr to populate their types
-        Type lValueType = (Type) lValue.visit(this, arg);
-        Type exprType = (Type) expr.visit(this, arg);
-        LOGGER.info("Type of LValue: " + lValueType);
-        LOGGER.info("Type of Expr: " + exprType);
-        
-        // Type check
-        if (lValueType != exprType) {
-            throw new TypeCheckException("Type mismatch in assignment statement");
+        try {
+            // Entering a new scope for this assignment statement
+            st.enterScope();
+
+            // Get the LValue and Expr from the assignment statement
+            LValue lValue = assignmentStatement.getlValue();
+            Expr expr = assignmentStatement.getE();
+
+            // Visit LValue and Expr to populate their types
+            Type lValueType = (Type) lValue.visit(this, true); // Assuming LValue context
+            Type exprType = (Type) expr.visit(this, null); // Assuming no special context for Expr
+            LOGGER.info("Type of LValue: " + lValueType);
+            LOGGER.info("Type of Expr: " + exprType);
+
+            //AssignmentCompatible
+            switch(lValueType){
+                case PIXEL -> {
+                    if(exprType != INT && exprType != PIXEL){
+                        throw new TypeCheckException("Type mismatch in assignment statement");
+                    }
+                }
+                case IMAGE ->{
+                    switch(exprType) {
+                        case PIXEL, INT, STRING, IMAGE -> {}
+                        default -> throw new TypeCheckException("Type mismatch in assgt statement");
+                    }
+                }
+                default -> {
+                    if(exprType != lValueType){
+                        throw new TypeCheckException("type mismatch in assgt statement");
+                    }
+                }
+            }
+            LOGGER.info("Successfully processed visit AssignmentStatement");
+            return lValueType;
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visit AssignmentStatement: " + e.getMessage());
+            throw e;
+        } finally {
+            // Make sure to leave the scope in case of an exception
+            st.leaveScope();
+            LOGGER.info("Leaving visit AssignmentStatement");
         }
-
-        // Everything is fine
-        LOGGER.info("Successfully processed visit AssignmentStatement");
-        return lValueType;
-        
-    } catch (TypeCheckException e) {
-        LOGGER.severe("TypeCheckException in visit AssignmentStatement: " + e.getMessage());
-        throw e;
-    } finally {
-        LOGGER.info("Leaving visit AssignmentStatement");
     }
-}
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
@@ -167,13 +184,17 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitBlock(Block block, Object arg) throws PLCCompilerException {
+        LOGGER.info("Entering visitBlock");
+
         st.enterScope();
         List<BlockElem> blockElems = block.getElems();
         for (BlockElem elem : blockElems) {
-            elem.visit(this, arg);
+            elem.visit(this, arg); // Passing the program type down to the block elements
         }
         st.leaveScope();
-        return block;
+
+        LOGGER.info("Leaving visitBlock");
+        return null; // Block itself doesn't have a type
     }
 
     @Override
@@ -187,7 +208,6 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
             // Visit the block within the StatementBlock
             Block block = statementBlock.getBlock();
             block.visit(this, arg);
-    
             // Leaving the scope
             st.leaveScope();
     
@@ -374,18 +394,37 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
     public Object visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
         LOGGER.info("Entering visitExpandedPixelExpr");
 
-        try {
-            // Visit and type-check the red, green, and blue expressions
-            Type redType = (Type) expandedPixelExpr.getRed().visit(this, arg);
-            Type greenType = (Type) expandedPixelExpr.getGreen().visit(this, arg);
-            Type blueType = (Type) expandedPixelExpr.getBlue().visit(this, arg);
+        boolean scopeEntered = false;
 
-            // All of red, green, and blue expressions must be of type INT
+        try {
+            // Check if we are in a context where the identifiers could be implicitly declared
+            if (st.lookup("x") == null) {
+                SyntheticNameDef nameX = new SyntheticNameDef("x");
+                st.enterScope();
+                st.insert(nameX);
+                scopeEntered = true;
+                LOGGER.info("Implicitly declared x");
+            }
+            if (st.lookup("y") == null) {
+                SyntheticNameDef nameY = new SyntheticNameDef("y");
+                if (!scopeEntered) {
+                    st.enterScope();
+                }
+                st.insert(nameY);
+                scopeEntered = true;
+                LOGGER.info("Implicitly declared y");
+            }
+
+            // Visit and type-check the red, green, and blue expressions
+            Type redType = (Type) expandedPixelExpr.getRed().visit(this, "PixelSelectorContext");
+            Type greenType = (Type) expandedPixelExpr.getGreen().visit(this, "PixelSelectorContext");
+            Type blueType = (Type) expandedPixelExpr.getBlue().visit(this, "PixelSelectorContext");
+
+
             if (redType != Type.INT || greenType != Type.INT || blueType != Type.INT) {
                 throw new TypeCheckException("The expressions for red, green, and blue in an ExpandedPixelExpr must be of type INT");
             }
 
-            // Set the type of ExpandedPixelExpr to PIXEL
             expandedPixelExpr.setType(Type.PIXEL);
 
             LOGGER.info("Successfully processed visitExpandedPixelExpr");
@@ -395,6 +434,10 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
             LOGGER.severe("TypeCheckException in visitExpandedPixelExpr: " + e.getMessage());
             throw e;
         } finally {
+
+            if (scopeEntered) {
+                st.leaveScope();
+            }
             LOGGER.info("Leaving visitExpandedPixelExpr");
         }
     }
@@ -430,18 +473,27 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
     @Override
     public Object visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
         LOGGER.info("Entering visitIdentExpr");
+        LOGGER.info("Current Symbol Table: " + st.toString());
 
         try {
             // Lookup the NameDef for the identifier in the symbol table
             NameDef nameDef = st.lookup(identExpr.getName());
-            if (nameDef == null) {
+
+            // Check if we are in a context where the identifier could be implicitly declared
+            // We use arg to pass the context information. It can be a String representing the context.
+            if (nameDef == null && arg != null && arg.equals("PixelSelectorContext")) {
+                nameDef = new SyntheticNameDef(identExpr.getName());  // Implicit type assumed to be INT
+                st.insert(nameDef);
+                identExpr.setNameDef(nameDef);
+                identExpr.setType(Type.INT);
+                LOGGER.info("Implicitly declared identifier: " + identExpr.getName());
+                return Type.INT;
+            } else if (nameDef == null) {
                 throw new TypeCheckException("Undeclared identifier: " + identExpr.getName());
             }
 
-            // Set the NameDef of the IdentExpr
+            // Set the NameDef and Type of the IdentExpr
             identExpr.setNameDef(nameDef);
-
-            // Set the type of the IdentExpr based on the type of the NameDef
             Type type = nameDef.getType();
             identExpr.setType(type);
 
@@ -505,9 +557,12 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
             Type varType = nd.getType();
 
             // Check the pixel selector and channel selector
-            lValue.getPixelSelector().visit(this, true);
             PixelSelector ps = lValue.getPixelSelector();
             ChannelSelector cs = lValue.getChannelSelector();
+
+            if (ps != null) {
+                ps.visit(this, true);  // True indicates we are in an LValue context
+            }
 
             // Conditions for PixelSelector and ChannelSelector
 
@@ -595,38 +650,55 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
-        //not sure if this is :ok:
-        Type typeX = (Type) pixelSelector.xExpr().visit(this, arg);
-        Type typeY = (Type) pixelSelector.yExpr().visit(this, arg);
-        if((Boolean) arg){
-            IToken tokenD = new Token(EOF, 0, 0, null, null);
-            IdentExpr dummy = new IdentExpr(tokenD);
-            if(pixelSelector.xExpr() instanceof  IdentExpr){
-                dummy = (IdentExpr) pixelSelector.xExpr();
-                if(st.lookup(dummy.getName()) == null){
-                    SyntheticNameDef name = new SyntheticNameDef(dummy.getName());
-                    st.insert(name);
+        LOGGER.info("Entering visitPixelSelector");
+
+        boolean scopeEntered = false;
+
+        try {
+            boolean inLValueContext = (Boolean) arg;
+
+            if (inLValueContext) {
+                if (st.lookup("x") == null) {
+                    SyntheticNameDef nameX = new SyntheticNameDef("x");
+                    st.enterScope();
+                    st.insert(nameX);
+                    scopeEntered = true;
+                    LOGGER.info("Implicitly declared x");
                 }
-            } else if(!(pixelSelector.xExpr() instanceof NumLitExpr)){
-                throw new TypeCheckException("expected IdentExpr or NumLitExpr xExpr");
+                if (st.lookup("y") == null) {
+                    SyntheticNameDef nameY = new SyntheticNameDef("y");
+                    if (!scopeEntered) {
+                        st.enterScope();
+                    }
+                    st.insert(nameY);
+                    scopeEntered = true;
+                    LOGGER.info("Implicitly declared y");
+                }
             }
 
-            if(pixelSelector.yExpr() instanceof  IdentExpr){
-                dummy = (IdentExpr) pixelSelector.yExpr();
-                if(st.lookup(dummy.getName()) == null){
-                    SyntheticNameDef name = new SyntheticNameDef(dummy.getName());
-                    st.insert(name);
-                }
-            } else if(!(pixelSelector.yExpr() instanceof NumLitExpr)){
-                throw new TypeCheckException("expected IdentExpr or NumLitExpr yExpr");
+            Type typeX = (Type) pixelSelector.xExpr().visit(this, "PixelSelectorContext");
+            Type typeY = (Type) pixelSelector.yExpr().visit(this, "PixelSelectorContext");
+
+
+            if (typeX != Type.INT || typeY != Type.INT) {
+                throw new TypeCheckException("Expected type INT for component expressions");
             }
+
+            LOGGER.info("Successfully processed visitPixelSelector");
+            return Type.INT;
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitPixelSelector: " + e.getMessage());
+            throw e;
+        } finally {
+
+            if (scopeEntered) {
+                st.leaveScope();
+            }
+            LOGGER.info("Leaving visitPixelSelector");
         }
-        if(typeX != INT || typeY != INT){
-            throw new TypeCheckException("expected type INT for component expressions");
-        }
-        return pixelSelector;
     }
     @Override
+    //differences here
     public Object visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
         postfixExpr.primary().setType((Type) postfixExpr.primary().visit(this, arg));
         Type pixelType = (Type) postfixExpr.pixel().visit(this, false); //idk,,,,,
@@ -684,6 +756,8 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
 
     @Override
     public Object visitProgram(Program program, Object arg) throws PLCCompilerException {
+        LOGGER.info("Entering visitProgram");
+
         Type type = Type.kind2type(program.getTypeToken().kind());
         program.setType(type);  // Setting the type attribute for Program
         st.enterScope();  // Entering a new scope in the symbol table
@@ -691,18 +765,37 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
         for (NameDef param : params) {
             param.visit(this, arg);  // Visiting each NameDef child node
         }
-        program.getBlock().visit(this, arg);  // Visiting the Block child node
+        program.getBlock().visit(this, type);  // Visiting the Block child node, passing the program type
         st.leaveScope();  // Leaving the scope in the symbol table
+
+        LOGGER.info("Leaving visitProgram");
         return type;
     }
 
     @Override
     public Object visitReturnStatement(ReturnStatement returnStatement, Object arg) throws PLCCompilerException {
-        Type type = (Type) returnStatement.getE().visit(this, arg);
-        if(type == ((Type) arg)){
-            return type;
-        } else {
-            throw new TypeCheckException("Expected equivalent type to parent program: " + ((Type) arg));
+        LOGGER.info("Entering visitReturnStatement");
+
+        try {
+            // Visit the expression in ReturnStatement to get its type
+            Type exprType = (Type) returnStatement.getE().visit(this, arg);
+
+            // Check if the type of the expression matches the type of the parent program (which is passed as arg)
+            if (exprType == arg) {
+                // Types match, so we can proceed
+                LOGGER.info("Successfully processed visitReturnStatement: Type matches parent program.");
+                return exprType;
+            } else {
+                // Types do not match, so we throw an exception
+                String errorMsg = "Mismatched types: Expected " + arg + " but found " + exprType;
+                LOGGER.severe("TypeCheckException in visitReturnStatement: " + errorMsg);
+                throw new TypeCheckException(errorMsg);
+            }
+        } catch (TypeCheckException e) {
+            LOGGER.severe("TypeCheckException in visitReturnStatement: " + e.getMessage());
+            throw e;
+        } finally {
+            LOGGER.info("Leaving visitReturnStatement");
         }
     }
 
@@ -723,7 +816,7 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
                     boolean val = !Boolean.parseBoolean(unaryExpr.getExpr().firstToken().text());
                     return BOOLEAN;
                 }
-                throw new UnsupportedOperationException("Invalid type for unaryExpr with BOOLEAN Expr type");
+                throw new TypeCheckException("Invalid type for unaryExpr with BOOLEAN Expr type");
             }
             case INT -> {
                 if(opKind==MINUS) {
@@ -731,7 +824,7 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
                     int val = - Integer.parseInt(unaryExpr.getExpr().firstToken().text());
                     return INT;
                 }
-                throw new UnsupportedOperationException("Invalid type for unaryExpr with INT Expr type");
+                throw new TypeCheckException("Invalid type for unaryExpr with INT Expr type");
             }
             case IMAGE -> {
                 switch(opKind){
@@ -746,7 +839,7 @@ public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, 
                         return INT;
                         //not actually sure if this is how height/width are supposed to work
                     }
-                    default-> throw new UnsupportedOperationException("Invalid type for unaryExpr with IMAGE Expr type");
+                    default-> throw new TypeCheckException("Invalid type for unaryExpr with IMAGE Expr type");
                 }
             }
         };
