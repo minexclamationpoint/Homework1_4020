@@ -165,7 +165,7 @@ public class TypeCheckVisitor implements ASTVisitor {
         else if (op == Kind.PLUS && leftType == rightType) {
             return leftType;
         }
-        // INT,PIXEL,IMAGE MINUS, TIMES, DIV, MOD ExprleftExpr.type ExprleftExpr.type
+      
         else if ((leftType == Type.INT || leftType == Type.PIXEL || leftType == Type.IMAGE) && (op == Kind.MINUS || op == Kind.TIMES || op == Kind.DIV || op == Kind.MOD) && leftType == rightType) {
             return leftType;
         }
@@ -182,7 +182,7 @@ public class TypeCheckVisitor implements ASTVisitor {
         st.enterScope();
         List<BlockElem> blockElems = block.getElems();
         for (BlockElem elem : blockElems) {
-            elem.visit(this, arg); // Passing the program type down to the block elements
+            elem.visit(this, arg);
         }
         st.leaveScope();
     
@@ -391,7 +391,7 @@ public class TypeCheckVisitor implements ASTVisitor {
         boolean scopeEntered = false;
     
         try {
-            // Check if we are in a context where the identifiers could be implicitly declared
+            // itCheck if we are in a context where the identifiers could be implicitly declared
             if (st.lookup("x") == null) {
                 SyntheticNameDef nameX = new SyntheticNameDef("x");
                 st.enterScope();
