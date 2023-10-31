@@ -57,11 +57,11 @@ Program, NameDef, Declaration and all other Expr nodes have an attribute "type".
 public class TypeCheckVisitor implements ASTVisitor {
 
     private static final Logger LOGGER = Logger.getLogger(TypeCheckVisitor.class.getName());
+    private Type currentType;
 
 
     //vvv implemented with the symbol table class
     private SymbolTable st = new SymbolTable();
-
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
         LOGGER.info("Entering visit AssignmentStatement");
@@ -73,7 +73,7 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Get the LValue and Expr from the assignment statement
             LValue lValue = assignmentStatement.getlValue();
             Expr expr = assignmentStatement.getE();
-
+            st.leaveScope();
             // Visit LValue and Expr to populate their types
             Type lValueType = (Type) lValue.visit(this, true); // Assuming LValue context
             Type exprType = (Type) expr.visit(this, null); // Assuming no special context for Expr
@@ -106,7 +106,6 @@ public class TypeCheckVisitor implements ASTVisitor {
             throw e;
         } finally {
             // Make sure to leave the scope in case of an exception
-            st.leaveScope();
             LOGGER.info("Leaving visit AssignmentStatement");
         }
     }
@@ -472,39 +471,13 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitIdentExpr");
-        LOGGER.info("Current Symbol Table: " + st.toString());
-
-        try {
-            // Lookup the NameDef for the identifier in the symbol table
-            NameDef nameDef = st.lookup(identExpr.getName());
-
-            // Check if we are in a context where the identifier could be implicitly declared
-            // We use arg to pass the context information. It can be a String representing the context.
-            if (nameDef == null && arg != null && arg.equals("PixelSelectorContext")) {
-                nameDef = new SyntheticNameDef(identExpr.getName());  // Implicit type assumed to be INT
-                st.insert(nameDef);
-                identExpr.setNameDef(nameDef);
-                identExpr.setType(Type.INT);
-                LOGGER.info("Implicitly declared identifier: " + identExpr.getName());
-                return Type.INT;
-            } else if (nameDef == null) {
-                throw new TypeCheckException("Undeclared identifier: " + identExpr.getName());
-            }
-
-            // Set the NameDef and Type of the IdentExpr
-            identExpr.setNameDef(nameDef);
-            Type type = nameDef.getType();
-            identExpr.setType(type);
-
-            LOGGER.info("Successfully processed visitIdentExpr");
-            return type;
-        } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitIdentExpr: " + e.getMessage());
-            throw e;
-        } finally {
-            LOGGER.info("Leaving visitIdentExpr");
+        NameDef nameDef = st.lookup(identExpr.getName());
+        if(nameDef == null){
+            throw new TypeCheckException("identExpr name not found within symbolTable");
         }
+        identExpr.setNameDef(nameDef);
+        identExpr.setType(identExpr.getNameDef().getType());
+        return identExpr.getType();
     }
 
     @Override
@@ -652,32 +625,34 @@ public class TypeCheckVisitor implements ASTVisitor {
     public Object visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
         LOGGER.info("Entering visitPixelSelector");
 
-        boolean scopeEntered = false;
-
         try {
             boolean inLValueContext = (Boolean) arg;
 
             if (inLValueContext) {
-                if (st.lookup("x") == null) {
-                    SyntheticNameDef nameX = new SyntheticNameDef("x");
-                    st.enterScope();
-                    st.insert(nameX);
-                    scopeEntered = true;
-                    LOGGER.info("Implicitly declared x");
-                }
-                if (st.lookup("y") == null) {
-                    SyntheticNameDef nameY = new SyntheticNameDef("y");
-                    if (!scopeEntered) {
-                        st.enterScope();
+                if(pixelSelector.xExpr() instanceof IdentExpr) {
+                    String newName = ((IdentExpr) pixelSelector.xExpr()).getName();
+                    if (st.lookup(newName) == null) {
+                        SyntheticNameDef nameX = new SyntheticNameDef(newName);
+                        st.insert(nameX);
+                        LOGGER.info("Implicitly declared x");
                     }
-                    st.insert(nameY);
-                    scopeEntered = true;
-                    LOGGER.info("Implicitly declared y");
+                } else if(!(pixelSelector.xExpr() instanceof NumLitExpr)){
+                    throw new TypeCheckException("expected IdentExpr or NumLitExpr argument for Expression x");
+                }
+                if(pixelSelector.yExpr() instanceof IdentExpr) {
+                    String newName = ((IdentExpr) pixelSelector.yExpr()).getName();
+                    if (st.lookup(newName) == null) {
+                        SyntheticNameDef nameY = new SyntheticNameDef(newName);
+                        st.insert(nameY);
+                        LOGGER.info("Implicitly declared y");
+                    }
+                } else if(!(pixelSelector.yExpr() instanceof NumLitExpr)){
+                    throw new TypeCheckException("expected IdentExpr or NumLitExpr argument for Expression y");
                 }
             }
+            Type typeX = (Type) pixelSelector.xExpr().visit(this, arg);
+            Type typeY = (Type) pixelSelector.yExpr().visit(this, arg);
 
-            Type typeX = (Type) pixelSelector.xExpr().visit(this, "PixelSelectorContext");
-            Type typeY = (Type) pixelSelector.yExpr().visit(this, "PixelSelectorContext");
 
 
             if (typeX != Type.INT || typeY != Type.INT) {
@@ -690,10 +665,6 @@ public class TypeCheckVisitor implements ASTVisitor {
             LOGGER.severe("TypeCheckException in visitPixelSelector: " + e.getMessage());
             throw e;
         } finally {
-
-            if (scopeEntered) {
-                st.leaveScope();
-            }
             LOGGER.info("Leaving visitPixelSelector");
         }
     }
@@ -760,12 +731,13 @@ public class TypeCheckVisitor implements ASTVisitor {
 
         Type type = Type.kind2type(program.getTypeToken().kind());
         program.setType(type);  // Setting the type attribute for Program
+        currentType = type;
         st.enterScope();  // Entering a new scope in the symbol table
         List<NameDef> params = program.getParams();
         for (NameDef param : params) {
             param.visit(this, arg);  // Visiting each NameDef child node
         }
-        program.getBlock().visit(this, type);  // Visiting the Block child node, passing the program type
+        program.getBlock().visit(this, currentType);  // Visiting the Block child node, passing the program type
         st.leaveScope();  // Leaving the scope in the symbol table
 
         LOGGER.info("Leaving visitProgram");
@@ -781,7 +753,7 @@ public class TypeCheckVisitor implements ASTVisitor {
             Type exprType = (Type) returnStatement.getE().visit(this, arg);
 
             // Check if the type of the expression matches the type of the parent program (which is passed as arg)
-            if (exprType == arg) {
+            if (exprType == currentType) {
                 // Types match, so we can proceed
                 LOGGER.info("Successfully processed visitReturnStatement: Type matches parent program.");
                 return exprType;
