@@ -64,14 +64,13 @@ public class SymbolTable {
                 logger.info("Comparing " + entry.scopeSerial + " with " + currentScopeSerial);
                 if (entry.scopeSerial == currentScopeSerial) {
                     logger.info("Identifier found in scope: " + currentScopeSerial);
-                    return entry.nameDef; 
+                    return entry.nameDef;
                 }
             }
         }
-        
 
         logger.warning("Identifier not found in the current scope or any enclosing scopes: " + name);
-        return null; 
+        return null;
     }
 
     @Override
