@@ -73,10 +73,12 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Get the LValue and Expr from the assignment statement
             LValue lValue = assignmentStatement.getlValue();
             Expr expr = assignmentStatement.getE();
-            st.leaveScope();
             // Visit LValue and Expr to populate their types
-            Type lValueType = (Type) lValue.visit(this, true); // Assuming LValue context
-            Type exprType = (Type) expr.visit(this, null); // Assuming no special context for Expr
+            st.enterScope();
+            //entering a new scope for variable declaration
+            Type lValueType = (Type) lValue.visit(this, arg); // Assuming LValue context
+            Type exprType = (Type) expr.visit(this, arg); // Assuming no special context for Expr
+            st.leaveScope();
             LOGGER.info("Type of LValue: " + lValueType);
             LOGGER.info("Type of Expr: " + exprType);
 
@@ -100,6 +102,7 @@ public class TypeCheckVisitor implements ASTVisitor {
                 }
             }
             LOGGER.info("Successfully processed visit AssignmentStatement");
+            st.leaveScope();
             return lValueType;
         } catch (TypeCheckException e) {
             LOGGER.severe("TypeCheckException in visit AssignmentStatement: " + e.getMessage());
@@ -287,31 +290,28 @@ public class TypeCheckVisitor implements ASTVisitor {
         LOGGER.info("Entering visitDeclaration");
     
         try {
-            // Get the NameDef and its type
-            NameDef nameDef = declaration.getNameDef();
-            Type nameDefType = (Type) nameDef.visit(this, arg); // This should populate the type in NameDef as well
-    
-            // Get the initializer Expr and its type if it is not null
+            // Get the initializer, create variables
             Expr initializer = declaration.getInitializer();
-            Type initializerType = null;
-            if (initializer != null) {
-                initializerType = (Type) initializer.visit(this, arg); // This should populate the type in Expr as well
-            }
-    
-            // Check conditions
-            if (initializerType != null) {
-                if (initializerType != nameDefType) {
-                    if (initializerType == Type.STRING && nameDefType == Type.IMAGE) {
-                        // Special case is valid, do nothing
-                    } else {
-                        throw new TypeCheckException("Type mismatch between NameDef and Expr in declaration");
-                    }
+            Type initType = VOID;
+            NameDef nameDef;
+            Type nameDefType;
+            // branch whether or not initializer should be visited or not
+            if(initializer != null){
+                initType = (Type) initializer.visit(this, arg);
+                nameDef = declaration.getNameDef();
+                nameDefType = (Type) nameDef.visit(this, arg);
+                //Check conditions
+                if((initType == nameDefType) || ((initType == STRING) && (nameDefType == IMAGE))){
+                    LOGGER.info("Successfully processed visitDeclaration");
+                    return nameDefType;
                 }
+                throw new TypeCheckException("mismatched parameters in declaration");
+            } else {
+                nameDef = declaration.getNameDef();
+                nameDefType = (Type) nameDef.visit(this, arg);
+                return nameDefType;
             }
-    
             // Successfully processed the declaration
-            LOGGER.info("Successfully processed visitDeclaration");
-            return nameDefType;  // Returning the type of NameDef
     
         } catch (TypeCheckException e) {
             LOGGER.severe("TypeCheckException in visitDeclaration: " + e.getMessage());
