@@ -18,10 +18,12 @@ public class SymbolTable {
     private static class ScopeEntry {
         NameDef nameDef;
         int scopeSerial;
+        boolean isComplete;
 
         public ScopeEntry(NameDef nameDef, int scopeSerial) {
             this.nameDef = nameDef;
             this.scopeSerial = scopeSerial;
+            this.isComplete = isComplete;
         }
     }
 
@@ -61,16 +63,16 @@ public class SymbolTable {
         for (int i = scopeStack.size() - 1; i >= 0; i--) {
             int currentScopeSerial = scopeStack.get(i);
             for (ScopeEntry entry : chain) {
-                logger.info("Comparing " + entry.scopeSerial + " with " + currentScopeSerial);
+            logger.info("Comparing " + entry.scopeSerial + " with " + currentScopeSerial);
                 if (entry.scopeSerial == currentScopeSerial) {
                     logger.info("Identifier found in scope: " + currentScopeSerial);
-                    return entry.nameDef;
+                    return entry.nameDef; 
                 }
             }
         }
 
         logger.warning("Identifier not found in the current scope or any enclosing scopes: " + name);
-        return null;
+        return null; 
     }
 
     @Override
@@ -88,5 +90,7 @@ public class SymbolTable {
         sb.append("}");
         return sb.toString();
     }
+
+    
 
 }
