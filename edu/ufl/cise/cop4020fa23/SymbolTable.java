@@ -6,7 +6,6 @@ import java.util.Stack;
 import edu.ufl.cise.cop4020fa23.ast.NameDef;
 import edu.ufl.cise.cop4020fa23.exceptions.TypeCheckException;
 import java.util.logging.Logger;
-
 public class SymbolTable {
     private static final Logger logger = Logger.getLogger(SymbolTable.class.getName());
 
