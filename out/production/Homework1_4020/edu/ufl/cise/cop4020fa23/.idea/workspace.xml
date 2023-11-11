@@ -4,31 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76a934ec-7e5e-461a-ba4d-04223bed60dc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../../.idea/artifacts/Homework1_4020_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../.idea/artifacts/Homework1_4020_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ComponentFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/ComponentFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Token.java" beforeDir="false" afterPath="$PROJECT_DIR$/Token.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/ASTVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/ASTVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/AssignmentStatement.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/AssignmentStatement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/Block.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/Block.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/Declaration.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/Declaration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/Dimension.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/Dimension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/DoStatement.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/DoStatement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/Expr.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/Expr.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/GuardedBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/GuardedBlock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/IdentExpr.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/IdentExpr.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/IfStatement.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/IfStatement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/LValue.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/LValue.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/NameDef.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/NameDef.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/Program.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/Program.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/ReturnStatement.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/ReturnStatement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/Statement.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/Statement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/StatementBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/StatementBlock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/WriteStatement.java" beforeDir="false" afterPath="$PROJECT_DIR$/ast/WriteStatement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/exceptions/SyntaxException.java" beforeDir="false" afterPath="$PROJECT_DIR$/exceptions/SyntaxException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../../out/artifacts/Homework1_4020_jar/Homework1_4020.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../out/artifacts/Homework1_4020_jar/Homework1_4020.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../../out/production/Homework1_4020/.idea/artifacts/Homework1_4020_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../out/production/Homework1_4020/.idea/artifacts/Homework1_4020_jar.xml" afterDir="false" />
+    <list default="true" id="76a934ec-7e5e-461a-ba4d-04223bed60dc" name="Changes" comment="Added setup for project part 4">
+      <change afterPath="$PROJECT_DIR$/DynamicJavaCompileAndExecute/DynamicClassLoader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DynamicJavaCompileAndExecute/DynamicCompiler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DynamicJavaCompileAndExecute/InMemoryBytecodeObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DynamicJavaCompileAndExecute/InMemoryClassFileManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DynamicJavaCompileAndExecute/PLCLangExec.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DynamicJavaCompileAndExecute/StringJavaFileObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/exceptions/CodeGenException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/runtime/ConsoleIO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SymbolTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolTable.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
