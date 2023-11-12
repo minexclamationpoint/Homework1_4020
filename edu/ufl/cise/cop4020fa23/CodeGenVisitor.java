@@ -2,10 +2,7 @@ package edu.ufl.cise.cop4020fa23;
 
 import edu.ufl.cise.cop4020fa23.ast.*;
 import edu.ufl.cise.cop4020fa23.ast.Block.BlockElem;
-import edu.ufl.cise.cop4020fa23.exceptions.LexicalException;
-import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
-import edu.ufl.cise.cop4020fa23.exceptions.SyntaxException;
-import edu.ufl.cise.cop4020fa23.exceptions.TypeCheckException;
+import edu.ufl.cise.cop4020fa23.exceptions.*;
 import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO;
 
 import static edu.ufl.cise.cop4020fa23.Kind.*;
@@ -40,7 +37,7 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     @Override
-    public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
         /*
         If ExprleftExpr.type is string and op is EQ
         _ ExprleftExpr_ .equals( _ ExprrigthExpr _)
@@ -53,26 +50,26 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     @Override
-    public Object visitBlock(Block block, Object arg) throws PLCCompilerException {
+    public StringBuilder visitBlock(Block block, Object arg) throws PLCCompilerException {
         //{ _BlockElem*_ }
         //BlockElem ::= Declaration | Statement
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitBlockStatement(StatementBlock statementBlock, Object arg) throws PLCCompilerException {
+    public StringBuilder visitBlockStatement(StatementBlock statementBlock, Object arg) throws PLCCompilerException {
         //_Block_
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitChannelSelector(ChannelSelector channelSelector, Object arg) throws PLCCompilerException {
+    public StringBuilder visitChannelSelector(ChannelSelector channelSelector, Object arg) throws PLCCompilerException {
         //Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitConditionalExpr(ConditionalExpr conditionalExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitConditionalExpr(ConditionalExpr conditionalExpr, Object arg) throws PLCCompilerException {
         /*
         ( _ ExprGuardExpr_ ? _ ExprTrueExpr _
         : _ ExprFalseExpr _ )
@@ -81,7 +78,7 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     @Override
-    public Object visitDeclaration(Declaration declaration, Object arg) throws PLCCompilerException {
+    public StringBuilder visitDeclaration(Declaration declaration, Object arg) throws PLCCompilerException {
         /*
         either _NameDef_ or _NameDef_ = _Expr_
          */
@@ -89,48 +86,48 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     @Override
-    public Object visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
+    public StringBuilder visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitDoStatement(DoStatement doStatement, Object arg) throws PLCCompilerException {
+    public StringBuilder visitDoStatement(DoStatement doStatement, Object arg) throws PLCCompilerException {
         //Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
         //Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
+    public StringBuilder visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
         //Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
         //_IdentExpr_.getNameDef().getJavaName()
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitIfStatement(IfStatement ifStatement, Object arg) throws PLCCompilerException {
+    public StringBuilder visitIfStatement(IfStatement ifStatement, Object arg) throws PLCCompilerException {
         //Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
+    public StringBuilder visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
         //_IdentExpr_.getNameDef().getJavaName()
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitNameDef(NameDef nameDef, Object arg) throws PLCCompilerException {
+    public StringBuilder visitNameDef(NameDef nameDef, Object arg) throws PLCCompilerException {
 
         /*
         Dimension is implemented in Assignment 5
@@ -141,26 +138,30 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     @Override
-    public Object visitNumLitExpr(NumLitExpr numLitExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitNumLitExpr(NumLitExpr numLitExpr, Object arg) throws PLCCompilerException {
         //_NumLitExpr_.getText
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
+    public StringBuilder visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
         //Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
         //Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public Object visitProgram(Program program, Object arg) throws PLCCompilerException {
-        /*public class _IDENT_ {
+    public StringBuilder visitProgram(Program program, Object arg) throws PLCCompilerException {
+        /*
+        Should accept a package name as an argument and return a String containing a
+        java program implementing the semantics of the language. The package name may be null or an empty string.
+        If so, the generated program should be in the default package.
+            public class _IDENT_ {
             public static _Type_ apply(
                 _NameDef*_
             ) _Block
@@ -171,44 +172,89 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     @Override
-    public Object visitReturnStatement(ReturnStatement returnStatement, Object arg) throws PLCCompilerException {
+    public StringBuilder visitReturnStatement(ReturnStatement returnStatement, Object arg) throws PLCCompilerException {
         //return _Expr_
-        throw new UnsupportedOperationException("Unimplemented method");
+        StringBuilder subString = new StringBuilder("return ");
+        subString.append(determineExpr(returnStatement.getE(), arg));
+        return subString;
     }
 
     @Override
-    public Object visitStringLitExpr(StringLitExpr stringLitExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitStringLitExpr(StringLitExpr stringLitExpr, Object arg) throws PLCCompilerException {
         //_StringLitExpr_.getText
-        throw new UnsupportedOperationException("Unimplemented method");
+        return new StringBuilder(stringLitExpr.getText());
     }
 
     @Override
-    public Object visitUnaryExpr(UnaryExpr unaryExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitUnaryExpr(UnaryExpr unaryExpr, Object arg) throws PLCCompilerException {
         /*
         ( _op_ _Expr_ )
         Note: you do not need to handle width and height
         in this assignment
          */
-        throw new UnsupportedOperationException("Unimplemented method");
+        StringBuilder subString = new StringBuilder("(");
+        subString.append(unaryExpr.getOp().toString()).append(" ");
+        subString.append(unaryExpr.getExpr()).append(")");
+        return subString;
     }
 
     @Override
-    public Object visitWriteStatement(WriteStatement writeStatement, Object arg) throws PLCCompilerException {
+    public StringBuilder visitWriteStatement(WriteStatement writeStatement, Object arg) throws PLCCompilerException {
         /*
         ConsoleIO.write( _Expr_ )
         Note: you will need to import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO
          */
-        throw new UnsupportedOperationException("Unimplemented method");
+        Expr subExpr = writeStatement.getExpr();
+        StringBuilder subString = new StringBuilder("ConsoleIO.write(");
+        subString.append(determineExpr(subExpr, arg));
+        subString.append(")");
+        return subString;
+    }
+
+    //Helper method for the various visitors that have to go through the different versions of Expr
+    private StringBuilder determineExpr(Expr subExpr, Object arg) throws PLCCompilerException {
+        StringBuilder subString = new StringBuilder();
+        switch(subExpr.getClass().getName()) {
+            case "ConditionalExpr" -> {
+                subString.append(visitConditionalExpr((ConditionalExpr) subExpr, arg));
+            }
+            case "BinaryExpr" -> {
+                subString.append(visitBinaryExpr((BinaryExpr) subExpr, arg));
+            }
+            case "UnaryExpr" -> {
+                subString.append(visitUnaryExpr((UnaryExpr) subExpr, arg));
+            }
+            case "StringLitExpr" -> {
+                subString.append(visitStringLitExpr((StringLitExpr) subExpr, arg));
+            }
+            case "NumLitExpr" -> {
+                subString.append(visitNumLitExpr((NumLitExpr) subExpr, arg));
+            }
+            case "IdentExpr" -> {
+                subString.append(visitIdentExpr((IdentExpr) subExpr, arg));
+            }
+            case "BooleanLitExpr" -> {
+                subString.append(visitBooleanLitExpr((BooleanLitExpr) subExpr, arg));
+            }
+            default -> throw new CodeGenException("Unexpected subexpression type");
+        };
+        return subString;
     }
 
     @Override
-    public Object visitBooleanLitExpr(BooleanLitExpr booleanLitExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitBooleanLitExpr(BooleanLitExpr booleanLitExpr, Object arg) throws PLCCompilerException {
         //true or false
-        throw new UnsupportedOperationException("Unimplemented method");
+        System.out.println(booleanLitExpr.getText());
+        StringBuilder subString = new StringBuilder();
+        return switch(booleanLitExpr.getText()){
+            case "FALSE" -> subString.append("false");
+            case "TRUE" -> subString.append("true");
+            default -> throw new CodeGenException("Unexpected type in BooleanLitExpr");
+        };
     }
 
     @Override
-    public Object visitConstExpr(ConstExpr constExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitConstExpr(ConstExpr constExpr, Object arg) throws PLCCompilerException {
         //Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
