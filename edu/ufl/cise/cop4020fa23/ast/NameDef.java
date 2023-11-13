@@ -35,6 +35,8 @@ public class NameDef extends AST {
 		this.typeToken = typeToken;
 		this.identToken = identToken;
 		this.dimension = dimension;
+		setJavaName(identToken.text());
+		//^^default javaname, should be changed
 	}
 
 

@@ -146,12 +146,14 @@ public class CodeGenVisitor implements ASTVisitor {
     private StringBuilder determineStatement(Statement statement, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
         sb.append(switch (statement.getClass().getName()){
-            case "AssignmentStatement" -> visitAssignmentStatement((AssignmentStatement) statement, arg);
-            case "WriteStatement" -> visitWriteStatement((WriteStatement) statement, arg);
-            case "DoStatement", "IfStatement" -> throw new UnsupportedOperationException("Unimplemented method");
-            case "ReturnStatement" -> visitReturnStatement((ReturnStatement) statement, arg);
-            case "StatementBlock" -> visitBlockStatement((StatementBlock) statement, arg);
-            default -> throw new CodeGenException("Unexpected value: " + statement.getClass().getName());
+            case "edu.ufl.cise.cop4020fa23.ast.AssignmentStatement" -> visitAssignmentStatement((AssignmentStatement) statement, arg);
+            case "edu.ufl.cise.cop4020fa23.ast.WriteStatement" -> visitWriteStatement((WriteStatement) statement, arg);
+            case "edu.ufl.cise.cop4020fa23.ast.DoStatement", "edu.ufl.cise.cop4020fa23.ast.IfStatement" -> throw new UnsupportedOperationException("Unimplemented method");
+            case "edu.ufl.cise.cop4020fa23.ast.ReturnStatement" -> visitReturnStatement((ReturnStatement) statement, arg);
+            case "edu.ufl.cise.cop4020fa23.ast.StatementBlock" -> visitBlockStatement((StatementBlock) statement, arg);
+            default -> {
+                throw new CodeGenException("Unexpected value: " + statement.getClass().getName());
+            }
         });
         return sb;
     }
@@ -236,8 +238,7 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     @Override
-    public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg)
-            throws PLCCompilerException {
+    public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
@@ -274,13 +275,16 @@ public class CodeGenVisitor implements ASTVisitor {
          * _Type_ _name_
          * Where _name_ is the Java name of the IDENT
          */
-        throw new UnsupportedOperationException("Unimplemented method");
+        StringBuilder sb = new StringBuilder();
+        sb.append(determineType(nameDef.getType())).append(" ");
+        sb.append(nameDef.getJavaName());
+        return sb;
     }
 
     @Override
     public StringBuilder visitNumLitExpr(NumLitExpr numLitExpr, Object arg) throws PLCCompilerException {
         // _NumLitExpr_.getText
-        throw new UnsupportedOperationException("Unimplemented method");
+        return new StringBuilder(numLitExpr.getText());
     }
 
     @Override
@@ -392,25 +396,25 @@ public class CodeGenVisitor implements ASTVisitor {
     private StringBuilder determineExpr(Expr subExpr, Object arg) throws PLCCompilerException {
         StringBuilder subString = new StringBuilder();
         switch (subExpr.getClass().getName()) {
-            case "ConditionalExpr" -> {
+            case "edu.ufl.cise.cop4020fa23.ast.ConditionalExpr" -> {
                 subString.append(visitConditionalExpr((ConditionalExpr) subExpr, arg));
             }
-            case "BinaryExpr" -> {
+            case "edu.ufl.cise.cop4020fa23.ast.BinaryExpr" -> {
                 subString.append(visitBinaryExpr((BinaryExpr) subExpr, arg));
             }
-            case "UnaryExpr" -> {
+            case "edu.ufl.cise.cop4020fa23.ast.UnaryExpr" -> {
                 subString.append(visitUnaryExpr((UnaryExpr) subExpr, arg));
             }
-            case "StringLitExpr" -> {
+            case "edu.ufl.cise.cop4020fa23.ast.StringLitExpr" -> {
                 subString.append(visitStringLitExpr((StringLitExpr) subExpr, arg));
             }
-            case "NumLitExpr" -> {
+            case "edu.ufl.cise.cop4020fa23.ast.NumLitExpr" -> {
                 subString.append(visitNumLitExpr((NumLitExpr) subExpr, arg));
             }
-            case "IdentExpr" -> {
+            case "edu.ufl.cise.cop4020fa23.ast.IdentExpr" -> {
                 subString.append(visitIdentExpr((IdentExpr) subExpr, arg));
             }
-            case "BooleanLitExpr" -> {
+            case "edu.ufl.cise.cop4020fa23.ast.BooleanLitExpr" -> {
                 subString.append(visitBooleanLitExpr((BooleanLitExpr) subExpr, arg));
             }
             default -> throw new CodeGenException("Unexpected subexpression type");
