@@ -211,7 +211,7 @@ public class CodeGenVisitor implements ASTVisitor {
         if (nameDef.getType() == null || nameDef.getIdentToken() == null) {
             throw new CodeGenException("Invalid type or identifier in declaration.");
         }
-        sb.append(determineType(nameDef.getType())).append(" ").append(nameDef.getIdentToken().text());
+        sb.append(visitNameDef(nameDef, arg));
 
         if (initializer != null) {
             sb.append(" = ");
@@ -279,6 +279,7 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitNumLitExpr(NumLitExpr numLitExpr, Object arg) throws PLCCompilerException {
         // _NumLitExpr_.getText
+        System.out.println(numLitExpr.getText());
         return new StringBuilder(numLitExpr.getText());
     }
 
