@@ -30,8 +30,7 @@ public class CodeGenVisitor implements ASTVisitor {
     // Types image and pixel are implemented in Assignment 5
     private Type currentType;
     private SymbolTable st = new SymbolTable();
-    private StringBuilder sb;
-
+    //TODO: implement javanames
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
             throws PLCCompilerException {
@@ -82,7 +81,6 @@ public class CodeGenVisitor implements ASTVisitor {
         StringBuilder rightSb = determineExpr(binaryExpr.getRightExpr(), arg);
 
         Type leftType = binaryExpr.getLeftExpr().getType();
-        Type rightType = binaryExpr.getRightExpr().getType();
         Kind opKind = binaryExpr.getOpKind();
 
         StringBuilder sb = new StringBuilder();
@@ -99,7 +97,8 @@ public class CodeGenVisitor implements ASTVisitor {
             throw new CodeGenException("Unsupported operation or type mismatch for operation " + opKind);
         }
 
-        return sb;
+        return sb.append("\n");
+        //^^^ unsure if this newline is necessary
     }
 
     private String convertOpKind(Kind opKind) throws CodeGenException {
@@ -163,6 +162,32 @@ public class CodeGenVisitor implements ASTVisitor {
         }
         blockCode.append("}\n");
         return blockCode;
+    }
+
+    private StringBuilder visitBlockElem(BlockElem blockElem, Object arg) throws  PLCCompilerException {
+        StringBuilder sb = new StringBuilder();
+        if(blockElem instanceof Declaration){
+            sb.append(visitDeclaration((Declaration) blockElem, arg));
+        } else if (blockElem instanceof Statement){
+            sb.append(determineStatement((Statement) blockElem, arg));
+        } else {
+            throw new CodeGenException("Unsupported BlockElem type");
+        }
+        sb.append(";\n");
+        return sb;
+    }
+
+    private StringBuilder determineStatement(Statement statement, Object arg) throws PLCCompilerException {
+        StringBuilder sb = new StringBuilder();
+        sb.append(switch (statement.getClass().getName()){
+            case "AssignmentStatement" -> visitAssignmentStatement((AssignmentStatement) statement, arg);
+            case "WriteStatement" -> visitWriteStatement((WriteStatement) statement, arg);
+            case "DoStatement", "IfStatement" -> throw new UnsupportedOperationException("Unimplemented method");
+            case "ReturnStatement" -> visitReturnStatement((ReturnStatement) statement, arg);
+            case "StatementBlock" -> visitBlockStatement((StatementBlock) statement, arg);
+            default -> throw new CodeGenException("Unexpected value: " + statement.getClass().getName());
+        });
+        return sb;
     }
 
     @Override
@@ -268,7 +293,7 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
         // _IdentExpr_.getNameDef().getJavaName()
-        throw new UnsupportedOperationException("Unimplemented method");
+        return new StringBuilder(identExpr.getNameDef().getJavaName());
     }
 
     @Override
@@ -280,7 +305,7 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
         // _IdentExpr_.getNameDef().getJavaName()
-        throw new UnsupportedOperationException("Unimplemented method");
+        return new StringBuilder(lValue.getNameDef().getJavaName());
     }
 
     @Override
@@ -326,7 +351,42 @@ public class CodeGenVisitor implements ASTVisitor {
          * }
          * Note: parameters from _NameDef*_ are separated by commas
          */
-        throw new UnsupportedOperationException("Unimplemented method");
+        /*How to deal with import statements
+        • Traverse the entire tree adding code to a StringBuilder
+        • As you traverse the AST, keep track of methods called by generated
+            code that would require an import.
+            TODO: add a table that keeps track of methods that would require an import
+        • After you return back to Program after visiting its children, you will
+            have a String containing the body of the class.
+        • Construct another String containing the necessary imports.
+        • Concatenate the package name, the import statements, and the class
+            body to get the complete Java class.*/
+        //TODO: implement package name argument
+        StringBuilder subString = new StringBuilder("public class ").append(program.getName()).append(" {\n");
+        subString.append("\tpublic static ").append(determineType(program.getType())).append(" apply(\n").append("\t\t");
+        ListIterator<NameDef> listIterator = program.getParams().listIterator();
+        while(listIterator.hasNext()){
+            subString.append(visitNameDef(listIterator.next(), arg));
+            if(listIterator.hasNext()){
+                subString.append(", ");
+            } else {
+                subString.append("\n");
+            }
+        }
+        subString.append("\t) ").append(visitBlock(program.getBlock(), arg)).append("\n");
+        subString.append("}\n");
+        //^^^ unsure if the above \n is necessary
+        return subString;
+    }
+
+    private String determineType(Type type) throws CodeGenException {
+        return switch(type) {
+            case INT-> "int";
+            case STRING -> "String";
+            case VOID -> "void";
+            case BOOLEAN -> "boolean";
+            case IMAGE,PIXEL -> throw new UnsupportedOperationException("Unimplemented method");
+        };
     }
 
     @Override
@@ -350,9 +410,9 @@ public class CodeGenVisitor implements ASTVisitor {
          * Note: you do not need to handle width and height
          * in this assignment
          */
-        StringBuilder subString = new StringBuilder("(");
+        StringBuilder subString = new StringBuilder("( ");
         subString.append(unaryExpr.getOp().toString()).append(" ");
-        subString.append(unaryExpr.getExpr()).append(")");
+        subString.append(unaryExpr.getExpr()).append(" )");
         return subString;
     }
 
