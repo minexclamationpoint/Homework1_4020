@@ -51,8 +51,7 @@ public class CodeGenVisitor implements ASTVisitor {
                 throw new CodeGenException("Expression in assignment statement is null");
             }
             sb.append(visitLValue(assignmentStatement.getlValue(), arg)).append(" = ");
-            sb.append(determineExpr(assignmentStatement.getE(), arg)).append("\n");
-            //^^^ unsure if newline here is necessary
+            sb.append(determineExpr(assignmentStatement.getE(), arg));
             return sb;
         } catch (Exception e) {
             throw new CodeGenException("Well then we shouldn't be here" + e.getMessage());
@@ -212,20 +211,12 @@ public class CodeGenVisitor implements ASTVisitor {
         if (nameDef.getType() == null || nameDef.getIdentToken() == null) {
             throw new CodeGenException("Invalid type or identifier in declaration.");
         }
-
-        sb.append(nameDef.getType().toString()).append(" ").append(nameDef.getIdentToken());
+        sb.append(determineType(nameDef.getType())).append(" ").append(nameDef.getIdentToken().text());
 
         if (initializer != null) {
-            Object result = initializer.visit(this, arg);
-
-            StringBuilder initCode = (StringBuilder) result;
-            if (initCode.isEmpty()) {
-                throw new CodeGenException("Failed to generate code for the initializer expression.");
-            }
-            sb.append(" = ").append(initCode);
+            sb.append(" = ");
+            sb.append(determineExpr(initializer, arg));
         }
-
-        sb.append(";");
         return sb;
     }
 
