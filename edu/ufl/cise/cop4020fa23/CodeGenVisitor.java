@@ -206,11 +206,8 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
-        return new StringBuilder("int width = ")
-                .append(determineExpr(dimension.getWidth(), arg))
-                .append(";\nint height = ")
-                .append(determineExpr(dimension.getHeight(), arg))
-                .append(";\n");
+        // Implemented in Assignment 5
+        throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
@@ -246,23 +243,19 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
-        //_IdentExpr_.getNameDef().getJavaName()
-        //TODO: add name additions n stuff
-        return new StringBuilder(lValue.getNameDef().getName());
+        // _IdentExpr_.getNameDef().getJavaName()
+        throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitNameDef(NameDef nameDef, Object arg) throws PLCCompilerException {
 
         /*
-         Dimension is implemented in Assignment 5
-         _Type_ _name_
-         Where _name_ is the Java name of the IDENT
+         * Dimension is implemented in Assignment 5
+         * _Type_ _name_
+         * Where _name_ is the Java name of the IDENT
          */
-        StringBuilder subString = new StringBuilder(determineType(nameDef.getType())).append(" ");
-        //TODO: add name additions n stuff
-        subString.append(nameDef.getName());
-        return subString;
+        throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
@@ -285,53 +278,24 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitProgram(Program program, Object arg) throws PLCCompilerException {
-        //TODO: implement package shenanigans
-        StringBuilder subString = new StringBuilder("public class ");
-        //TODO: implement overlapping name things
-        subString.append(program.getName()).append(" {\n");
-        subString.append("\tpublic static ");
-        subString.append(determineType(program.getType())).append(" apply(\n");
-        subString.append("\t\t");
-        ListIterator<NameDef> it = program.getParams().listIterator();
-        while(it.hasNext()){
-            subString.append(visitNameDef(it.next(), arg));
-            if(!it.hasNext()){
-                subString.append(" ,");
-            } else {
-                subString.append("\n\t) ");
-            }
-        }
-        subString.append(visitBlock(program.getBlock(), arg));
-        subString.append("\n}");
-        return subString;
         /*
-        Should accept a package name as an argument and return a String containing a
-         java program implementing the semantics of the language. The package name may be null or an empty string.
-         If so, the generated program should be in the default package.
-         public class _IDENT_ {
-         public static _Type_ apply(
-         _NameDef*_
-         ) _Block
-         }
-        Note: parameters from _NameDef*_ are separated by commas
+         * Should accept a package name as an argument and return a String containing a
+         * java program implementing the semantics of the language. The package name may
+         * be null or an empty string.
+         * If so, the generated program should be in the default package.
+         * public class _IDENT_ {
+         * public static _Type_ apply(
+         * _NameDef*_
+         * ) _Block
+         * }
+         * Note: parameters from _NameDef*_ are separated by commas
          */
-        
-    }
-
-    public StringBuilder determineType(Type type) throws PLCCompilerException {
-        return new StringBuilder(
-                switch(type){
-                    case INT -> "int";
-                    case STRING -> "String";
-                    case VOID -> "void";
-                    case BOOLEAN -> "boolean";
-                    case IMAGE, PIXEL -> throw new UnsupportedOperationException("Unimplemented types");
-});
+        throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitReturnStatement(ReturnStatement returnStatement, Object arg) throws PLCCompilerException {
-        //return _Expr_
+        // return _Expr_
         StringBuilder subString = new StringBuilder("return ");
         subString.append(determineExpr(returnStatement.getE(), arg));
         return subString;
@@ -339,16 +303,16 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitStringLitExpr(StringLitExpr stringLitExpr, Object arg) throws PLCCompilerException {
-        //_StringLitExpr_.getText
+        // _StringLitExpr_.getText
         return new StringBuilder(stringLitExpr.getText());
     }
 
     @Override
     public StringBuilder visitUnaryExpr(UnaryExpr unaryExpr, Object arg) throws PLCCompilerException {
         /*
-         ( _op_ _Expr_ )
-         Note: you do not need to handle width and height
-         in this assignment
+         * ( _op_ _Expr_ )
+         * Note: you do not need to handle width and height
+         * in this assignment
          */
         StringBuilder subString = new StringBuilder("(");
         subString.append(unaryExpr.getOp().toString()).append(" ");
@@ -359,8 +323,8 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitWriteStatement(WriteStatement writeStatement, Object arg) throws PLCCompilerException {
         /*
-         ConsoleIO.write( _Expr_ )
-         Note: you will need to import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO
+         * ConsoleIO.write( _Expr_ )
+         * Note: you will need to import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO
          */
         Expr subExpr = writeStatement.getExpr();
         StringBuilder subString = new StringBuilder("ConsoleIO.write(");
@@ -369,10 +333,11 @@ public class CodeGenVisitor implements ASTVisitor {
         return subString;
     }
 
-    //Helper method for the various visitors that have to go through the different versions of Expr
+    // Helper method for the various visitors that have to go through the different
+    // versions of Expr
     private StringBuilder determineExpr(Expr subExpr, Object arg) throws PLCCompilerException {
         StringBuilder subString = new StringBuilder();
-        switch(subExpr.getClass().getName()) {
+        switch (subExpr.getClass().getName()) {
             case "ConditionalExpr" -> {
                 subString.append(visitConditionalExpr((ConditionalExpr) subExpr, arg));
             }
@@ -395,16 +360,17 @@ public class CodeGenVisitor implements ASTVisitor {
                 subString.append(visitBooleanLitExpr((BooleanLitExpr) subExpr, arg));
             }
             default -> throw new CodeGenException("Unexpected subexpression type");
-        };
+        }
+        ;
         return subString;
     }
 
     @Override
     public StringBuilder visitBooleanLitExpr(BooleanLitExpr booleanLitExpr, Object arg) throws PLCCompilerException {
-        //true or false
+        // true or false
         System.out.println(booleanLitExpr.getText());
         StringBuilder subString = new StringBuilder();
-        return switch(booleanLitExpr.getText()){
+        return switch (booleanLitExpr.getText()) {
             case "FALSE" -> subString.append("false");
             case "TRUE" -> subString.append("true");
             default -> throw new CodeGenException("Unexpected type in BooleanLitExpr");
@@ -413,7 +379,7 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitConstExpr(ConstExpr constExpr, Object arg) throws PLCCompilerException {
-        //Implemented in Assignment 5
+        // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 }
