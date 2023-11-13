@@ -386,9 +386,11 @@ public class CodeGenVisitor implements ASTVisitor {
          * Note: you do not need to handle width and height
          * in this assignment
          */
-        StringBuilder subString = new StringBuilder("( ");
-        subString.append(unaryExpr.getOp().toString()).append(" ");
-        subString.append(unaryExpr.getExpr()).append(" )");
+        StringBuilder subString = new StringBuilder("(");
+        subString.append(convertOpKind(unaryExpr.getOp()));
+        System.out.println(subString);
+        subString.append(determineExpr(unaryExpr.getExpr(), arg)).append(")");
+        System.out.println(subString);
         return subString;
     }
 

@@ -203,7 +203,7 @@ class CodeGenTest_starter {
 	}
 	
 	@Test 
-	void cg110() throws Exception {
+	void cg11() throws Exception {
 		String source = """
 				boolean f(boolean a)
 				<:
