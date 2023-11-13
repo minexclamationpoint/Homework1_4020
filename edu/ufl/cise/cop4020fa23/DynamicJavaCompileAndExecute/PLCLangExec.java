@@ -25,7 +25,7 @@ public class PLCLangExec {
 		String className = ((Program)ast).getName();
 		String fullyQualifiedName = packageName != "" ? packageName + '.' + className : className;
 		//Generate Java code
-		String javaCode = (String) ast.visit(ComponentFactory.makeCodeGenerator(), packageName);
+		String javaCode = ast.visit(ComponentFactory.makeCodeGenerator(), packageName).toString();
 		//Display generated code if VERBOSE is set
 		System.out.println(javaCode);
 		//Invoke Java compiler to obtain classfile 

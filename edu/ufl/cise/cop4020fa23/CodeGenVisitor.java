@@ -34,13 +34,25 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
             throws PLCCompilerException {
-        // _LValue_ = _Expr_
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(visitLValue(assignmentStatement.getlValue(), arg)).append(" = ");
-        sb.append(determineExpr(assignmentStatement.getE(), arg)).append("\n");
-        //^^^ unsure if newline here is necessary
-        return sb;
+        try {
+            // _LValue_ = _Expr_
+            StringBuilder sb = new StringBuilder();
+            if (assignmentStatement.getlValue() == null) {
+                throw new CodeGenException("LValue in assignment statement is null");
+            }
+            if (assignmentStatement.getlValue().getName() == null || assignmentStatement.getlValue().getName().isEmpty()) {
+                throw new CodeGenException("Variable name in LValue is null or empty.");
+            }
+            if(assignmentStatement.getE() == null){
+                throw new CodeGenException("Expression in assignment statement is null");
+            }
+            sb.append(visitLValue(assignmentStatement.getlValue(), arg)).append(" = ");
+            sb.append(determineExpr(assignmentStatement.getE(), arg)).append("\n");
+            //^^^ unsure if newline here is necessary
+            return sb;
+        } catch (Exception e) {
+            throw new CodeGenException("Well then we shouldn't be here" + e.getMessage());
+        }
     }
 
     @Override
@@ -74,7 +86,7 @@ public class CodeGenVisitor implements ASTVisitor {
             sb.append("(").append(leftSb).append(" ").append(op).append(" ").append(rightSb).append(")");
         }
 
-        return sb.append("\n");
+        return sb;
         //^^^ unsure if this newline is necessary
     }
 
@@ -108,7 +120,11 @@ public class CodeGenVisitor implements ASTVisitor {
         //Extended visitBlock into two subexpressions: visitBlockElem and determineStatement
         StringBuilder blockCode = new StringBuilder("{\n");
         for (Block.BlockElem elem : block.getElems()) {
-            blockCode.append(visitBlockElem(elem, arg));
+            try {
+                blockCode.append(visitBlockElem(elem, arg));
+            } catch (CodeGenException e) {
+                throw e;
+            }
         }
         blockCode.append("}\n");
         return blockCode;
@@ -187,11 +203,20 @@ public class CodeGenVisitor implements ASTVisitor {
         NameDef nameDef = declaration.getNameDef();
         Expr initializer = declaration.getInitializer();
 
+        if (nameDef.getType() == null || nameDef.getIdentToken() == null) {
+            throw new CodeGenException("Invalid type or identifier in declaration.");
+        }
+
         sb.append(nameDef.getType().toString()).append(" ").append(nameDef.getIdentToken());
 
         if (initializer != null) {
-            sb.append(" = ");
-            sb.append(initializer.visit(this, arg));
+            Object result = initializer.visit(this, arg);
+
+            StringBuilder initCode = (StringBuilder) result;
+            if (initCode.isEmpty()) {
+                throw new CodeGenException("Failed to generate code for the initializer expression.");
+            }
+            sb.append(" = ").append(initCode);
         }
 
         sb.append(";");
@@ -398,12 +423,11 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitBooleanLitExpr(BooleanLitExpr booleanLitExpr, Object arg) throws PLCCompilerException {
         // true or false
         System.out.println(booleanLitExpr.getText());
-        StringBuilder subString = new StringBuilder();
-        return switch (booleanLitExpr.getText()) {
-            case "FALSE" -> subString.append("false");
-            case "TRUE" -> subString.append("true");
+        return new StringBuilder(switch (booleanLitExpr.getText()) {
+            case "FALSE" -> "false";
+            case "TRUE" -> "true";
             default -> throw new CodeGenException("Unexpected type in BooleanLitExpr");
-        };
+        });
     }
 
     @Override
