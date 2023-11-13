@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import java.util.ListIterator;
-import java.util.logging.Logger;
 
 /*To work around a mismatch between the scoping rules of our language and Java’s scoping rules,
 implement a way to rename variables in the generated Java code so that every variable has a
