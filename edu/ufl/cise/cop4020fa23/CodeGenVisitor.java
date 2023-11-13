@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import java.util.ListIterator;
 import java.util.logging.Logger;
 
 /*To work around a mismatch between the scoping rules of our language and Java’s scoping rules,
@@ -87,6 +88,7 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
+        //Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
@@ -111,7 +113,7 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
         //_IdentExpr_.getNameDef().getJavaName()
-        throw new UnsupportedOperationException("Unimplemented method");
+        return new StringBuilder(identExpr.getNameDef().getName());
     }
 
     @Override
@@ -123,7 +125,8 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
         //_IdentExpr_.getNameDef().getJavaName()
-        throw new UnsupportedOperationException("Unimplemented method");
+        //TODO: add name additions n stuff
+        return new StringBuilder(lValue.getNameDef().getName());
     }
 
     @Override
@@ -134,13 +137,15 @@ public class CodeGenVisitor implements ASTVisitor {
         _Type_ _name_
         Where _name_ is the Java name of the IDENT
         */
-        throw new UnsupportedOperationException("Unimplemented method");
+        StringBuilder subString = new StringBuilder(determineType(nameDef.getType())).append(" ");
+        //TODO: add name additions n stuff
+        subString.append(nameDef.getName());
+        return subString;
     }
 
     @Override
     public StringBuilder visitNumLitExpr(NumLitExpr numLitExpr, Object arg) throws PLCCompilerException {
-        //_NumLitExpr_.getText
-        throw new UnsupportedOperationException("Unimplemented method");
+        return new StringBuilder(numLitExpr.getText());
     }
 
     @Override
@@ -157,6 +162,25 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitProgram(Program program, Object arg) throws PLCCompilerException {
+        //TODO: implement package shenanigans
+        StringBuilder subString = new StringBuilder("public class ");
+        //TODO: implement overlapping name things
+        subString.append(program.getName()).append(" {\n");
+        subString.append("\tpublic static ");
+        subString.append(determineType(program.getType())).append(" apply(\n");
+        subString.append("\t\t");
+        ListIterator<NameDef> it = program.getParams().listIterator();
+        while(it.hasNext()){
+            subString.append(visitNameDef(it.next(), arg));
+            if(!it.hasNext()){
+                subString.append(" ,");
+            } else {
+                subString.append("\n\t) ");
+            }
+        }
+        subString.append(visitBlock(program.getBlock(), arg));
+        subString.append("\n}");
+        return subString;
         /*
         Should accept a package name as an argument and return a String containing a
         java program implementing the semantics of the language. The package name may be null or an empty string.
@@ -168,7 +192,18 @@ public class CodeGenVisitor implements ASTVisitor {
             }
         Note: parameters from _NameDef*_ are separated by commas
          */
-        throw new UnsupportedOperationException("Unimplemented method");
+
+    }
+
+    public StringBuilder determineType(Type type) throws PLCCompilerException {
+        return new StringBuilder(
+                switch(type){
+                    case INT -> "int";
+                    case STRING -> "String";
+                    case VOID -> "void";
+                    case BOOLEAN -> "boolean";
+                    case IMAGE, PIXEL -> throw new UnsupportedOperationException("Unimplemented types");
+                });
     }
 
     @Override
