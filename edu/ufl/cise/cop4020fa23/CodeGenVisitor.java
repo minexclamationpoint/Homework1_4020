@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import java.util.ListIterator;
 import java.util.logging.Logger;
 
 /*To work around a mismatch between the scoping rules of our language and Java’s scoping rules,
@@ -27,98 +26,221 @@ has no package declaration).
  */
 public class CodeGenVisitor implements ASTVisitor {
 
-    //Types image and pixel are implemented in Assignment 5
+    // Types image and pixel are implemented in Assignment 5
     private Type currentType;
     private SymbolTable st = new SymbolTable();
     private StringBuilder sb;
+
     @Override
-    public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
-        //_LValue_ = _Expr_
-        throw new UnsupportedOperationException("Unimplemented method");
+    public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
+            throws PLCCompilerException {
+        // _LValue_ = _Expr_
+        StringBuilder assignmentStringBuilder = new StringBuilder();
+
+        LValue lvalue = assignmentStatement.getlValue();
+        String variableName = lvalue.getName();
+        assignmentStringBuilder.append(variableName);
+
+        assignmentStringBuilder.append(" = ");
+
+        Expr expr = assignmentStatement.getE();
+        StringBuilder exprCode = determineExpr(expr, arg);
+        assignmentStringBuilder.append(exprCode);
+
+        assignmentStringBuilder.append(";\n");
+
+        return assignmentStringBuilder;
     }
 
     @Override
     public StringBuilder visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
         /*
-        If ExprleftExpr.type is string and op is EQ
-        _ ExprleftExpr_ .equals( _ ExprrigthExpr _)
-        If op is EXP
-        ((int)Math.round(Math.pow( _ ExprleftExpr _ , _ExprrigthExpr_ ))
-        Otherwise
-        (_ ExprleftExpr _ _op_ _ ExprrigthExpr _)
-        */
-        throw new UnsupportedOperationException("Unimplemented method");
+         * If ExprleftExpr.type is string and op is EQ
+         * _ ExprleftExpr_ .equals( _ ExprrigthExpr _)
+         * If op is EXP
+         * ((int)Math.round(Math.pow( _ ExprleftExpr _ , _ExprrigthExpr_ ))
+         * Otherwise
+         * (_ ExprleftExpr _ _op_ _ ExprrigthExpr _)
+         */
+
+        StringBuilder leftSb = determineExpr(binaryExpr.getLeftExpr(), arg);
+        StringBuilder rightSb = determineExpr(binaryExpr.getRightExpr(), arg);
+
+        Type leftType = binaryExpr.getLeftExpr().getType();
+        Type rightType = binaryExpr.getRightExpr().getType();
+        Kind opKind = binaryExpr.getOpKind();
+
+        StringBuilder sb = new StringBuilder();
+
+        if (leftType == Type.STRING && opKind == Kind.EQ) {
+            sb.append(leftSb).append(".equals(").append(rightSb).append(")");
+        }
+
+        else if (opKind == Kind.EXP) {
+            // is this bs? maybeeee
+            sb.append("(int)Math.round(Math.pow(").append(leftSb).append(", ").append(rightSb).append("))");
+        } else {
+            String op = convertOpKind(opKind);
+            sb.append("(").append(leftSb).append(" ").append(op).append(" ").append(rightSb).append(")");
+        }
+
+        return sb;
+    }
+
+    private String convertOpKind(Kind opKind) {
+        switch (opKind) {
+            case PLUS:
+                return "+";
+            case MINUS:
+                return "-";
+            case TIMES:
+                return "*";
+            case DIV:
+                return "/";
+            case MOD:
+                return "%";
+            case EQ:
+                return "==";
+            case LE:
+                return "<=";
+            case GE:
+                return ">=";
+            case LT:
+                return "<";
+            case GT:
+                return ">";
+            case AND:
+                return "&&";
+            case OR:
+                return "||";
+            case BITAND:
+                return "&";
+            case BITOR:
+                return "|";
+            case BANG:
+                return "!";
+            // should be all of them
+
+            default:
+                throw new UnsupportedOperationException("Operation " + opKind + " not supported.");
+        }
     }
 
     @Override
     public StringBuilder visitBlock(Block block, Object arg) throws PLCCompilerException {
-        //{ _BlockElem*_ }
-        //BlockElem ::= Declaration | Statement
-        throw new UnsupportedOperationException("Unimplemented method");
+        // { _BlockElem*_ }
+        // BlockElem ::= Declaration | Statement
+
+        StringBuilder blockCode = new StringBuilder("{\n");
+        for (Block.BlockElem elem : block.getElems()) {
+            if (elem instanceof Declaration) {
+                blockCode.append(visitDeclaration((Declaration) elem, arg));
+            } else if (elem instanceof Statement) {
+                blockCode.append(visitBlockStatement((StatementBlock) elem, arg));
+            } else {
+                throw new PLCCompilerException("Unsupported BlockElem type");
+            }
+            blockCode.append(";\n");
+        }
+        blockCode.append("}\n");
+        return blockCode;
     }
 
     @Override
     public StringBuilder visitBlockStatement(StatementBlock statementBlock, Object arg) throws PLCCompilerException {
-        //_Block_
-        throw new UnsupportedOperationException("Unimplemented method");
+        // _Block_
+        return visitBlock(statementBlock.getBlock(), arg);
     }
 
     @Override
     public StringBuilder visitChannelSelector(ChannelSelector channelSelector, Object arg) throws PLCCompilerException {
-        //Implemented in Assignment 5
+        // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitConditionalExpr(ConditionalExpr conditionalExpr, Object arg) throws PLCCompilerException {
         /*
-        ( _ ExprGuardExpr_ ? _ ExprTrueExpr _
-        : _ ExprFalseExpr _ )
+         * ( _ ExprGuardExpr_ ? _ ExprTrueExpr _
+         * : _ ExprFalseExpr _ )
          */
-        throw new UnsupportedOperationException("Unimplemented method");
+        StringBuilder sb = new StringBuilder();
+
+        StringBuilder guardExpr = determineExpr(conditionalExpr.getGuardExpr(), arg);
+
+        StringBuilder trueExpr = determineExpr(conditionalExpr.getTrueExpr(), arg);
+
+        StringBuilder falseExpr = determineExpr(conditionalExpr.getFalseExpr(), arg);
+
+        // probably right?
+        sb.append("(")
+                .append(guardExpr)
+                .append(" ? ")
+                .append(trueExpr)
+                .append(" : ")
+                .append(falseExpr)
+                .append(")");
+
+        return sb;
     }
 
     @Override
     public StringBuilder visitDeclaration(Declaration declaration, Object arg) throws PLCCompilerException {
         /*
-        either _NameDef_ or _NameDef_ = _Expr_
+         * either _NameDef_ or _NameDef_ = _Expr_
          */
-        throw new UnsupportedOperationException("Unimplemented method");
+        StringBuilder sb = new StringBuilder();
+        NameDef nameDef = declaration.getNameDef();
+        Expr initializer = declaration.getInitializer();
+
+        sb.append(nameDef.getType().toString()).append(" ").append(nameDef.getIdentToken());
+
+        if (initializer != null) {
+            sb.append(" = ");
+            sb.append(initializer.visit(this, arg));
+        }
+
+        sb.append(";");
+        return sb;
     }
 
     @Override
     public StringBuilder visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
-        //Implemented in Assignment 5
-        throw new UnsupportedOperationException("Unimplemented method");
+        return new StringBuilder("int width = ")
+                .append(determineExpr(dimension.getWidth(), arg))
+                .append(";\nint height = ")
+                .append(determineExpr(dimension.getHeight(), arg))
+                .append(";\n");
     }
 
     @Override
     public StringBuilder visitDoStatement(DoStatement doStatement, Object arg) throws PLCCompilerException {
-        //Implemented in Assignment 5
+        // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
-    public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
-        //Implemented in Assignment 5
+    public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg)
+            throws PLCCompilerException {
+        // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
-        //Implemented in Assignment 5
+        // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
-        //_IdentExpr_.getNameDef().getJavaName()
-        return new StringBuilder(identExpr.getNameDef().getName());
+        // _IdentExpr_.getNameDef().getJavaName()
+        throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitIfStatement(IfStatement ifStatement, Object arg) throws PLCCompilerException {
-        //Implemented in Assignment 5
+        // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
@@ -133,10 +255,10 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitNameDef(NameDef nameDef, Object arg) throws PLCCompilerException {
 
         /*
-        Dimension is implemented in Assignment 5
-        _Type_ _name_
-        Where _name_ is the Java name of the IDENT
-        */
+         Dimension is implemented in Assignment 5
+         _Type_ _name_
+         Where _name_ is the Java name of the IDENT
+         */
         StringBuilder subString = new StringBuilder(determineType(nameDef.getType())).append(" ");
         //TODO: add name additions n stuff
         subString.append(nameDef.getName());
@@ -145,18 +267,19 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitNumLitExpr(NumLitExpr numLitExpr, Object arg) throws PLCCompilerException {
-        return new StringBuilder(numLitExpr.getText());
+        // _NumLitExpr_.getText
+        throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
-        //Implemented in Assignment 5
+        // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
-        //Implemented in Assignment 5
+        // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
@@ -183,16 +306,16 @@ public class CodeGenVisitor implements ASTVisitor {
         return subString;
         /*
         Should accept a package name as an argument and return a String containing a
-        java program implementing the semantics of the language. The package name may be null or an empty string.
-        If so, the generated program should be in the default package.
-            public class _IDENT_ {
-            public static _Type_ apply(
-                _NameDef*_
-            ) _Block
-            }
+         java program implementing the semantics of the language. The package name may be null or an empty string.
+         If so, the generated program should be in the default package.
+         public class _IDENT_ {
+         public static _Type_ apply(
+         _NameDef*_
+         ) _Block
+         }
         Note: parameters from _NameDef*_ are separated by commas
          */
-
+        
     }
 
     public StringBuilder determineType(Type type) throws PLCCompilerException {
@@ -203,7 +326,7 @@ public class CodeGenVisitor implements ASTVisitor {
                     case VOID -> "void";
                     case BOOLEAN -> "boolean";
                     case IMAGE, PIXEL -> throw new UnsupportedOperationException("Unimplemented types");
-                });
+});
     }
 
     @Override
@@ -223,9 +346,9 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitUnaryExpr(UnaryExpr unaryExpr, Object arg) throws PLCCompilerException {
         /*
-        ( _op_ _Expr_ )
-        Note: you do not need to handle width and height
-        in this assignment
+         ( _op_ _Expr_ )
+         Note: you do not need to handle width and height
+         in this assignment
          */
         StringBuilder subString = new StringBuilder("(");
         subString.append(unaryExpr.getOp().toString()).append(" ");
@@ -236,8 +359,8 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitWriteStatement(WriteStatement writeStatement, Object arg) throws PLCCompilerException {
         /*
-        ConsoleIO.write( _Expr_ )
-        Note: you will need to import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO
+         ConsoleIO.write( _Expr_ )
+         Note: you will need to import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO
          */
         Expr subExpr = writeStatement.getExpr();
         StringBuilder subString = new StringBuilder("ConsoleIO.write(");
