@@ -207,11 +207,8 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
-        return new StringBuilder("int width = ")
-                .append(determineExpr(dimension.getWidth(), arg))
-                .append(";\nint height = ")
-                .append(determineExpr(dimension.getHeight(), arg))
-                .append(";\n");
+        // Implemented in Assignment 5
+        throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
