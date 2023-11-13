@@ -136,9 +136,7 @@ public class CodeGenVisitor implements ASTVisitor {
             // should be all of them
 
             default:
-                throw new CodeGenException("Unsupported operation or type mismatch for operation " + opKind);// WHY WPNT
-                                                                                                             // THIS
-                                                                                                             // QWOERK
+                throw new CodeGenException("Unsupported operation or type mismatch for operation " + opKind);
         }
     }
 
@@ -152,7 +150,6 @@ public class CodeGenVisitor implements ASTVisitor {
                 } else if (elem instanceof Statement) {
                     blockCode.append(visitBlockStatement((StatementBlock) elem, arg));
                 } else {
-                    // Here, we throw a CodeGenException for an unsupported BlockElem type.
                     throw new CodeGenException(elem.firstToken() + "Unsupported BlockElem type");
                 }
                 blockCode.append(";\n");
