@@ -81,6 +81,7 @@ public class CodeGenVisitor implements ASTVisitor {
         StringBuilder rightSb = determineExpr(binaryExpr.getRightExpr(), arg);
 
         Type leftType = binaryExpr.getLeftExpr().getType();
+        Type rightType = binaryExpr.getRightExpr().getType();
         Kind opKind = binaryExpr.getOpKind();
 
         StringBuilder sb = new StringBuilder();
@@ -90,7 +91,6 @@ public class CodeGenVisitor implements ASTVisitor {
         } else if (leftType == Type.INT && rightType == Type.INT && opKind == Kind.EXP) {
             sb.append("(int)Math.round(Math.pow(").append(leftSb).append(", ").append(rightSb).append("))");
         } else if (leftType == Type.INT && rightType == Type.INT) {
-            // Arithmetic operations are only supported between integers in this example
             String op = convertOpKind(opKind);
             sb.append("(").append(leftSb).append(" ").append(op).append(" ").append(rightSb).append(")");
         } else {
