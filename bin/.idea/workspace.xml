@@ -1,0 +1,812 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Homework1_4020:jar" />
+      <artifact name="Homework1_4020:jar2" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="&#10;Fixed minor issue with visitUnaryExpr, 10/23 passed. Not sure what's wrong with 8/9/10">
+      <change beforePath="$PROJECT_DIR$/Homework1_4020.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Homework1_4020.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/artifacts/Homework1_4020_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/artifacts/Homework1_4020_jar2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/libraries/hamcrest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/libraries/junit_jupiter.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/libraries/lib.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/HW3_GIT_REPO.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/Homework1_4020.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/libraries/junit_jupiter.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/libraries/junit_jupiter_params.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment 2 Grammar.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment 3 Context constraints.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment 4 Code Generation.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment1.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment2.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment3.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment4.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ExpressionGrammar.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/edu.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/apiguardian-api-1.1.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-jupiter-5.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-jupiter-api-5.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-jupiter-engine-5.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-jupiter-params-5.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-platform-commons-1.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-platform-engine-1.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/opentest4j-1.2.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/test/Assignment3_starter.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/CodeGenTest_starter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/CodeGenVisitor$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ComponentFactory.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/DynamicClassLoader.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/DynamicCompiler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/InMemoryBytecodeObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/InMemoryClassFileManager$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/InMemoryClassFileManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/PLCLangExec.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/StringJavaFileObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ExpressionParser$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ExpressionParser.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW0Tests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW1TestSolutions.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW2Tests$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW2Tests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW3Test$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW3Test.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ILexer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/IParser.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/IToken.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Kind.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Lexer$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Lexer$State.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Lexer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Parser$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Parser.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ParserTest_starter$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ParserTest_starter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/SourceLocation.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/SymbolTable$ScopeEntry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/SymbolTable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Token.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/TypeCheckTest_starter$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/TypeCheckTest_starter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/TypeCheckVisitor$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/AST.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ASTVisitor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/AssignmentStatement.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/BinaryExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Block$BlockElem.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Block.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/BooleanLitExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ChannelSelector.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ConditionalExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ConstExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Declaration.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Dimension.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/DoStatement.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ExpandedPixelExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Expr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/GuardedBlock.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/IdentExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/IfStatement.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/LValue.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/NameDef.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/NumLitExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/PixelSelector.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/PostfixExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Program.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ReturnStatement.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Statement.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/StatementBlock.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/StringLitExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/SyntheticNameDef.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Type$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Type.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/UnaryExpr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/WriteStatement.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/cop4020fa23.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/CodeGenException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/LexicalException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/PLCCompilerException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/SyntaxException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/TypeCheckException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/runtime/ConsoleIO$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/runtime/ConsoleIO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/apiguardian-api-1.1.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/hamcrest-2.2.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-5.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-api-5.10.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-api-5.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-engine-5.10.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-engine-5.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-params-5.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-platform-commons-1.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-platform-console-standalone-1.10.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-platform-engine-1.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/opentest4j-1.2.0.jar" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="origin/main" />
+  </component>
+  <component name="Git.Pull.Settings">
+    <option name="OPTIONS">
+      <set>
+        <option value="NO_COMMIT" />
+      </set>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="sensen312 &lt;sensen312school@gmail.com&gt;" />
+      </list>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+    <option name="SWAP_SIDES_IN_COMPARE_BRANCHES" value="true" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;history&quot;: [
+    {
+      &quot;assignee&quot;: &quot;minexclamationpoint&quot;
+    }
+  ],
+  &quot;lastFilter&quot;: {
+    &quot;assignee&quot;: &quot;minexclamationpoint&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="6265f100-a611-4ead-9302-25f1e1d53413" />
+        <option name="url" value="https://github.com/minexclamationpoint/Homework1_4020.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2WAyHsDl6zIC2J3OrN5QwRpqJY1" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Downloaded.Files.Path.Enabled": "true",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/steve/IdeaProjects/Homework1_4020",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
+  }
+}]]></component>
+  <component name="RunManager" selected="JUnit.CodeGenTest_starter.cg4">
+    <configuration name="CodeGenTest_starter" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Homework1_4020" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.ufl.cise.cop4020fa23.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CodeGenTest_starter.cg11" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Homework1_4020" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.ufl.cise.cop4020fa23.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
+      <option name="METHOD_NAME" value="cg11" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CodeGenTest_starter.cg12" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Homework1_4020" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.ufl.cise.cop4020fa23.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
+      <option name="METHOD_NAME" value="cg12" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CodeGenTest_starter.cg4" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Homework1_4020" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.ufl.cise.cop4020fa23.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
+      <option name="METHOD_NAME" value="cg4" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CodeGenTest_starter.cg9" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Homework1_4020" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.ufl.cise.cop4020fa23.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
+      <option name="METHOD_NAME" value="cg9" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.CodeGenTest_starter.cg4" />
+        <item itemvalue="JUnit.CodeGenTest_starter" />
+        <item itemvalue="JUnit.CodeGenTest_starter.cg11" />
+        <item itemvalue="JUnit.CodeGenTest_starter.cg9" />
+        <item itemvalue="JUnit.CodeGenTest_starter.cg12" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="" />
+      <created>1696189596039</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1696189596039</updated>
+    </task>
+    <task id="LOCAL-00007" summary="passes 21 of 21 tests">
+      <option name="closed" value="true" />
+      <created>1696965513317</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1696965513317</updated>
+    </task>
+    <task id="LOCAL-00008" summary="passes 21 of 21 tests">
+      <option name="closed" value="true" />
+      <created>1696978841584</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1696978841584</updated>
+    </task>
+    <task id="LOCAL-00009" summary="New Test Cases,added HW2 files">
+      <option name="closed" value="true" />
+      <created>1696979037731</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1696979037731</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Fixed minor issue">
+      <option name="closed" value="true" />
+      <created>1696981077329</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1696981077329</updated>
+    </task>
+    <task id="LOCAL-00011" summary="7/15 Tests Passed">
+      <option name="closed" value="true" />
+      <created>1696988497999</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1696988497999</updated>
+    </task>
+    <task id="LOCAL-00012" summary="7/15 Tests Passed">
+      <option name="closed" value="true" />
+      <created>1697422298056</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1697422298056</updated>
+    </task>
+    <task id="LOCAL-00013" summary="7/15 Tests Passed">
+      <option name="closed" value="true" />
+      <created>1697422337466</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1697422337466</updated>
+    </task>
+    <task id="LOCAL-00014" summary="One more test case">
+      <option name="closed" value="true" />
+      <created>1697507670381</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1697507670381</updated>
+    </task>
+    <task id="LOCAL-00015" summary="One more test case">
+      <option name="closed" value="true" />
+      <created>1697508294423</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1697508294423</updated>
+    </task>
+    <task id="LOCAL-00016" summary="One more test case">
+      <option name="closed" value="true" />
+      <created>1697508334975</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1697508334975</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Added skeleton for homework 3">
+      <option name="closed" value="true" />
+      <created>1698260904939</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1698260904939</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Added skeleton for homework 3">
+      <option name="closed" value="true" />
+      <created>1698261034410</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1698261034410</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Added skeleton for homework 3">
+      <option name="closed" value="true" />
+      <created>1698610436732</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1698610436732</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Added skeleton for homework 3">
+      <option name="closed" value="true" />
+      <created>1698610452754</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1698610452754</updated>
+    </task>
+    <task id="LOCAL-00021" summary="h">
+      <option name="closed" value="true" />
+      <created>1698611947158</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1698611947158</updated>
+    </task>
+    <task id="LOCAL-00022" summary="h">
+      <option name="closed" value="true" />
+      <created>1698612967239</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1698612967239</updated>
+    </task>
+    <task id="LOCAL-00023" summary="updating visitbinary n stuff">
+      <option name="closed" value="true" />
+      <created>1698614519471</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1698614519471</updated>
+    </task>
+    <task id="LOCAL-00024" summary="updating visitbinary n stuff">
+      <option name="closed" value="true" />
+      <created>1698617989750</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1698617989750</updated>
+    </task>
+    <task id="LOCAL-00025" summary="updating visitbinary n stuff">
+      <option name="closed" value="true" />
+      <created>1698680216409</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1698680216409</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Completed all methods, now we just need to test. Got a lot of issues with things being null">
+      <option name="closed" value="true" />
+      <created>1698688427830</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1698688427830</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Passed 10 more tests after changing one line of code lol">
+      <option name="closed" value="true" />
+      <created>1698688696751</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1698688696751</updated>
+    </task>
+    <task id="LOCAL-00028" summary="23 passed 2 failed">
+      <option name="closed" value="true" />
+      <created>1698711042949</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1698711042949</updated>
+    </task>
+    <task id="LOCAL-00029" summary="24 passed 1 failed">
+      <option name="closed" value="true" />
+      <created>1698715268406</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1698715268406</updated>
+    </task>
+    <task id="LOCAL-00030" summary="25/25 passed">
+      <option name="closed" value="true" />
+      <created>1698718630954</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1698718630954</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Expanded test cases added, 31/32 passed">
+      <option name="closed" value="true" />
+      <created>1698719029148</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1698719029148</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Passed 32, broke 8 &amp; 15">
+      <option name="closed" value="true" />
+      <created>1698719777269</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1698719777269</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Added test 33, passes 33/33. Ready to submit.">
+      <option name="closed" value="true" />
+      <created>1698721955761</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1698721955761</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Added test 33, passes 33/33. Ready to submit.">
+      <option name="closed" value="true" />
+      <created>1698722172055</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1698722172055</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Added test 33, passes 33/33. Ready to submit. *Reverted accidental merge with older code. I think.">
+      <option name="closed" value="true" />
+      <created>1698723216951</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1698723216951</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Added test 33, passes 33/33. Ready to submit.">
+      <option name="closed" value="true" />
+      <created>1698723298477</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1698723298477</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Added files for assignment 4. Will work on thsi more later. :3">
+      <option name="closed" value="true" />
+      <created>1699659375891</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1699659375891</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Added skeleton for the CodeGenVisitor class. Will start to implement methods bottom up, like previous :3">
+      <option name="closed" value="true" />
+      <created>1699746099896</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1699746099896</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Should be good, think I fixed the dumb problem">
+      <option name="closed" value="true" />
+      <created>1699747010389</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1699747010389</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Written up to visitReturnStatement(). Created the method determineExpr() which is a good helper method for when Expr needs to be called.">
+      <option name="closed" value="true" />
+      <created>1699750470592</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1699750470592</updated>
+    </task>
+    <task id="LOCAL-00041" summary="Written up to visitIdentExpr(). Will need to revise once I know more about what's going on">
+      <option name="closed" value="true" />
+      <created>1699842455546</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1699842455546</updated>
+    </task>
+    <task id="LOCAL-00042" summary="Added the test class, forgot to add unrevisioned files to commit">
+      <option name="closed" value="true" />
+      <created>1699855014996</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1699855014996</updated>
+    </task>
+    <task id="LOCAL-00043" summary="Added the test class, forgot to add unrevisioned files to commit">
+      <option name="closed" value="true" />
+      <created>1699855067898</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1699855067898</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Reset Dimension back to default">
+      <option name="closed" value="true" />
+      <created>1699904036083</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1699904036083</updated>
+    </task>
+    <task id="LOCAL-00045" summary="Cleaned up some code, implemented helper functions visitBlockElem and determineStatement. Also added javaName variable, but didn't implement into code">
+      <option name="closed" value="true" />
+      <created>1699907576373</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1699907576373</updated>
+    </task>
+    <task id="LOCAL-00046" summary="Cleaned up changes, changed PLCLangExec's string to a .toString so it wouldn't error out w/ StringBuilder">
+      <option name="closed" value="true" />
+      <created>1699909375202</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1699909375202</updated>
+    </task>
+    <task id="LOCAL-00047" summary="&#10;Fixed errors with unimplemented methods/incorrect wording in methods, added skeleton of the &quot;javaname&quot; function">
+      <option name="closed" value="true" />
+      <created>1699910921687</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1699910921687</updated>
+    </task>
+    <task id="LOCAL-00048" summary="&#10;Fixed errors with unimplemented methods/incorrect wording in methods, added skeleton of the &quot;javaname&quot; function">
+      <option name="closed" value="true" />
+      <created>1699911686095</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1699911686095</updated>
+    </task>
+    <task id="LOCAL-00049" summary="&#10;Fixed errors with unimplemented methods/incorrect wording in methods, added skeleton of the &quot;javaname&quot; function">
+      <option name="closed" value="true" />
+      <created>1699912504012</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1699912504012</updated>
+    </task>
+    <task id="LOCAL-00050" summary="&#10;Fixed errors with unimplemented methods/incorrect wording in methods, added skeleton of the &quot;javaname&quot; function">
+      <option name="closed" value="true" />
+      <created>1699912842429</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1699912842429</updated>
+    </task>
+    <task id="LOCAL-00051" summary="&#10;Fixed errors with unimplemented methods/incorrect wording in methods, added skeleton of the &quot;javaname&quot; function">
+      <option name="closed" value="true" />
+      <created>1699913149231</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1699913149231</updated>
+    </task>
+    <task id="LOCAL-00052" summary="&#10;Caught up w/ basic import stuff">
+      <option name="closed" value="true" />
+      <created>1699913497313</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1699913497313</updated>
+    </task>
+    <task id="LOCAL-00053" summary="&#10;Caught up w/ basic import stuff, pass 6/23">
+      <option name="closed" value="true" />
+      <created>1699913697207</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1699913697207</updated>
+    </task>
+    <task id="LOCAL-00054" summary="&#10;/Fixed minor issue with visitNameDef, 7/23 passed">
+      <option name="closed" value="true" />
+      <created>1699914533269</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1699914533270</updated>
+    </task>
+    <task id="LOCAL-00055" summary="&#10;Fixed minor issue with visitUnaryExpr, 10/23 passed. Not sure what's wrong with 8/9/10">
+      <option name="closed" value="true" />
+      <created>1699915181408</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1699915181408</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/main" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="main" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="h" />
+    <MESSAGE value="updating visitbinary n stuff" />
+    <MESSAGE value="Completed all methods, now we just need to test. Got a lot of issues with things being null" />
+    <MESSAGE value="Passed 10 more tests after changing one line of code lol" />
+    <MESSAGE value="23 passed 2 failed" />
+    <MESSAGE value="24 passed 1 failed" />
+    <MESSAGE value="25/25 passed" />
+    <MESSAGE value="Expanded test cases added, 31/32 passed" />
+    <MESSAGE value="Passed 32, broke 8 &amp; 15" />
+    <MESSAGE value="Added test 33, passes 33/33. Ready to submit. *Reverted accidental merge with older code. I think." />
+    <MESSAGE value="Added test 33, passes 33/33. Ready to submit." />
+    <MESSAGE value="Added files for assignment 4. Will work on thsi more later. :3" />
+    <MESSAGE value="Added skeleton for the CodeGenVisitor class. Will start to implement methods bottom up, like previous :3" />
+    <MESSAGE value="Should be good, think I fixed the dumb problem" />
+    <MESSAGE value="Written up to visitReturnStatement(). Created the method determineExpr() which is a good helper method for when Expr needs to be called." />
+    <MESSAGE value="Written up to visitIdentExpr(). Will need to revise once I know more about what's going on" />
+    <MESSAGE value="Added the test class, forgot to add unrevisioned files to commit" />
+    <MESSAGE value="Reset Dimension back to default" />
+    <MESSAGE value="Cleaned up some code, implemented helper functions visitBlockElem and determineStatement. Also added javaName variable, but didn't implement into code" />
+    <MESSAGE value="Cleaned up changes, changed PLCLangExec's string to a .toString so it wouldn't error out w/ StringBuilder" />
+    <MESSAGE value="&#10;Fixed errors with unimplemented methods/incorrect wording in methods, added skeleton of the &quot;javaname&quot; function" />
+    <MESSAGE value="&#10;Caught up w/ basic import stuff" />
+    <MESSAGE value="&#10;Caught up w/ basic import stuff, pass 6/23" />
+    <MESSAGE value="&#10;/Fixed minor issue with visitNameDef, 7/23 passed" />
+    <MESSAGE value="&#10;Fixed minor issue with visitUnaryExpr, 10/23 passed. Not sure what's wrong with 8/9/10" />
+    <option name="LAST_COMMIT_MESSAGE" value="&#10;Fixed minor issue with visitUnaryExpr, 10/23 passed. Not sure what's wrong with 8/9/10" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="JUnit">
+        <watch expression="type" />
+        <watch expression="nameDef" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>

@@ -8,12 +8,7 @@ import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO;
 import static edu.ufl.cise.cop4020fa23.Kind.*;
 import static edu.ufl.cise.cop4020fa23.ast.Type.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
-import java.util.ListIterator;
+import java.util.*;
 
 /*To work around a mismatch between the scoping rules of our language and Java’s scoping rules,
 implement a way to rename variables in the generated Java code so that every variable has a
@@ -32,6 +27,7 @@ public class CodeGenVisitor implements ASTVisitor {
     private SymbolTable st = new SymbolTable();
 
     private HashSet<String> importSet = new HashSet<>();
+    private HashMap<StringBuilder, Integer> javaNameSet = new HashMap<>();
 
 
     // TODO: implement javanames
@@ -90,7 +86,6 @@ public class CodeGenVisitor implements ASTVisitor {
         }
 
         return sb;
-        //^^^ unsure if this newline is necessary
     }
 
     private String convertOpKind(Kind opKind) throws PLCCompilerException {
@@ -244,10 +239,29 @@ public class CodeGenVisitor implements ASTVisitor {
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
+    public StringBuilder updateJavaName(NameDef nameDef) throws PLCCompilerException {
+        StringBuilder javaName = new StringBuilder(nameDef.getJavaName());
+        StringBuilder name = new StringBuilder(nameDef.getIdentToken().text());
+        if(!(javaName.compareTo(name) == 0)){
+            return new StringBuilder(javaName);
+        }else if(javaNameSet.containsKey(javaName)){
+            int old = javaNameSet.get(javaName);
+            javaNameSet.replace(javaName, old, old+1);
+            javaName.append("$").append(old+1);
+            nameDef.setJavaName(javaName.toString());
+            return javaName;
+        } else {
+            javaNameSet.put(javaName, 1);
+            javaName.append("$1");
+            nameDef.setJavaName(javaName.toString());
+            return javaName;
+        }
+    }
+
     @Override
     public StringBuilder visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
         // _IdentExpr_.getNameDef().getJavaName()
-        return new StringBuilder(identExpr.getNameDef().getJavaName());
+        return updateJavaName(identExpr.getNameDef());
     }
 
     @Override
@@ -259,7 +273,7 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
         // _IdentExpr_.getNameDef().getJavaName()
-        return new StringBuilder(lValue.getNameDef().getJavaName());
+        return updateJavaName(lValue.getNameDef());
     }
 
     @Override
@@ -272,7 +286,7 @@ public class CodeGenVisitor implements ASTVisitor {
          */
         StringBuilder sb = new StringBuilder();
         sb.append(determineType(nameDef.getType())).append(" ");
-        sb.append(nameDef.getJavaName());
+        sb.append(updateJavaName(nameDef));
         return sb;
     }
 
