@@ -34,33 +34,22 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
             throws PLCCompilerException {
-        // I have to wrap in try catch
         try {
             // _LValue_ = _Expr_
-            StringBuilder assignmentStringBuilder = new StringBuilder();
-
-            LValue lvalue = assignmentStatement.getlValue();
-            if (lvalue == null) {
+            StringBuilder sb = new StringBuilder();
+            if (assignmentStatement.getlValue() == null) {
                 throw new CodeGenException("LValue in assignment statement is null");
             }
-            String variableName = lvalue.getName();
-            if (variableName == null || variableName.isEmpty()) {
+            if (assignmentStatement.getlValue().getName() == null || assignmentStatement.getlValue().getName().isEmpty()) {
                 throw new CodeGenException("Variable name in LValue is null or empty.");
             }
-            assignmentStringBuilder.append(variableName);
-
-            assignmentStringBuilder.append(" = ");
-
-            Expr expr = assignmentStatement.getE();
-            if (expr == null) {
+            if(assignmentStatement.getE() == null){
                 throw new CodeGenException("Expression in assignment statement is null");
             }
-            StringBuilder exprCode = determineExpr(expr, arg);
-            assignmentStringBuilder.append(exprCode);
-
-            assignmentStringBuilder.append(";\n");
-
-            return assignmentStringBuilder;
+            sb.append(visitLValue(assignmentStatement.getlValue(), arg)).append(" = ");
+            sb.append(determineExpr(assignmentStatement.getE(), arg)).append("\n");
+            //^^^ unsure if newline here is necessary
+            return sb;
         } catch (Exception e) {
             throw new CodeGenException("Well then we shouldn't be here" + e.getMessage());
         }
@@ -81,70 +70,64 @@ public class CodeGenVisitor implements ASTVisitor {
         StringBuilder rightSb = determineExpr(binaryExpr.getRightExpr(), arg);
 
         Type leftType = binaryExpr.getLeftExpr().getType();
-        Type rightType = binaryExpr.getRightExpr().getType();
         Kind opKind = binaryExpr.getOpKind();
 
         StringBuilder sb = new StringBuilder();
 
-        if (leftType == Type.STRING && rightType == Type.STRING && opKind == Kind.EQ) {
+        if (leftType == Type.STRING && opKind == Kind.EQ) {
             sb.append(leftSb).append(".equals(").append(rightSb).append(")");
-        } else if (leftType == Type.INT && rightType == Type.INT && opKind == Kind.EXP) {
-            sb.append("(int)Math.round(Math.pow(").append(leftSb).append(", ").append(rightSb).append("))");
-        } else if (leftType == Type.INT && rightType == Type.INT) {
-            String op = convertOpKind(opKind);
-            sb.append("(").append(leftSb).append(" ").append(op).append(" ").append(rightSb).append(")");
-        } else {
-            throw new CodeGenException("Unsupported operation or type mismatch for operation " + opKind);
         }
 
-        return sb.append("\n");
+        else if (opKind == Kind.EXP) {
+            // is this bs? maybeeee
+            sb.append("(int)Math.round(Math.pow(").append(leftSb).append(", ").append(rightSb).append("))");
+        } else {
+            String op = convertOpKind(opKind);
+            sb.append("(").append(leftSb).append(" ").append(op).append(" ").append(rightSb).append(")");
+        }
+
+        return sb;
         //^^^ unsure if this newline is necessary
     }
 
-    private String convertOpKind(Kind opKind) throws CodeGenException {
-        switch (opKind) {
-            case PLUS:
-                return "+";
-            case MINUS:
-                return "-";
-            case TIMES:
-                return "*";
-            case DIV:
-                return "/";
-            case MOD:
-                return "%";
-            case EQ:
-                return "==";
-            case LE:
-                return "<=";
-            case GE:
-                return ">=";
-            case LT:
-                return "<";
-            case GT:
-                return ">";
-            case AND:
-                return "&&";
-            case OR:
-                return "||";
-            case BITAND:
-                return "&";
-            case BITOR:
-                return "|";
-            case BANG:
-                return "!";
+    private String convertOpKind(Kind opKind) {
+        return switch (opKind) {
+            case PLUS -> "+";
+            case MINUS -> "-";
+            case TIMES -> "*";
+            case DIV -> "/";
+            case MOD -> "%";
+            case EQ -> "==";
+            case LE -> "<=";
+            case GE -> ">=";
+            case LT -> "<";
+            case GT -> ">";
+            case AND -> "&&";
+            case OR -> "||";
+            case BITAND -> "&";
+            case BITOR -> "|";
+            case BANG -> "!";
             // should be all of them
 
+<<<<<<< HEAD
             default:
                 throw new CodeGenException("Unsupported operation or type mismatch for operation " + opKind);
         }
+=======
+            default -> throw new UnsupportedOperationException("Operation " + opKind + " not supported.");
+        };
+>>>>>>> 558324bf5378f385e33e5b2cb0c614586cb08270
     }
 
     @Override
     public StringBuilder visitBlock(Block block, Object arg) throws PLCCompilerException {
+        // { _BlockElem*_ }
+        // BlockElem ::= Declaration | Statement
+        //Extended visitBlock into two subexpressions: visitBlockElem and determineStatement
         StringBuilder blockCode = new StringBuilder("{\n");
         for (Block.BlockElem elem : block.getElems()) {
             try {
+<<<<<<< HEAD
                 if (elem instanceof Declaration) {
                     blockCode.append(visitDeclaration((Declaration) elem, arg));
                 } else if (elem instanceof Statement) {
@@ -153,6 +136,9 @@ public class CodeGenVisitor implements ASTVisitor {
                     throw new CodeGenException(elem.firstToken() + "Unsupported BlockElem type");
                 }
                 blockCode.append(";\n");
+=======
+                blockCode.append(visitBlockElem(elem, arg));
+>>>>>>> 558324bf5378f385e33e5b2cb0c614586cb08270
             } catch (CodeGenException e) {
                 throw e;
             }
@@ -208,19 +194,11 @@ public class CodeGenVisitor implements ASTVisitor {
         StringBuilder sb = new StringBuilder();
 
         StringBuilder guardExpr = determineExpr(conditionalExpr.getGuardExpr(), arg);
-        if (guardExpr == null) {
-            throw new CodeGenException("Guard expression is null in conditional expression");
-        }
 
         StringBuilder trueExpr = determineExpr(conditionalExpr.getTrueExpr(), arg);
-        if (trueExpr == null) {
-            throw new CodeGenException("True expression is null in conditional expression");
-        }
 
         StringBuilder falseExpr = determineExpr(conditionalExpr.getFalseExpr(), arg);
-        if (falseExpr == null) {
-            throw new CodeGenException("False expression is null in conditional expression");
-        }
+
         // probably right?
         sb.append("(")
                 .append(guardExpr)
@@ -249,10 +227,10 @@ public class CodeGenVisitor implements ASTVisitor {
         sb.append(nameDef.getType().toString()).append(" ").append(nameDef.getIdentToken());
 
         if (initializer != null) {
-            Object result = initializer.visit(this, arg); 
+            Object result = initializer.visit(this, arg);
 
             StringBuilder initCode = (StringBuilder) result;
-            if (initCode.length() == 0) {
+            if (initCode.isEmpty()) {
                 throw new CodeGenException("Failed to generate code for the initializer expression.");
             }
             sb.append(" = ").append(initCode);
@@ -462,12 +440,11 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitBooleanLitExpr(BooleanLitExpr booleanLitExpr, Object arg) throws PLCCompilerException {
         // true or false
         System.out.println(booleanLitExpr.getText());
-        StringBuilder subString = new StringBuilder();
-        return switch (booleanLitExpr.getText()) {
-            case "FALSE" -> subString.append("false");
-            case "TRUE" -> subString.append("true");
+        return new StringBuilder(switch (booleanLitExpr.getText()) {
+            case "FALSE" -> "false";
+            case "TRUE" -> "true";
             default -> throw new CodeGenException("Unexpected type in BooleanLitExpr");
-        };
+        });
     }
 
     @Override

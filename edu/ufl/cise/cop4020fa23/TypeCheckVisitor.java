@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import java.util.logging.Logger;
 
 /*
 Your parser returns an AST
@@ -56,7 +55,6 @@ Program, NameDef, Declaration and all other Expr nodes have an attribute "type".
  */
 public class TypeCheckVisitor implements ASTVisitor {
 
-    private static final Logger LOGGER = Logger.getLogger(TypeCheckVisitor.class.getName());
     private Type currentType;
 
 
@@ -64,8 +62,6 @@ public class TypeCheckVisitor implements ASTVisitor {
     private SymbolTable st = new SymbolTable();
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visit AssignmentStatement");
-
         try {
             // Entering a new scope for this assignment statement
             st.enterScope();
@@ -79,8 +75,6 @@ public class TypeCheckVisitor implements ASTVisitor {
             Type lValueType = (Type) lValue.visit(this, arg); // Assuming LValue context
             Type exprType = (Type) expr.visit(this, arg); // Assuming no special context for Expr
             st.leaveScope();
-            LOGGER.info("Type of LValue: " + lValueType);
-            LOGGER.info("Type of Expr: " + exprType);
 
             //AssignmentCompatible
             switch(lValueType){
@@ -101,22 +95,17 @@ public class TypeCheckVisitor implements ASTVisitor {
                     }
                 }
             }
-            LOGGER.info("Successfully processed visit AssignmentStatement");
             st.leaveScope();
             return lValueType;
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visit AssignmentStatement: " + e.getMessage());
             throw e;
         } finally {
             // Make sure to leave the scope in case of an exception
-            LOGGER.info("Leaving visit AssignmentStatement");
         }
     }
 
     @Override
     public Object visitBinaryExpr(BinaryExpr binaryExpr, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitBinaryExpr");
-    
         try {
             Type leftExprType = (Type) binaryExpr.getLeftExpr().visit(this, arg);
             Type rightExprType = (Type) binaryExpr.getRightExpr().visit(this, arg);
@@ -130,15 +119,10 @@ public class TypeCheckVisitor implements ASTVisitor {
             }
 
             binaryExpr.setType(resultType);
-    
-            LOGGER.info("Successfully processed visitBinaryExpr");
             return resultType;
     
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitBinaryExpr: " + e.getMessage());
             throw e;
-        } finally {
-            LOGGER.info("Leaving visitBinaryExpr");
         }
     }
     private Type inferBinaryType(Type leftType, Kind op, Type rightType) throws TypeCheckException {
@@ -186,23 +170,17 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitBlock(Block block, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitBlock");
-
         st.enterScope();
         List<BlockElem> blockElems = block.getElems();
         for (BlockElem elem : blockElems) {
             elem.visit(this, arg); // Passing the program type down to the block elements
         }
         st.leaveScope();
-
-        LOGGER.info("Leaving visitBlock");
         return null; // Block itself doesn't have a type
     }
 
     @Override
     public Object visitBlockStatement(StatementBlock statementBlock, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitBlockStatement");
-    
         try {
             // Entering a new scope
             st.enterScope();
@@ -213,21 +191,15 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Leaving the scope
             st.leaveScope();
     
-            LOGGER.info("Successfully processed visitBlockStatement");
             return null;  // BlockStatement doesn't have a type
             
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitBlockStatement: " + e.getMessage());
             throw e;
-        } finally {
-            LOGGER.info("Leaving visitBlockStatement");
         }
     }
 
     @Override
     public Object visitChannelSelector(ChannelSelector channelSelector, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitChannelSelector");
-    
         try {
 
             // Validate that the color is one of the allowed types (red, green, blue)
@@ -237,23 +209,16 @@ public class TypeCheckVisitor implements ASTVisitor {
             }
     
 
-    
-            LOGGER.info("Successfully processed visitChannelSelector");
-    
+
 
             return colorKind;
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitChannelSelector: " + e.getMessage());
             throw e;
-        } finally {
-            LOGGER.info("Leaving visitChannelSelector");
         }
     }
 
     @Override
     public Object visitConditionalExpr(ConditionalExpr conditionalExpr, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitConditionalExpr");
-    
         try {
             // Visit and type check the guard expression
             Type guardType = (Type) conditionalExpr.getGuardExpr().visit(this, arg);
@@ -273,22 +238,15 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Everything is fine, set the type of the ConditionalExpr to be the same as that of trueExpr
             conditionalExpr.setType(trueExprType);
     
-            LOGGER.info("Successfully processed visitConditionalExpr");
             return trueExprType;
     
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitConditionalExpr: " + e.getMessage());
             throw e;
-    
-        } finally {
-            LOGGER.info("Leaving visitConditionalExpr");
         }
     }
 
     @Override
     public Object visitDeclaration(Declaration declaration, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitDeclaration");
-    
         try {
             // Get the initializer, create variables
             Expr initializer = declaration.getInitializer();
@@ -302,7 +260,6 @@ public class TypeCheckVisitor implements ASTVisitor {
                 nameDefType = (Type) nameDef.visit(this, arg);
                 //Check conditions
                 if((initType == nameDefType) || ((initType == STRING) && (nameDefType == IMAGE))){
-                    LOGGER.info("Successfully processed visitDeclaration");
                     if(st.lookup(declaration.getNameDef().getName()) != null){
                     }
                     return nameDefType;
@@ -316,18 +273,12 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Successfully processed the declaration
     
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitDeclaration: " + e.getMessage());
             throw e;
-    
-        } finally {
-            LOGGER.info("Leaving visitDeclaration");
         }
     }
 
     @Override
     public Object visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitDimension");
-    
         try {
             // Visit and type check the width expression
             Type widthType = (Type) dimension.getWidth().visit(this, arg);
@@ -342,23 +293,15 @@ public class TypeCheckVisitor implements ASTVisitor {
             check(heightType == Type.INT, dimension, "Height expression must be of type INT");
             
             // Everything is fine
-            LOGGER.info("Successfully processed visitDimension");
-            
             return dimension;  // Return the dimension object
     
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitDimension: " + e.getMessage());
             throw e;
-            
-        } finally {
-            LOGGER.info("Leaving visitDimension");
         }
     }
 
     @Override
     public Object visitDoStatement(DoStatement doStatement, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitDoStatement");
-
         try {
             // Entering a new scope
             st.enterScope();
@@ -380,21 +323,15 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Leaving the scope
             st.leaveScope();
 
-            LOGGER.info("Successfully processed visitDoStatement");
             return null;  // DoStatement doesn't have a type
 
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitDoStatement: " + e.getMessage());
             throw e;
-        } finally {
-            LOGGER.info("Leaving visitDoStatement");
         }
     }
 
     @Override
     public Object visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitExpandedPixelExpr");
-
         boolean scopeEntered = false;
 
         try {
@@ -404,7 +341,6 @@ public class TypeCheckVisitor implements ASTVisitor {
                 st.enterScope();
                 st.insert(nameX);
                 scopeEntered = true;
-                LOGGER.info("Implicitly declared x");
             }
             if (st.lookup("y") == null) {
                 SyntheticNameDef nameY = new SyntheticNameDef("y");
@@ -413,7 +349,6 @@ public class TypeCheckVisitor implements ASTVisitor {
                 }
                 st.insert(nameY);
                 scopeEntered = true;
-                LOGGER.info("Implicitly declared y");
             }
 
             // Visit and type-check the red, green, and blue expressions
@@ -428,25 +363,20 @@ public class TypeCheckVisitor implements ASTVisitor {
 
             expandedPixelExpr.setType(Type.PIXEL);
 
-            LOGGER.info("Successfully processed visitExpandedPixelExpr");
             return Type.PIXEL;
 
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitExpandedPixelExpr: " + e.getMessage());
             throw e;
         } finally {
 
             if (scopeEntered) {
                 st.leaveScope();
             }
-            LOGGER.info("Leaving visitExpandedPixelExpr");
         }
     }
 
     @Override
     public Object visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitGuardedBlock");
-
         try {
             // Visit and type-check the guard expression
             Expr guard = guardedBlock.getGuard();
@@ -459,15 +389,11 @@ public class TypeCheckVisitor implements ASTVisitor {
             Block block = guardedBlock.getBlock();
             block.visit(this, arg);
 
-            LOGGER.info("Successfully processed visitGuardedBlock");
             return null;  // GuardedBlock doesn't have a type
 
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitGuardedBlock: " + e.getMessage());
             throw e;
 
-        } finally {
-            LOGGER.info("Leaving visitGuardedBlock");
         }
     }
 
@@ -484,8 +410,6 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitIfStatement(IfStatement ifStatement, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitIfStatement");
-
         try {
             // Retrieve the list of guarded blocks in the if statement
             List<GuardedBlock> guardedBlocks = ifStatement.getGuardedBlocks();
@@ -505,22 +429,15 @@ public class TypeCheckVisitor implements ASTVisitor {
                 block.visit(this, arg);
             }
 
-            LOGGER.info("Successfully processed visitIfStatement");
             return null; // IfStatement doesn't have a type
 
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitIfStatement: " + e.getMessage());
             throw e;
-
-        } finally {
-            LOGGER.info("Leaving visitIfStatement");
         }
     }
 
     @Override
     public Object visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitLValue");
-
         try {
             // Lookup the NameDef of this LValue from the symbol table
             NameDef nd = st.lookup(lValue.getName());
@@ -553,13 +470,9 @@ public class TypeCheckVisitor implements ASTVisitor {
             Type inferredType = inferLValueType(varType, ps, cs);
             lValue.setType(inferredType);
 
-            LOGGER.info("Successfully processed visitLValue with inferredType: " + inferredType);
             return inferredType;
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitLValue: " + e.getMessage());
             throw e;
-        } finally {
-            LOGGER.info("Leaving visitLValue");
         }
     }
 
@@ -590,7 +503,6 @@ public class TypeCheckVisitor implements ASTVisitor {
         if(nameDef.getDimension() != null){
             nameDef.getDimension().visit(this, arg);
         }
-        LOGGER.info("Entering visitNameDef");
         try {
             type = nameDef.getType();  // Assuming that getType() returns the Type of the NameDef
             Dimension dimension = nameDef.getDimension();  // Assuming that getDimension() returns the Dimension
@@ -606,12 +518,9 @@ public class TypeCheckVisitor implements ASTVisitor {
                 throw new TypeCheckException("trying to overwrite a variable " + nameDef.getName() + " already in this scope.");
             }
             st.insert(nameDef);  // Inserting the NameDef into the symbol table
-            LOGGER.info("Successfully processed visitNameDef");
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitNameDef: " + e.getMessage());
             throw e;
         } finally {
-            LOGGER.info("Leaving visitNameDef");
         }
         return type;  // Return the type, which could be null if an exception was thrown
     }
@@ -627,8 +536,6 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitPixelSelector");
-
         try {
             boolean inLValueContext = (Boolean) arg;
 
@@ -638,7 +545,6 @@ public class TypeCheckVisitor implements ASTVisitor {
                     if (st.lookup(newName) == null) {
                         SyntheticNameDef nameX = new SyntheticNameDef(newName);
                         st.insert(nameX);
-                        LOGGER.info("Implicitly declared x");
                     }
                 } else if(!(pixelSelector.xExpr() instanceof NumLitExpr)){
                     throw new TypeCheckException("expected IdentExpr or NumLitExpr argument for Expression x");
@@ -648,7 +554,6 @@ public class TypeCheckVisitor implements ASTVisitor {
                     if (st.lookup(newName) == null) {
                         SyntheticNameDef nameY = new SyntheticNameDef(newName);
                         st.insert(nameY);
-                        LOGGER.info("Implicitly declared y");
                     }
                 } else if(!(pixelSelector.yExpr() instanceof NumLitExpr)){
                     throw new TypeCheckException("expected IdentExpr or NumLitExpr argument for Expression y");
@@ -663,13 +568,10 @@ public class TypeCheckVisitor implements ASTVisitor {
                 throw new TypeCheckException("Expected type INT for component expressions");
             }
 
-            LOGGER.info("Successfully processed visitPixelSelector");
             return Type.INT;
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitPixelSelector: " + e.getMessage());
             throw e;
         } finally {
-            LOGGER.info("Leaving visitPixelSelector");
         }
     }
     @Override
@@ -731,8 +633,6 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitProgram(Program program, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitProgram");
-
         Type type = Type.kind2type(program.getTypeToken().kind());
         program.setType(type);  // Setting the type attribute for Program
         currentType = type;
@@ -744,14 +644,11 @@ public class TypeCheckVisitor implements ASTVisitor {
         program.getBlock().visit(this, currentType);  // Visiting the Block child node, passing the program type
         st.leaveScope();  // Leaving the scope in the symbol table
 
-        LOGGER.info("Leaving visitProgram");
         return type;
     }
 
     @Override
     public Object visitReturnStatement(ReturnStatement returnStatement, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering visitReturnStatement");
-
         try {
             // Visit the expression in ReturnStatement to get its type
             Type exprType = (Type) returnStatement.getE().visit(this, arg);
@@ -759,19 +656,14 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Check if the type of the expression matches the type of the parent program (which is passed as arg)
             if (exprType == currentType) {
                 // Types match, so we can proceed
-                LOGGER.info("Successfully processed visitReturnStatement: Type matches parent program.");
                 return exprType;
             } else {
                 // Types do not match, so we throw an exception
                 String errorMsg = "Mismatched types: Expected " + arg + " but found " + exprType;
-                LOGGER.severe("TypeCheckException in visitReturnStatement: " + errorMsg);
                 throw new TypeCheckException(errorMsg);
             }
         } catch (TypeCheckException e) {
-            LOGGER.severe("TypeCheckException in visitReturnStatement: " + e.getMessage());
             throw e;
-        } finally {
-            LOGGER.info("Leaving visitReturnStatement");
         }
     }
 
@@ -838,7 +730,6 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitConstExpr(ConstExpr constExpr, Object arg) throws PLCCompilerException {
-        LOGGER.info("Entering const expression");
         if (constExpr.getName().equals("Z")){
             constExpr.setType(INT);
             return INT;
@@ -847,11 +738,8 @@ public class TypeCheckVisitor implements ASTVisitor {
         return PIXEL;
     }
     private void check(boolean bool, AST ast, String str) throws TypeCheckException{
-        LOGGER.info("Entering check method");
         if (!bool) {
-            LOGGER.severe("TypeCheckException in check: " + str);
             throw new TypeCheckException(ast.firstToken.sourceLocation(), str);
         }
-        LOGGER.info("Successfully processed check method");
     }
 }
