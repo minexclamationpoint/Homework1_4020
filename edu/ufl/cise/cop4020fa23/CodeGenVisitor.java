@@ -10,6 +10,7 @@ import static edu.ufl.cise.cop4020fa23.ast.Type.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import java.util.ListIterator;
@@ -30,7 +31,11 @@ public class CodeGenVisitor implements ASTVisitor {
     // Types image and pixel are implemented in Assignment 5
     private Type currentType;
     private SymbolTable st = new SymbolTable();
-    //TODO: implement javanames
+
+    private HashSet<String> importSet = new HashSet<>();
+
+
+    // TODO: implement javanames
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
             throws PLCCompilerException {
@@ -40,15 +45,16 @@ public class CodeGenVisitor implements ASTVisitor {
             if (assignmentStatement.getlValue() == null) {
                 throw new CodeGenException("LValue in assignment statement is null");
             }
-            if (assignmentStatement.getlValue().getName() == null || assignmentStatement.getlValue().getName().isEmpty()) {
+            if (assignmentStatement.getlValue().getName() == null
+                    || assignmentStatement.getlValue().getName().isEmpty()) {
                 throw new CodeGenException("Variable name in LValue is null or empty.");
             }
-            if(assignmentStatement.getE() == null){
+            if (assignmentStatement.getE() == null) {
                 throw new CodeGenException("Expression in assignment statement is null");
             }
             sb.append(visitLValue(assignmentStatement.getlValue(), arg)).append(" = ");
             sb.append(determineExpr(assignmentStatement.getE(), arg)).append("\n");
-            //^^^ unsure if newline here is necessary
+            // ^^^ unsure if newline here is necessary
             return sb;
         } catch (Exception e) {
             throw new CodeGenException("Well then we shouldn't be here" + e.getMessage());
@@ -87,10 +93,10 @@ public class CodeGenVisitor implements ASTVisitor {
         }
 
         return sb;
-        //^^^ unsure if this newline is necessary
+        // ^^^ unsure if this newline is necessary
     }
 
-    private String convertOpKind(Kind opKind) {
+    private String convertOpKind(Kind opKind) throws CodeGenException {
         return switch (opKind) {
             case PLUS -> "+";
             case MINUS -> "-";
@@ -109,49 +115,41 @@ public class CodeGenVisitor implements ASTVisitor {
             case BANG -> "!";
             // should be all of them
 
-<<<<<<< HEAD
-            default:
+            default ->
                 throw new CodeGenException("Unsupported operation or type mismatch for operation " + opKind);
-        }
-=======
-            default -> throw new UnsupportedOperationException("Operation " + opKind + " not supported.");
         };
->>>>>>> 558324bf5378f385e33e5b2cb0c614586cb08270
     }
 
     @Override
     public StringBuilder visitBlock(Block block, Object arg) throws PLCCompilerException {
         // { _BlockElem*_ }
         // BlockElem ::= Declaration | Statement
-        //Extended visitBlock into two subexpressions: visitBlockElem and determineStatement
+        // Extended visitBlock into two subexpressions: visitBlockElem and
+        // determineStatement
         StringBuilder blockCode = new StringBuilder("{\n");
         for (Block.BlockElem elem : block.getElems()) {
             try {
-<<<<<<< HEAD
                 if (elem instanceof Declaration) {
                     blockCode.append(visitDeclaration((Declaration) elem, arg));
                 } else if (elem instanceof Statement) {
                     blockCode.append(visitBlockStatement((StatementBlock) elem, arg));
-                } else {
                     throw new CodeGenException(elem.firstToken() + "Unsupported BlockElem type");
                 }
                 blockCode.append(";\n");
-=======
-                blockCode.append(visitBlockElem(elem, arg));
->>>>>>> 558324bf5378f385e33e5b2cb0c614586cb08270
             } catch (CodeGenException e) {
                 throw e;
+
             }
         }
         blockCode.append("}\n");
         return blockCode;
     }
 
-    private StringBuilder visitBlockElem(BlockElem blockElem, Object arg) throws  PLCCompilerException {
+    private StringBuilder visitBlockElem(BlockElem blockElem, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
-        if(blockElem instanceof Declaration){
+        if (blockElem instanceof Declaration) {
             sb.append(visitDeclaration((Declaration) blockElem, arg));
-        } else if (blockElem instanceof Statement){
+        } else if (blockElem instanceof Statement) {
             sb.append(determineStatement((Statement) blockElem, arg));
         } else {
             throw new CodeGenException("Unsupported BlockElem type");
@@ -162,7 +160,7 @@ public class CodeGenVisitor implements ASTVisitor {
 
     private StringBuilder determineStatement(Statement statement, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
-        sb.append(switch (statement.getClass().getName()){
+        sb.append(switch (statement.getClass().getName()) {
             case "AssignmentStatement" -> visitAssignmentStatement((AssignmentStatement) statement, arg);
             case "WriteStatement" -> visitWriteStatement((WriteStatement) statement, arg);
             case "DoStatement", "IfStatement" -> throw new UnsupportedOperationException("Unimplemented method");
@@ -311,56 +309,85 @@ public class CodeGenVisitor implements ASTVisitor {
         // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
+    /*
+     * Should accept a package name as an argument and return a String containing a
+     * java program implementing the semantics of the language. The package name may
+     * be null or an empty string.
+     * If so, the generated program should be in the default package.
+     * public class _IDENT_ {
+     * public static _Type_ apply(
+     * _NameDef*_
+     * ) _Block
+     * }
+     * Note: parameters from _NameDef*_ are separated by commas
+     */
+    /*
+     * How to deal with import statements
+     * • Traverse the entire tree adding code to a StringBuilder
+     * • As you traverse the AST, keep track of methods called by generated
+     * code that would require an import.
+     * TODO: add a table that keeps track of methods that would require an import
+     * • After you return back to Program after visiting its children, you will
+     * have a String containing the body of the class.
+     * • Construct another String containing the necessary imports.
+     * • Concatenate the package name, the import statements, and the class
+     * body to get the complete Java class.
+     */
+    // TODO: implement package name argument
 
     @Override
     public StringBuilder visitProgram(Program program, Object arg) throws PLCCompilerException {
-        /*
-         * Should accept a package name as an argument and return a String containing a
-         * java program implementing the semantics of the language. The package name may
-         * be null or an empty string.
-         * If so, the generated program should be in the default package.
-         * public class _IDENT_ {
-         * public static _Type_ apply(
-         * _NameDef*_
-         * ) _Block
-         * }
-         * Note: parameters from _NameDef*_ are separated by commas
-         */
-        /*How to deal with import statements
-        • Traverse the entire tree adding code to a StringBuilder
-        • As you traverse the AST, keep track of methods called by generated
-            code that would require an import.
-            TODO: add a table that keeps track of methods that would require an import
-        • After you return back to Program after visiting its children, you will
-            have a String containing the body of the class.
-        • Construct another String containing the necessary imports.
-        • Concatenate the package name, the import statements, and the class
-            body to get the complete Java class.*/
-        //TODO: implement package name argument
-        StringBuilder subString = new StringBuilder("public class ").append(program.getName()).append(" {\n");
-        subString.append("\tpublic static ").append(determineType(program.getType())).append(" apply(\n").append("\t\t");
+        StringBuilder classBody = new StringBuilder();
+        StringBuilder imports = new StringBuilder();
+      
+
+        classBody.append("public class ").append(program.getName()).append(" {\n");
+        classBody.append("\tpublic static ").append(determineType(program.getType())).append(" apply(");
+
         ListIterator<NameDef> listIterator = program.getParams().listIterator();
-        while(listIterator.hasNext()){
-            subString.append(visitNameDef(listIterator.next(), arg));
-            if(listIterator.hasNext()){
-                subString.append(", ");
+        while (listIterator.hasNext()) {
+            classBody.append(visitNameDef(listIterator.next(), arg));
+            if (listIterator.hasNext()) {
+                classBody.append(", ");
             } else {
-                subString.append("\n");
+                classBody.append(") {\n");
             }
         }
-        subString.append("\t) ").append(visitBlock(program.getBlock(), arg)).append("\n");
-        subString.append("}\n");
-        //^^^ unsure if the above \n is necessary
-        return subString;
+
+        classBody.append(visitBlock(program.getBlock(), arg));
+        classBody.append("\t}\n");
+        classBody.append("}\n");
+
+        for (String importString : importSet) {
+            imports.append("import ").append(importString).append(";\n");
+        }
+
+        // Add more imports here as needed
+
+        StringBuilder completeJavaClass = new StringBuilder();
+        String packageName = arg != null ? (String) arg : "";|
+
+        // check if null or empty
+        if (!packageName.isEmpty()) {
+            completeJavaClass.append("package ").append(packageName).append(";\n\n");
+        }
+
+        if (imports.length() > 0) {
+            completeJavaClass.append(imports).append("\n");
+        }
+
+        completeJavaClass.append(classBody);
+
+        return completeJavaClass;
     }
 
     private String determineType(Type type) throws CodeGenException {
-        return switch(type) {
-            case INT-> "int";
+        return switch (type) {
+            case INT -> "int";
             case STRING -> "String";
             case VOID -> "void";
             case BOOLEAN -> "boolean";
-            case IMAGE,PIXEL -> throw new UnsupportedOperationException("Unimplemented method");
+            case IMAGE, PIXEL -> throw new UnsupportedOperationException("Unimplemented method");
         };
     }
 
@@ -397,6 +424,7 @@ public class CodeGenVisitor implements ASTVisitor {
          * ConsoleIO.write( _Expr_ )
          * Note: you will need to import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO
          */
+        importSet.add("edu.ufl.cise.cop4020fa23.runtime.ConsoleIO");
         Expr subExpr = writeStatement.getExpr();
         StringBuilder subString = new StringBuilder("ConsoleIO.write(");
         subString.append(determineExpr(subExpr, arg));
