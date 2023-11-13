@@ -64,6 +64,7 @@ class CodeGenTest_starter {
 	
 	@Test
 	void cg0() throws Exception {
+		System.out.println("meowwwwww");
 		String input = "void f()<::>";
 		Object result = PLCLangExec.runCode(packageName, input);
 		show(result);
