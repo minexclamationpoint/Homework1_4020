@@ -329,7 +329,6 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitProgram(Program program, Object arg) throws PLCCompilerException {
         StringBuilder imports = new StringBuilder();
-
         StringBuilder classBody = new StringBuilder("public class ").append(program.getName()).append(" {\n");
         classBody.append("\tpublic static ").append(determineType(program.getType())).append(" apply(\n").append("\t\t");
         ListIterator<NameDef> listIterator = program.getParams().listIterator();
@@ -349,7 +348,7 @@ public class CodeGenVisitor implements ASTVisitor {
             imports.append("import ").append(importString).append(";\n");
         }
         StringBuilder completeJavaClass = new StringBuilder();
-        String packageName = arg != null ? (String) arg : "";|
+        String packageName = arg != null ? (String) arg : "";
 
         // check if null or empty
         if (!packageName.isEmpty()) {
