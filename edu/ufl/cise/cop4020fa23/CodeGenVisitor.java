@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.HashMap;
 
 import java.util.ListIterator;
 
@@ -32,6 +33,8 @@ public class CodeGenVisitor implements ASTVisitor {
     private SymbolTable st = new SymbolTable();
 
     private HashSet<String> importSet = new HashSet<>();
+    private HashMap<String, Integer> nameCounter = new HashMap<>();
+
 
 
     // TODO: implement javanames
@@ -271,8 +274,23 @@ public class CodeGenVisitor implements ASTVisitor {
          * Where _name_ is the Java name of the IDENT
          */
         StringBuilder sb = new StringBuilder();
+        String ident = nameDef.getIdentToken().text();
+    
+        // Generate Name
+        int count = nameCounter.getOrDefault(ident, 0);
+        String uniqueName;
+        if (count > 0) {
+            uniqueName = ident + "_" + count;
+        } else {
+            uniqueName = ident;
+        }
+        nameCounter.put(ident, count + 1); 
+    
+        nameDef.setJavaName(uniqueName);
+    
         sb.append(determineType(nameDef.getType())).append(" ");
-        sb.append(nameDef.getJavaName());
+        sb.append(uniqueName);
+        
         return sb;
     }
 
