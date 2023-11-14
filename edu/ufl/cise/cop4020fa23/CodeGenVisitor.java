@@ -404,23 +404,28 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitUnaryExpr(UnaryExpr unaryExpr, Object arg) throws PLCCompilerException {
-        /*
-         * ( _op_ _Expr_ )
-         * Note: you do not need to handle width and height
-         * in this assignment
-         */
+        if (unaryExpr == null || unaryExpr.getOp() == null || unaryExpr.getExpr() == null) {
+            throw new CodeGenException("Null reference in unary expression components.");
+        }
+
+        // Uhh putting error handling breaks code lmao
+
         StringBuilder subExprString = new StringBuilder();
         String opString = convertOpKind(unaryExpr.getOp());
         StringBuilder operandString = determineExpr(unaryExpr.getExpr(), arg);
-        if (opString.equals("-")) {
+
+        
+
+        // this is such a stupid way to do this but it works
+        if (operandString.toString().startsWith("-") && opString.equals("-")) {
+            subExprString.append(operandString.substring(1)); // Remove the first negation
+        } else if (opString.equals("-")) {
             subExprString.append(opString).append(operandString);
         } else {
-            // Handle other unary operators if needed
             subExprString.append("(").append(opString).append(operandString).append(")");
         }
-    
-        return subExprString;
 
+        return subExprString;
     }
 
     @Override
