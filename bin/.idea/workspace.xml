@@ -10,139 +10,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="&#10;Fixed minor issue with visitUnaryExpr, 10/23 passed. Not sure what's wrong with 8/9/10">
-      <change beforePath="$PROJECT_DIR$/Homework1_4020.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Homework1_4020.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/artifacts/Homework1_4020_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/artifacts/Homework1_4020_jar2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/libraries/hamcrest.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/libraries/junit_jupiter.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/libraries/lib.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/HW3_GIT_REPO.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/Homework1_4020.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/libraries/junit_jupiter.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/libraries/junit_jupiter_params.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment 2 Grammar.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment 3 Context constraints.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment 4 Code Generation.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment1.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment2.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment3.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/Assignment4.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ExpressionGrammar.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/edu.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/apiguardian-api-1.1.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-jupiter-5.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-jupiter-api-5.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-jupiter-engine-5.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-jupiter-params-5.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-platform-commons-1.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/junit-platform-engine-1.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/lib/opentest4j-1.2.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/test/Assignment3_starter.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/CodeGenTest_starter.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/CodeGenVisitor$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ComponentFactory.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/DynamicClassLoader.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/DynamicCompiler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/InMemoryBytecodeObject.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/InMemoryClassFileManager$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/InMemoryClassFileManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/PLCLangExec.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/DynamicJavaCompileAndExecute/StringJavaFileObject.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ExpressionParser$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ExpressionParser.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW0Tests.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW1TestSolutions.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW2Tests$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW2Tests.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW3Test$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/HW3Test.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ILexer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/IParser.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/IToken.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Kind.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Lexer$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Lexer$State.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Lexer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Parser$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Parser.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ParserTest_starter$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ParserTest_starter.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/SourceLocation.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/SymbolTable$ScopeEntry.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/SymbolTable.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/Token.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/TypeCheckTest_starter$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/TypeCheckTest_starter.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/TypeCheckVisitor$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/AST.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ASTVisitor.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/AssignmentStatement.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/BinaryExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Block$BlockElem.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Block.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/BooleanLitExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ChannelSelector.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ConditionalExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ConstExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Declaration.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Dimension.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/DoStatement.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ExpandedPixelExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Expr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/GuardedBlock.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/IdentExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/IfStatement.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/LValue.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/NameDef.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/NumLitExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/PixelSelector.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/PostfixExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Program.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/ReturnStatement.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Statement.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/StatementBlock.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/StringLitExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/SyntheticNameDef.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Type$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/Type.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/UnaryExpr.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/ast/WriteStatement.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/cop4020fa23.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/CodeGenException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/LexicalException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/PLCCompilerException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/SyntaxException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/exceptions/TypeCheckException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/runtime/ConsoleIO$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/edu/ufl/cise/cop4020fa23/runtime/ConsoleIO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/apiguardian-api-1.1.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/hamcrest-2.2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-5.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-api-5.10.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-api-5.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-engine-5.10.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-engine-5.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-jupiter-params-5.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-platform-commons-1.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-platform-console-standalone-1.10.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/junit-platform-engine-1.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Homework1_4020/lib/opentest4j-1.2.0.jar" beforeDir="false" />
+    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="&#10;Implementedn basic javaName updating, needs to consider scope. 14/23 passed.">
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenTest_starter.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenTest_starter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/Lexer.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/Lexer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/Lexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/Lexer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -158,13 +31,6 @@
   </component>
   <component name="Git.Merge.Settings">
     <option name="BRANCH" value="origin/main" />
-  </component>
-  <component name="Git.Pull.Settings">
-    <option name="OPTIONS">
-      <set>
-        <option value="NO_COMMIT" />
-      </set>
-    </option>
   </component>
   <component name="Git.Settings">
     <option name="PREVIOUS_COMMIT_AUTHORS">
@@ -208,24 +74,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Downloaded.Files.Path.Enabled": "true",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/steve/IdeaProjects/Homework1_4020",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;true&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/steve/IdeaProjects/Homework1_4020&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="JUnit.CodeGenTest_starter.cg4">
+}</component>
+  <component name="RunManager" selected="JUnit.CodeGenTest_starter">
     <configuration name="CodeGenTest_starter" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
@@ -241,7 +107,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_starter.cg11" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_starter.cg16" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -251,13 +117,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
-      <option name="METHOD_NAME" value="cg11" />
+      <option name="METHOD_NAME" value="cg16" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_starter.cg12" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_starter.cg18" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -267,13 +133,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
-      <option name="METHOD_NAME" value="cg12" />
+      <option name="METHOD_NAME" value="cg18" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_starter.cg4" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_starter.cg2" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -283,13 +149,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
-      <option name="METHOD_NAME" value="cg4" />
+      <option name="METHOD_NAME" value="cg2" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_starter.cg9" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="HW1TestSolutions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -298,20 +164,19 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
-      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
-      <option name="METHOD_NAME" value="cg9" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.HW1TestSolutions" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.CodeGenTest_starter.cg4" />
         <item itemvalue="JUnit.CodeGenTest_starter" />
-        <item itemvalue="JUnit.CodeGenTest_starter.cg11" />
-        <item itemvalue="JUnit.CodeGenTest_starter.cg9" />
-        <item itemvalue="JUnit.CodeGenTest_starter.cg12" />
+        <item itemvalue="JUnit.CodeGenTest_starter.cg16" />
+        <item itemvalue="JUnit.CodeGenTest_starter.cg18" />
+        <item itemvalue="JUnit.HW1TestSolutions" />
+        <item itemvalue="JUnit.CodeGenTest_starter.cg2" />
       </list>
     </recent_temporary>
   </component>
@@ -323,22 +188,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1696189596039</updated>
-    </task>
-    <task id="LOCAL-00007" summary="passes 21 of 21 tests">
-      <option name="closed" value="true" />
-      <created>1696965513317</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1696965513317</updated>
-    </task>
-    <task id="LOCAL-00008" summary="passes 21 of 21 tests">
-      <option name="closed" value="true" />
-      <created>1696978841584</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1696978841584</updated>
     </task>
     <task id="LOCAL-00009" summary="New Test Cases,added HW2 files">
       <option name="closed" value="true" />
@@ -716,7 +565,23 @@
       <option name="project" value="LOCAL" />
       <updated>1699915181408</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="&#10;Fixed error with nameDef's temp javaName variable, and other minor fixes. 12/23 passed">
+      <option name="closed" value="true" />
+      <created>1699916250260</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1699916250260</updated>
+    </task>
+    <task id="LOCAL-00057" summary="&#10;Implementedn basic javaName updating, needs to consider scope. 14/23 passed.">
+      <option name="closed" value="true" />
+      <created>1699918796723</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1699918796723</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -774,9 +639,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="h" />
-    <MESSAGE value="updating visitbinary n stuff" />
-    <MESSAGE value="Completed all methods, now we just need to test. Got a lot of issues with things being null" />
     <MESSAGE value="Passed 10 more tests after changing one line of code lol" />
     <MESSAGE value="23 passed 2 failed" />
     <MESSAGE value="24 passed 1 failed" />
@@ -799,7 +661,10 @@
     <MESSAGE value="&#10;Caught up w/ basic import stuff, pass 6/23" />
     <MESSAGE value="&#10;/Fixed minor issue with visitNameDef, 7/23 passed" />
     <MESSAGE value="&#10;Fixed minor issue with visitUnaryExpr, 10/23 passed. Not sure what's wrong with 8/9/10" />
-    <option name="LAST_COMMIT_MESSAGE" value="&#10;Fixed minor issue with visitUnaryExpr, 10/23 passed. Not sure what's wrong with 8/9/10" />
+    <MESSAGE value="&#10;Fixed error with nameDef's temp javaName variable, and other minor fixes. 12/23 passed" />
+    <MESSAGE value="&#10;Implementedn basic javaName updating, needs to consider scope" />
+    <MESSAGE value="&#10;Implementedn basic javaName updating, needs to consider scope. 14/23 passed." />
+    <option name="LAST_COMMIT_MESSAGE" value="&#10;Implementedn basic javaName updating, needs to consider scope. 14/23 passed." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
