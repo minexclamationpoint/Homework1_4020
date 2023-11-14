@@ -29,7 +29,6 @@ public class CodeGenVisitor implements ASTVisitor {
     private HashSet<String> importSet = new HashSet<>();
     private HashMap<StringBuilder, Integer> javaNameSet = new HashMap<>();
 
-
     // TODO: implement javanames
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
@@ -40,10 +39,11 @@ public class CodeGenVisitor implements ASTVisitor {
             if (assignmentStatement.getlValue() == null) {
                 throw new CodeGenException("LValue in assignment statement is null");
             }
-            if (assignmentStatement.getlValue().getName() == null || assignmentStatement.getlValue().getName().isEmpty()) {
+            if (assignmentStatement.getlValue().getName() == null
+                    || assignmentStatement.getlValue().getName().isEmpty()) {
                 throw new CodeGenException("Variable name in LValue is null or empty.");
             }
-            if(assignmentStatement.getE() == null){
+            if (assignmentStatement.getE() == null) {
                 throw new CodeGenException("Expression in assignment statement is null");
             }
             sb.append(visitLValue(assignmentStatement.getlValue(), arg)).append(" = ");
@@ -115,7 +115,8 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitBlock(Block block, Object arg) throws PLCCompilerException {
         // { _BlockElem*_ }
         // BlockElem ::= Declaration | Statement
-        //Extended visitBlock into two subexpressions: visitBlockElem and determineStatement
+        // Extended visitBlock into two subexpressions: visitBlockElem and
+        // determineStatement
         StringBuilder blockCode = new StringBuilder("{\n");
         for (Block.BlockElem elem : block.getElems()) {
             try {
@@ -128,11 +129,11 @@ public class CodeGenVisitor implements ASTVisitor {
         return blockCode;
     }
 
-    private StringBuilder visitBlockElem(BlockElem blockElem, Object arg) throws  PLCCompilerException {
+    private StringBuilder visitBlockElem(BlockElem blockElem, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
-        if(blockElem instanceof Declaration){
+        if (blockElem instanceof Declaration) {
             sb.append(visitDeclaration((Declaration) blockElem, arg));
-        } else if (blockElem instanceof Statement){
+        } else if (blockElem instanceof Statement) {
             sb.append(determineStatement((Statement) blockElem, arg));
         } else {
             throw new CodeGenException("Unsupported BlockElem type");
@@ -143,11 +144,14 @@ public class CodeGenVisitor implements ASTVisitor {
 
     private StringBuilder determineStatement(Statement statement, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
-        sb.append(switch (statement.getClass().getName()){
-            case "edu.ufl.cise.cop4020fa23.ast.AssignmentStatement" -> visitAssignmentStatement((AssignmentStatement) statement, arg);
+        sb.append(switch (statement.getClass().getName()) {
+            case "edu.ufl.cise.cop4020fa23.ast.AssignmentStatement" ->
+                visitAssignmentStatement((AssignmentStatement) statement, arg);
             case "edu.ufl.cise.cop4020fa23.ast.WriteStatement" -> visitWriteStatement((WriteStatement) statement, arg);
-            case "edu.ufl.cise.cop4020fa23.ast.DoStatement", "edu.ufl.cise.cop4020fa23.ast.IfStatement" -> throw new UnsupportedOperationException("Unimplemented method");
-            case "edu.ufl.cise.cop4020fa23.ast.ReturnStatement" -> visitReturnStatement((ReturnStatement) statement, arg);
+            case "edu.ufl.cise.cop4020fa23.ast.DoStatement", "edu.ufl.cise.cop4020fa23.ast.IfStatement" ->
+                throw new UnsupportedOperationException("Unimplemented method");
+            case "edu.ufl.cise.cop4020fa23.ast.ReturnStatement" ->
+                visitReturnStatement((ReturnStatement) statement, arg);
             case "edu.ufl.cise.cop4020fa23.ast.StatementBlock" -> visitBlockStatement((StatementBlock) statement, arg);
             default -> {
                 throw new CodeGenException("Unexpected value: " + statement.getClass().getName());
@@ -228,7 +232,8 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     @Override
-    public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg)
+            throws PLCCompilerException {
         // Implemented in Assignment 5
         throw new UnsupportedOperationException("Unimplemented method");
     }
@@ -242,12 +247,12 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder updateJavaName(NameDef nameDef) throws PLCCompilerException {
         StringBuilder javaName = new StringBuilder(nameDef.getJavaName());
         StringBuilder name = new StringBuilder(nameDef.getIdentToken().text());
-        if(!(javaName.compareTo(name) == 0)){
+        if (!(javaName.compareTo(name) == 0)) {
             return new StringBuilder(javaName);
-        }else if(javaNameSet.containsKey(javaName)){
+        } else if (javaNameSet.containsKey(javaName)) {
             int old = javaNameSet.get(javaName);
-            javaNameSet.replace(javaName, old, old+1);
-            javaName.append("$").append(old+1);
+            javaNameSet.replace(javaName, old, old + 1);
+            javaName.append("$").append(old + 1);
             nameDef.setJavaName(javaName.toString());
             return javaName;
         } else {
@@ -320,27 +325,30 @@ public class CodeGenVisitor implements ASTVisitor {
      * }
      * Note: parameters from _NameDef*_ are separated by commas
      */
-    /*How to deal with import statements
-    • Traverse the entire tree adding code to a StringBuilder
-     • As you traverse the AST, keep track of methods called by generated
-            code that would require an import.
-            TODO: add a table that keeps track of methods that would require an import
-        • After you return back to Program after visiting its children, you will
-            have a String containing the body of the class.
-        • Construct another String containing the necessary imports.
-        • Concatenate the package name, the import statements, and the class
-            body to get the complete Java class.*/
-    //TODO: implement package name argument
+    /*
+     * How to deal with import statements
+     * • Traverse the entire tree adding code to a StringBuilder
+     * • As you traverse the AST, keep track of methods called by generated
+     * code that would require an import.
+     * TODO: add a table that keeps track of methods that would require an import
+     * • After you return back to Program after visiting its children, you will
+     * have a String containing the body of the class.
+     * • Construct another String containing the necessary imports.
+     * • Concatenate the package name, the import statements, and the class
+     * body to get the complete Java class.
+     */
+    // TODO: implement package name argument
 
     @Override
     public StringBuilder visitProgram(Program program, Object arg) throws PLCCompilerException {
         StringBuilder imports = new StringBuilder();
         StringBuilder classBody = new StringBuilder("public class ").append(program.getName()).append(" {\n");
-        classBody.append("\tpublic static ").append(determineType(program.getType())).append(" apply(\n").append("\t\t");
+        classBody.append("\tpublic static ").append(determineType(program.getType())).append(" apply(\n")
+                .append("\t\t");
         ListIterator<NameDef> listIterator = program.getParams().listIterator();
-        while(listIterator.hasNext()){
+        while (listIterator.hasNext()) {
             classBody.append(visitNameDef(listIterator.next(), arg));
-            if(listIterator.hasNext()){
+            if (listIterator.hasNext()) {
                 classBody.append(", ");
             } else {
                 classBody.append("\n");
@@ -348,7 +356,7 @@ public class CodeGenVisitor implements ASTVisitor {
         }
         classBody.append("\t) ").append(visitBlock(program.getBlock(), arg)).append("\n");
         classBody.append("}\n");
-        //^^^ unsure if the above \n is necessary
+        // ^^^ unsure if the above \n is necessary
 
         for (String importString : importSet) {
             imports.append("import ").append(importString).append(";\n");
@@ -371,12 +379,12 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     private String determineType(Type type) throws CodeGenException {
-        return switch(type) {
-            case INT-> "int";
+        return switch (type) {
+            case INT -> "int";
             case STRING -> "String";
             case VOID -> "void";
             case BOOLEAN -> "boolean";
-            case IMAGE,PIXEL -> throw new UnsupportedOperationException("Unimplemented method");
+            case IMAGE, PIXEL -> throw new UnsupportedOperationException("Unimplemented method");
         };
     }
 
@@ -401,12 +409,18 @@ public class CodeGenVisitor implements ASTVisitor {
          * Note: you do not need to handle width and height
          * in this assignment
          */
-        StringBuilder subString = new StringBuilder("(");
-        subString.append(convertOpKind(unaryExpr.getOp()));
-        System.out.println(subString);
-        subString.append(determineExpr(unaryExpr.getExpr(), arg)).append(")");
-        System.out.println(subString);
-        return subString;
+        StringBuilder subExprString = new StringBuilder();
+        String opString = convertOpKind(unaryExpr.getOp());
+        StringBuilder operandString = determineExpr(unaryExpr.getExpr(), arg);
+        if (opString.equals("-")) {
+            subExprString.append(opString).append(operandString);
+        } else {
+            // Handle other unary operators if needed
+            subExprString.append("(").append(opString).append(operandString).append(")");
+        }
+    
+        return subExprString;
+
     }
 
     @Override
