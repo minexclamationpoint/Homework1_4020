@@ -220,7 +220,7 @@ public class Lexer implements ILexer {
 								line++;
 								column = 0;
 							}
-							if (sb.length() >= 1)
+							if (!sb.isEmpty())
 							 {
 							 	sb.deleteCharAt(sb.length() - 1);
 							 }
@@ -478,30 +478,21 @@ public class Lexer implements ILexer {
 					}
 					case IN_WHITESPACE -> {
 						sb.append(ch);
-						if (ch != ' ' || ch != '\n' || ch != '\r' || ch != '\t') {
-							// not going to update pos
-							st = State.START;
-							if (sb.length() >= 1)
-								sb.deleteCharAt(sb.length() - 1);
-							
-							break;
-						}
-						// checks if sb is a white space
+                        // not going to update pos
+                        st = State.START;
+                        if (!sb.isEmpty())
+                            sb.deleteCharAt(sb.length() - 1);
+
+                        break;
+                        // checks if sb is a white space
 
 
 						// this should instantly break
 						// well this is a problem if this reaches here like huh
 						//NEVER CALLED
 						// break outer;
-						
-						if (sb.length() >= 1)
-							sb.deleteCharAt(sb.length() - 1);
-						pos++;
-						column++;
-						
-						break;
 
-					}
+                    }
 					default -> {
 						throw new LexicalException(new SourceLocation(line, column), "Unexpected character: " + ch);
 						// should only happen if the starting character is an error

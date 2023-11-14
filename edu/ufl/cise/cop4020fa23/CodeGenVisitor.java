@@ -403,9 +403,8 @@ public class CodeGenVisitor implements ASTVisitor {
          */
         StringBuilder subString = new StringBuilder("(");
         subString.append(convertOpKind(unaryExpr.getOp()));
-        System.out.println(subString);
+        System.out.println("hello" + subString);
         subString.append(determineExpr(unaryExpr.getExpr(), arg)).append(")");
-        System.out.println(subString);
         return subString;
     }
 
