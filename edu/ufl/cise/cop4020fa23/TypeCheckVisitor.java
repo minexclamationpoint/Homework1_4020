@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 /*
 Your parser returns an AST
 • In this assignment, we will use the visitor pattern to traverse this AST
@@ -57,11 +56,12 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     private Type currentType;
 
-
-    //vvv implemented with the symbol table class
+    // vvv implemented with the symbol table class
     private SymbolTable st = new SymbolTable();
+
     @Override
-    public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
+    public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
+            throws PLCCompilerException {
         try {
             // Entering a new scope for this assignment statement
             st.enterScope();
@@ -71,26 +71,27 @@ public class TypeCheckVisitor implements ASTVisitor {
             Expr expr = assignmentStatement.getE();
             // Visit LValue and Expr to populate their types
             st.enterScope();
-            //entering a new scope for variable declaration
+            // entering a new scope for variable declaration
             Type lValueType = (Type) lValue.visit(this, arg); // Assuming LValue context
             Type exprType = (Type) expr.visit(this, arg); // Assuming no special context for Expr
             st.leaveScope();
 
-            //AssignmentCompatible
-            switch(lValueType){
+            // AssignmentCompatible
+            switch (lValueType) {
                 case PIXEL -> {
-                    if(exprType != INT && exprType != PIXEL){
+                    if (exprType != INT && exprType != PIXEL) {
                         throw new TypeCheckException("Type mismatch in assignment statement");
                     }
                 }
-                case IMAGE ->{
-                    switch(exprType) {
-                        case PIXEL, INT, STRING, IMAGE -> {}
+                case IMAGE -> {
+                    switch (exprType) {
+                        case PIXEL, INT, STRING, IMAGE -> {
+                        }
                         default -> throw new TypeCheckException("Type mismatch in assgt statement");
                     }
                 }
                 default -> {
-                    if(exprType != lValueType){
+                    if (exprType != lValueType) {
                         throw new TypeCheckException("type mismatch in assgt statement");
                     }
                 }
@@ -111,20 +112,21 @@ public class TypeCheckVisitor implements ASTVisitor {
             Type rightExprType = (Type) binaryExpr.getRightExpr().visit(this, arg);
 
             Kind opKind = binaryExpr.getOpKind();
-    
+
             Type resultType = inferBinaryType(leftExprType, opKind, rightExprType);
-    
+
             if (resultType == null) {
                 throw new TypeCheckException("Invalid combination of types and operator in binary expression");
             }
 
             binaryExpr.setType(resultType);
             return resultType;
-    
+
         } catch (TypeCheckException e) {
             throw e;
         }
     }
+
     private Type inferBinaryType(Type leftType, Kind op, Type rightType) throws TypeCheckException {
         // PIXEL BITAND, BITOR PIXEL PIXEL
         if (leftType == Type.PIXEL && (op == Kind.BITAND || op == Kind.BITOR) && rightType == Type.PIXEL) {
@@ -135,7 +137,8 @@ public class TypeCheckVisitor implements ASTVisitor {
             return Type.BOOLEAN;
         }
         // INT LT, GT, LE, GE INT BOOLEAN
-        else if (leftType == Type.INT && (op == Kind.LT || op == Kind.GT || op == Kind.LE || op == Kind.GE) && rightType == Type.INT) {
+        else if (leftType == Type.INT && (op == Kind.LT || op == Kind.GT || op == Kind.LE || op == Kind.GE)
+                && rightType == Type.INT) {
             return Type.BOOLEAN;
         }
         // any EQ ExprleftExpr.type BOOLEAN
@@ -151,7 +154,8 @@ public class TypeCheckVisitor implements ASTVisitor {
             return Type.PIXEL;
         }
         // PIXEL,IMAGE TIMES, DIV, MOD INT ExprleftExpr.type
-        else if ((leftType == Type.PIXEL || leftType == Type.IMAGE) && (op == Kind.TIMES || op == Kind.DIV || op == Kind.MOD) && rightType == Type.INT) {
+        else if ((leftType == Type.PIXEL || leftType == Type.IMAGE)
+                && (op == Kind.TIMES || op == Kind.DIV || op == Kind.MOD) && rightType == Type.INT) {
             return leftType;
         }
         // Any PLUS ExprleftExpr.type ExprleftExpr.type
@@ -159,14 +163,14 @@ public class TypeCheckVisitor implements ASTVisitor {
             return leftType;
         }
         // INT,PIXEL,IMAGE MINUS, TIMES, DIV, MOD ExprleftExpr.type ExprleftExpr.type
-        else if ((leftType == Type.INT || leftType == Type.PIXEL || leftType == Type.IMAGE) && (op == Kind.MINUS || op == Kind.TIMES || op == Kind.DIV || op == Kind.MOD) && leftType == rightType) {
+        else if ((leftType == Type.INT || leftType == Type.PIXEL || leftType == Type.IMAGE)
+                && (op == Kind.MINUS || op == Kind.TIMES || op == Kind.DIV || op == Kind.MOD)
+                && leftType == rightType) {
             return leftType;
-        }
-        else {
+        } else {
             throw new TypeCheckException("Invalid combination of leftType, op, and rightType");
         }
     }
-    
 
     @Override
     public Object visitBlock(Block block, Object arg) throws PLCCompilerException {
@@ -184,15 +188,15 @@ public class TypeCheckVisitor implements ASTVisitor {
         try {
             // Entering a new scope
             st.enterScope();
-    
+
             // Visit the block within the StatementBlock
             Block block = statementBlock.getBlock();
             block.visit(this, arg);
             // Leaving the scope
             st.leaveScope();
-    
-            return null;  // BlockStatement doesn't have a type
-            
+
+            return null; // BlockStatement doesn't have a type
+
         } catch (TypeCheckException e) {
             throw e;
         }
@@ -207,9 +211,6 @@ public class TypeCheckVisitor implements ASTVisitor {
             if (colorKind != Kind.RES_red && colorKind != Kind.RES_blue && colorKind != Kind.RES_green) {
                 throw new TypeCheckException("Invalid color channel specified");
             }
-    
-
-
 
             return colorKind;
         } catch (TypeCheckException e) {
@@ -225,21 +226,22 @@ public class TypeCheckVisitor implements ASTVisitor {
             if (guardType != Type.BOOLEAN) {
                 throw new TypeCheckException("The guard expression in a conditional must be of type BOOLEAN");
             }
-    
+
             // Visit and type check the true and false expressions
             Type trueExprType = (Type) conditionalExpr.getTrueExpr().visit(this, arg);
             Type falseExprType = (Type) conditionalExpr.getFalseExpr().visit(this, arg);
-    
+
             // The types of trueExpr and falseExpr must be the same
             if (trueExprType != falseExprType) {
                 throw new TypeCheckException("The true and false expressions in a conditional must have the same type");
             }
-    
-            // Everything is fine, set the type of the ConditionalExpr to be the same as that of trueExpr
+
+            // Everything is fine, set the type of the ConditionalExpr to be the same as
+            // that of trueExpr
             conditionalExpr.setType(trueExprType);
-    
+
             return trueExprType;
-    
+
         } catch (TypeCheckException e) {
             throw e;
         }
@@ -254,13 +256,19 @@ public class TypeCheckVisitor implements ASTVisitor {
             NameDef nameDef;
             Type nameDefType;
             // branch whether or not initializer should be visited or not
-            if(initializer != null){
+            if (initializer != null) {
                 initType = (Type) initializer.visit(this, arg);
                 nameDef = declaration.getNameDef();
                 nameDefType = (Type) nameDef.visit(this, arg);
-                //Check conditions
-                if((initType == nameDefType) || ((initType == STRING) && (nameDefType == IMAGE))){
-                    if(st.lookup(declaration.getNameDef().getName()) != null){
+
+                if (nameDef.getJavaName() == null || nameDef.getJavaName().isEmpty()) {
+                    String uniqueJavaName = generateUniqueJavaName(nameDef.getName(), st.getCurrentNum());
+                    nameDef.setJavaName(uniqueJavaName);
+                }
+
+                // Check conditions
+                if ((initType == nameDefType) || ((initType == STRING) && (nameDefType == IMAGE))) {
+                    if (st.lookup(declaration.getNameDef().getName()) != null) {
                     }
                     return nameDefType;
                 }
@@ -271,7 +279,7 @@ public class TypeCheckVisitor implements ASTVisitor {
                 return nameDefType;
             }
             // Successfully processed the declaration
-    
+
         } catch (TypeCheckException e) {
             throw e;
         }
@@ -282,19 +290,19 @@ public class TypeCheckVisitor implements ASTVisitor {
         try {
             // Visit and type check the width expression
             Type widthType = (Type) dimension.getWidth().visit(this, arg);
-            
+
             // Use the check method to ensure the width type is INT
             check(widthType == Type.INT, dimension, "Width expression must be of type INT");
-            
+
             // Visit and type check the height expression
             Type heightType = (Type) dimension.getHeight().visit(this, arg);
-            
+
             // Use the check method to ensure the height type is INT
             check(heightType == Type.INT, dimension, "Height expression must be of type INT");
-            
+
             // Everything is fine
-            return dimension;  // Return the dimension object
-    
+            return dimension; // Return the dimension object
+
         } catch (TypeCheckException e) {
             throw e;
         }
@@ -323,7 +331,7 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Leaving the scope
             st.leaveScope();
 
-            return null;  // DoStatement doesn't have a type
+            return null; // DoStatement doesn't have a type
 
         } catch (TypeCheckException e) {
             throw e;
@@ -335,7 +343,8 @@ public class TypeCheckVisitor implements ASTVisitor {
         boolean scopeEntered = false;
 
         try {
-            // Check if we are in a context where the identifiers could be implicitly declared
+            // Check if we are in a context where the identifiers could be implicitly
+            // declared
             if (st.lookup("x") == null) {
                 SyntheticNameDef nameX = new SyntheticNameDef("x");
                 st.enterScope();
@@ -356,9 +365,9 @@ public class TypeCheckVisitor implements ASTVisitor {
             Type greenType = (Type) expandedPixelExpr.getGreen().visit(this, "PixelSelectorContext");
             Type blueType = (Type) expandedPixelExpr.getBlue().visit(this, "PixelSelectorContext");
 
-
             if (redType != Type.INT || greenType != Type.INT || blueType != Type.INT) {
-                throw new TypeCheckException("The expressions for red, green, and blue in an ExpandedPixelExpr must be of type INT");
+                throw new TypeCheckException(
+                        "The expressions for red, green, and blue in an ExpandedPixelExpr must be of type INT");
             }
 
             expandedPixelExpr.setType(Type.PIXEL);
@@ -389,7 +398,7 @@ public class TypeCheckVisitor implements ASTVisitor {
             Block block = guardedBlock.getBlock();
             block.visit(this, arg);
 
-            return null;  // GuardedBlock doesn't have a type
+            return null; // GuardedBlock doesn't have a type
 
         } catch (TypeCheckException e) {
             throw e;
@@ -400,7 +409,7 @@ public class TypeCheckVisitor implements ASTVisitor {
     @Override
     public Object visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
         NameDef nameDef = st.lookup(identExpr.getName());
-        if(nameDef == null){
+        if (nameDef == null) {
             throw new TypeCheckException("identExpr name " + identExpr.getName() + " not found within symbolTable");
         }
         identExpr.setNameDef(nameDef);
@@ -453,7 +462,7 @@ public class TypeCheckVisitor implements ASTVisitor {
             ChannelSelector cs = lValue.getChannelSelector();
 
             if (ps != null) {
-                ps.visit(this, true);  // True indicates we are in an LValue context
+                ps.visit(this, true); // True indicates we are in an LValue context
             }
 
             // Conditions for PixelSelector and ChannelSelector
@@ -499,14 +508,14 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitNameDef(NameDef nameDef, Object arg) throws PLCCompilerException {
-        Type type = null;  // Initialize to a default value
-        if(nameDef.getDimension() != null){
+        Type type = null; // Initialize to a default value
+        if (nameDef.getDimension() != null) {
             nameDef.getDimension().visit(this, arg);
         }
         try {
-            type = nameDef.getType();  // Assuming that getType() returns the Type of the NameDef
-            Dimension dimension = nameDef.getDimension();  // Assuming that getDimension() returns the Dimension
-            
+            type = nameDef.getType(); // Assuming that getType() returns the Type of the NameDef
+            Dimension dimension = nameDef.getDimension(); // Assuming that getDimension() returns the Dimension
+
             if (dimension != null) {
                 if (type != Type.IMAGE) {
                     throw new TypeCheckException("Dimension can only be associated with IMAGE type");
@@ -514,18 +523,24 @@ public class TypeCheckVisitor implements ASTVisitor {
             } else if (!Arrays.asList(Type.INT, Type.BOOLEAN, Type.STRING, Type.PIXEL, Type.IMAGE).contains(type)) {
                 throw new TypeCheckException("Invalid type for NameDef");
             }
-            if(st.getScopeOfSymbol(nameDef.getName()) == st.getCurrentNum()){
-                throw new TypeCheckException("trying to overwrite a variable " + nameDef.getName() + " already in this scope.");
+            if (st.getScopeOfSymbol(nameDef.getName()) == st.getCurrentNum()) {
+                throw new TypeCheckException(
+                        "trying to overwrite a variable " + nameDef.getName() + " already in this scope.");
             }
-            st.insert(nameDef);  // Inserting the NameDef into the symbol table
+            String uniqueJavaName = generateUniqueJavaName(nameDef.getName(), st.getCurrentNum());
+            nameDef.setJavaName(uniqueJavaName);
+
+            st.insert(nameDef); // Inserting the NameDef into the symbol table
         } catch (TypeCheckException e) {
             throw e;
         } finally {
         }
-        return type;  // Return the type, which could be null if an exception was thrown
+        return type; // Return the type, which could be null if an exception was thrown
     }
-    
 
+    private String generateUniqueJavaName(String originalName, int scopeNumber) {
+        return originalName + "$" + scopeNumber;
+    }
 
     @Override
     public Object visitNumLitExpr(NumLitExpr numLitExpr, Object arg) throws PLCCompilerException {
@@ -540,29 +555,27 @@ public class TypeCheckVisitor implements ASTVisitor {
             boolean inLValueContext = (Boolean) arg;
 
             if (inLValueContext) {
-                if(pixelSelector.xExpr() instanceof IdentExpr) {
+                if (pixelSelector.xExpr() instanceof IdentExpr) {
                     String newName = ((IdentExpr) pixelSelector.xExpr()).getName();
                     if (st.lookup(newName) == null) {
                         SyntheticNameDef nameX = new SyntheticNameDef(newName);
                         st.insert(nameX);
                     }
-                } else if(!(pixelSelector.xExpr() instanceof NumLitExpr)){
+                } else if (!(pixelSelector.xExpr() instanceof NumLitExpr)) {
                     throw new TypeCheckException("expected IdentExpr or NumLitExpr argument for Expression x");
                 }
-                if(pixelSelector.yExpr() instanceof IdentExpr) {
+                if (pixelSelector.yExpr() instanceof IdentExpr) {
                     String newName = ((IdentExpr) pixelSelector.yExpr()).getName();
                     if (st.lookup(newName) == null) {
                         SyntheticNameDef nameY = new SyntheticNameDef(newName);
                         st.insert(nameY);
                     }
-                } else if(!(pixelSelector.yExpr() instanceof NumLitExpr)){
+                } else if (!(pixelSelector.yExpr() instanceof NumLitExpr)) {
                     throw new TypeCheckException("expected IdentExpr or NumLitExpr argument for Expression y");
                 }
             }
             Type typeX = (Type) pixelSelector.xExpr().visit(this, arg);
             Type typeY = (Type) pixelSelector.yExpr().visit(this, arg);
-
-
 
             if (typeX != Type.INT || typeY != Type.INT) {
                 throw new TypeCheckException("Expected type INT for component expressions");
@@ -574,54 +587,57 @@ public class TypeCheckVisitor implements ASTVisitor {
         } finally {
         }
     }
+
     @Override
-    //differences here
+    // differences here
     public Object visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
         postfixExpr.primary().setType((Type) postfixExpr.primary().visit(this, arg));
-        Type pixelType = (Type) postfixExpr.pixel().visit(this, false); //idk,,,,,
-        postfixExpr.setType(inferPostfixExprType(postfixExpr.primary().getType(), postfixExpr.pixel(), postfixExpr.channel()));
+        Type pixelType = (Type) postfixExpr.pixel().visit(this, false); // idk,,,,,
+        postfixExpr.setType(
+                inferPostfixExprType(postfixExpr.primary().getType(), postfixExpr.pixel(), postfixExpr.channel()));
         return postfixExpr.getType();
     }
 
     private Type inferPostfixExprType(Type prim, PixelSelector pix, ChannelSelector chan) throws TypeCheckException {
         boolean pixNull = (pix == null);
         boolean chanNull = (chan == null);
-        switch(prim){
+        switch (prim) {
             case IMAGE -> {
-                if(pixNull && chanNull){
+                if (pixNull && chanNull) {
                     return prim;
                     // both null case
                 } else {
-                    //requires at least one or both to be null
-                    if(!pixNull){
-                        //checks if pix is not null
-                        if(!chanNull){
-                            //checks if chan is not null
+                    // requires at least one or both to be null
+                    if (!pixNull) {
+                        // checks if pix is not null
+                        if (!chanNull) {
+                            // checks if chan is not null
                             return INT;
-                            //neither null case
+                            // neither null case
                         }
                         return PIXEL;
-                        //chan null case
+                        // chan null case
                     }
                     return IMAGE;
-                    //pix null case
+                    // pix null case
                 }
             }
             case PIXEL -> {
-                if(pixNull && chanNull){
+                if (pixNull && chanNull) {
                     return prim;
                     // both null case
                 } else {
-                    if(!chanNull){
+                    if (!chanNull) {
                         return INT;
                         // just chan null case
                     }
-                    throw new TypeCheckException("invalid combination of parameters, likely pixelSelector is null when it shouldn't be");
+                    throw new TypeCheckException(
+                            "invalid combination of parameters, likely pixelSelector is null when it shouldn't be");
                     // just pix null case
                 }
             }
             default -> {
-                if(pixNull && chanNull){
+                if (pixNull && chanNull) {
                     return prim;
                     // both null case
                 }
@@ -634,15 +650,20 @@ public class TypeCheckVisitor implements ASTVisitor {
     @Override
     public Object visitProgram(Program program, Object arg) throws PLCCompilerException {
         Type type = Type.kind2type(program.getTypeToken().kind());
-        program.setType(type);  // Setting the type attribute for Program
+        program.setType(type); // Setting the type attribute for Program
         currentType = type;
-        st.enterScope();  // Entering a new scope in the symbol table
+        st.enterScope(); // Entering a new scope in the symbol table
         List<NameDef> params = program.getParams();
         for (NameDef param : params) {
-            param.visit(this, arg);  // Visiting each NameDef child node
+            param.visit(this, arg); // Visiting each NameDef child node
+            if (param.getJavaName() == null || param.getJavaName().isEmpty()) {
+                String uniqueJavaName = generateUniqueJavaName(param.getName(), st.getCurrentNum());
+                param.setJavaName(uniqueJavaName);
+            }
+
         }
-        program.getBlock().visit(this, currentType);  // Visiting the Block child node, passing the program type
-        st.leaveScope();  // Leaving the scope in the symbol table
+        program.getBlock().visit(this, currentType); // Visiting the Block child node, passing the program type
+        st.leaveScope(); // Leaving the scope in the symbol table
 
         return type;
     }
@@ -653,7 +674,8 @@ public class TypeCheckVisitor implements ASTVisitor {
             // Visit the expression in ReturnStatement to get its type
             Type exprType = (Type) returnStatement.getE().visit(this, arg);
 
-            // Check if the type of the expression matches the type of the parent program (which is passed as arg)
+            // Check if the type of the expression matches the type of the parent program
+            // (which is passed as arg)
             if (exprType == currentType) {
                 // Types match, so we can proceed
                 return exprType;
@@ -677,9 +699,9 @@ public class TypeCheckVisitor implements ASTVisitor {
     public Object visitUnaryExpr(UnaryExpr unaryExpr, Object arg) throws PLCCompilerException {
         unaryExpr.getExpr().visit(this, arg);
         Kind opKind = unaryExpr.getOp();
-        switch(unaryExpr.getExpr().getType()){
+        switch (unaryExpr.getExpr().getType()) {
             case BOOLEAN -> {
-                if(opKind==BANG){
+                if (opKind == BANG) {
                     unaryExpr.setType(BOOLEAN);
                     boolean val = !Boolean.parseBoolean(unaryExpr.getExpr().firstToken().text());
                     return BOOLEAN;
@@ -687,15 +709,15 @@ public class TypeCheckVisitor implements ASTVisitor {
                 throw new TypeCheckException("Invalid type for unaryExpr with BOOLEAN Expr type");
             }
             case INT -> {
-                if(opKind==MINUS) {
+                if (opKind == MINUS) {
                     unaryExpr.setType(INT);
-                    int val = - Integer.parseInt(unaryExpr.getExpr().firstToken().text());
-                    return INT;
+                    return Type.INT;
+
                 }
                 throw new TypeCheckException("Invalid type for unaryExpr with INT Expr type");
             }
             case IMAGE -> {
-                switch(opKind){
+                switch (opKind) {
                     case RES_width -> {
                         unaryExpr.setType(INT);
                         int val = Integer.parseInt(unaryExpr.getExpr().firstToken().text());
@@ -705,23 +727,27 @@ public class TypeCheckVisitor implements ASTVisitor {
                         unaryExpr.setType(INT);
                         int val = Integer.parseInt(unaryExpr.getExpr().firstToken.text());
                         return INT;
-                        //not actually sure if this is how height/width are supposed to work
+                        // not actually sure if this is how height/width are supposed to work
                     }
-                    default-> throw new TypeCheckException("Invalid type for unaryExpr with IMAGE Expr type");
+                    default -> throw new TypeCheckException("Invalid type for unaryExpr with IMAGE Expr type");
                 }
             }
-        };
+        }
+        ;
         return null;
     }
-    //If program, namedef, declaration, or part of expr, return type
+
+    // If program, namedef, declaration, or part of expr, return type
     // (conditionalExpr, BinaryExpr, unarOp Expr, PostFixExpr[check], PrimaryExpr,
-    // StringLitExpr, NumLitExpr[check], IdentExpr, ConstExpr[check], BooleanLitExpr[check], ExpandedPixelExpr)
-    //otherwise, return the object type
+    // StringLitExpr, NumLitExpr[check], IdentExpr, ConstExpr[check],
+    // BooleanLitExpr[check], ExpandedPixelExpr)
+    // otherwise, return the object type
     @Override
     public Object visitWriteStatement(WriteStatement writeStatement, Object arg) throws PLCCompilerException {
         writeStatement.getExpr().visit(this, arg);
         return writeStatement;
     }
+
     @Override
     public Object visitBooleanLitExpr(BooleanLitExpr booleanLitExpr, Object arg) throws PLCCompilerException {
         booleanLitExpr.setType(BOOLEAN);
@@ -730,14 +756,15 @@ public class TypeCheckVisitor implements ASTVisitor {
 
     @Override
     public Object visitConstExpr(ConstExpr constExpr, Object arg) throws PLCCompilerException {
-        if (constExpr.getName().equals("Z")){
+        if (constExpr.getName().equals("Z")) {
             constExpr.setType(INT);
             return INT;
         }
         constExpr.setType(PIXEL);
         return PIXEL;
     }
-    private void check(boolean bool, AST ast, String str) throws TypeCheckException{
+
+    private void check(boolean bool, AST ast, String str) throws TypeCheckException {
         if (!bool) {
             throw new TypeCheckException(ast.firstToken.sourceLocation(), str);
         }

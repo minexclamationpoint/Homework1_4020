@@ -29,7 +29,6 @@ public class CodeGenVisitor implements ASTVisitor {
     private HashSet<String> importSet = new HashSet<>();
     private HashMap<StringBuilder, Integer> javaNameSet = new HashMap<>();
 
-
     // TODO: implement javanames
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
@@ -320,23 +319,26 @@ public class CodeGenVisitor implements ASTVisitor {
      * }
      * Note: parameters from _NameDef*_ are separated by commas
      */
-    /*How to deal with import statements
-    • Traverse the entire tree adding code to a StringBuilder
-     • As you traverse the AST, keep track of methods called by generated
-            code that would require an import.
-            TODO: add a table that keeps track of methods that would require an import
-        • After you return back to Program after visiting its children, you will
-            have a String containing the body of the class.
-        • Construct another String containing the necessary imports.
-        • Concatenate the package name, the import statements, and the class
-            body to get the complete Java class.*/
-    //TODO: implement package name argument
+    /*
+     * How to deal with import statements
+     * • Traverse the entire tree adding code to a StringBuilder
+     * • As you traverse the AST, keep track of methods called by generated
+     * code that would require an import.
+     * TODO: add a table that keeps track of methods that would require an import
+     * • After you return back to Program after visiting its children, you will
+     * have a String containing the body of the class.
+     * • Construct another String containing the necessary imports.
+     * • Concatenate the package name, the import statements, and the class
+     * body to get the complete Java class.
+     */
+    // TODO: implement package name argument
 
     @Override
     public StringBuilder visitProgram(Program program, Object arg) throws PLCCompilerException {
         StringBuilder imports = new StringBuilder();
         StringBuilder classBody = new StringBuilder("public class ").append(program.getName()).append(" {\n");
-        classBody.append("\tpublic static ").append(determineType(program.getType())).append(" apply(\n").append("\t\t");
+        classBody.append("\tpublic static ").append(determineType(program.getType())).append(" apply(\n")
+                .append("\t\t");
         ListIterator<NameDef> listIterator = program.getParams().listIterator();
         while(listIterator.hasNext()){
             classBody.append(visitNameDef(listIterator.next(), arg));
@@ -371,12 +373,12 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     private String determineType(Type type) throws CodeGenException {
-        return switch(type) {
-            case INT-> "int";
+        return switch (type) {
+            case INT -> "int";
             case STRING -> "String";
             case VOID -> "void";
             case BOOLEAN -> "boolean";
-            case IMAGE,PIXEL -> throw new UnsupportedOperationException("Unimplemented method");
+            case IMAGE, PIXEL -> throw new UnsupportedOperationException("Unimplemented method");
         };
     }
 
@@ -396,16 +398,28 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitUnaryExpr(UnaryExpr unaryExpr, Object arg) throws PLCCompilerException {
-        /*
-         * ( _op_ _Expr_ )
-         * Note: you do not need to handle width and height
-         * in this assignment
-         */
-        StringBuilder subString = new StringBuilder("(");
-        subString.append(convertOpKind(unaryExpr.getOp()));
-        System.out.println("hello" + subString);
-        subString.append(determineExpr(unaryExpr.getExpr(), arg)).append(")");
-        return subString;
+        if (unaryExpr == null || unaryExpr.getOp() == null || unaryExpr.getExpr() == null) {
+            throw new CodeGenException("Null reference in unary expression components.");
+        }
+
+        // Uhh putting error handling breaks code lmao
+
+        StringBuilder subExprString = new StringBuilder();
+        String opString = convertOpKind(unaryExpr.getOp());
+        StringBuilder operandString = determineExpr(unaryExpr.getExpr(), arg);
+
+
+
+        // this is such a stupid way to do this but it works
+        if (operandString.toString().startsWith("-") && opString.equals("-")) {
+            subExprString.append(operandString.substring(1)); // Remove the first negation
+        } else if (opString.equals("-")) {
+            subExprString.append(opString).append(operandString);
+        } else {
+            subExprString.append("(").append(opString).append(operandString).append(")");
+        }
+
+        return subExprString;
     }
 
     @Override
