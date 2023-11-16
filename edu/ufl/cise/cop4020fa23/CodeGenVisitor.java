@@ -2,13 +2,16 @@ package edu.ufl.cise.cop4020fa23;
 
 import edu.ufl.cise.cop4020fa23.ast.*;
 import edu.ufl.cise.cop4020fa23.ast.Block.BlockElem;
+import edu.ufl.cise.cop4020fa23.ast.Dimension;
 import edu.ufl.cise.cop4020fa23.exceptions.*;
 import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO;
 
 import static edu.ufl.cise.cop4020fa23.Kind.*;
 import static edu.ufl.cise.cop4020fa23.ast.Type.*;
 
+import java.awt.*;
 import java.util.*;
+import java.lang.Math;
 
 /*To work around a mismatch between the scoping rules of our language and Java’s scoping rules,
 implement a way to rename variables in the generated Java code so that every variable has a
@@ -29,9 +32,19 @@ public class CodeGenVisitor implements ASTVisitor {
     private HashSet<String> importSet = new HashSet<>();
     private HashMap<StringBuilder, Integer> javaNameSet = new HashMap<>();
 
-    // TODO: implement javanames
+    // TODO: Possibly replace function calls with .visit calls?
     @Override
     public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
+            /*
+             * If LValue.varType == image. See explanation
+             * below.
+             * If LValue.varType == pixel and
+             * LValue.ChannelSelector != null
+             * PixelOps.setRed(_LValue_ , _Expr_)
+             * or setGreen or SetBlue
+             * Otherwise
+             * _LValue_ = _Expr_
+             */
             throws PLCCompilerException {
         try {
             // _LValue_ = _Expr_
@@ -62,6 +75,7 @@ public class CodeGenVisitor implements ASTVisitor {
          * ((int)Math.round(Math.pow( _ ExprleftExpr _ , _ExprrigthExpr_ ))
          * Otherwise
          * (_ ExprleftExpr _ _op_ _ ExprrigthExpr _)
+         * See pdf for handling Pixel and Image types.
          */
 
         StringBuilder leftSb = determineExpr(binaryExpr.getLeftExpr(), arg);
@@ -145,7 +159,8 @@ public class CodeGenVisitor implements ASTVisitor {
         sb.append(switch (statement.getClass().getName()){
             case "edu.ufl.cise.cop4020fa23.ast.AssignmentStatement" -> visitAssignmentStatement((AssignmentStatement) statement, arg);
             case "edu.ufl.cise.cop4020fa23.ast.WriteStatement" -> visitWriteStatement((WriteStatement) statement, arg);
-            case "edu.ufl.cise.cop4020fa23.ast.DoStatement", "edu.ufl.cise.cop4020fa23.ast.IfStatement" -> throw new UnsupportedOperationException("Unimplemented method");
+            case "edu.ufl.cise.cop4020fa23.ast.DoStatement" -> visitDoStatement((DoStatement) statement, arg);
+            case "edu.ufl.cise.cop4020fa23.ast.IfStatement" -> visitIfStatement((IfStatement) statement, arg);
             case "edu.ufl.cise.cop4020fa23.ast.ReturnStatement" -> visitReturnStatement((ReturnStatement) statement, arg);
             case "edu.ufl.cise.cop4020fa23.ast.StatementBlock" -> visitBlockStatement((StatementBlock) statement, arg);
             default -> {
@@ -164,6 +179,11 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitChannelSelector(ChannelSelector channelSelector, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
+        /*
+         * See PostfixExpr rule for how to handle this in
+         * context of an expression. See LValue for how to
+         * handle in context of an LValue
+         */
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
@@ -197,6 +217,17 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitDeclaration(Declaration declaration, Object arg) throws PLCCompilerException {
         /*
          * either _NameDef_ or _NameDef_ = _Expr_
+         * If NameDef.type is image, instantiate a
+         * BufferedImage object using
+         * ImageOps.makeImage.The size of the image
+         * comes from the Dimension object in the NameDef.
+         * If there is no Dimension object, this is an error:
+         * throw a CodeGenException.
+         * (Note: you may choose a different way to divide
+         * the code generation between visitDeclaration and
+         * visitNameDef)
+         * final BufferedImage NameDef.javaName =
+         * ImageOps.makeImage( _Dimension_ )
          */
         StringBuilder sb = new StringBuilder();
         NameDef nameDef = declaration.getNameDef();
@@ -217,24 +248,29 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        throw new UnsupportedOperationException("Unimplemented method");
+        return new StringBuilder(determineExpr(dimension.getWidth(), arg)).append(",").append(determineExpr(dimension.getHeight(), arg));
     }
 
     @Override
     public StringBuilder visitDoStatement(DoStatement doStatement, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
+        //Compilcated, see instructions pdf
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        throw new UnsupportedOperationException("Unimplemented method");
+        StringBuilder sb = new StringBuilder("PixelOps.pack(");
+        sb.append(determineExpr(expandedPixelExpr.getRed(), arg)).append(",");
+        sb.append(determineExpr(expandedPixelExpr.getGreen(), arg)).append(",");
+        return sb.append(determineExpr(expandedPixelExpr.getBlue(), arg)).append(")");
     }
 
     @Override
     public StringBuilder visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
+        //Compilcated, see instructions pdf
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
@@ -266,12 +302,16 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitIfStatement(IfStatement ifStatement, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
+        //Compilcated, see instructions pdf
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
         // _IdentExpr_.getNameDef().getJavaName()
+        /*(PixelSelector and ChannelSelector if present, must
+        be visited. It may be easier to invoke this methods
+        from the parent AssignmentStatement. )*/
         return updateJavaName(lValue.getNameDef());
     }
 
@@ -283,6 +323,7 @@ public class CodeGenVisitor implements ASTVisitor {
          * _Type_ _name_
          * Where _name_ is the Java name of the IDENT
          */
+        //The dimension will be visited in the parent declaration
         StringBuilder sb = new StringBuilder();
         sb.append(determineType(nameDef.getType())).append(" ");
         sb.append(updateJavaName(nameDef));
@@ -299,39 +340,56 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        throw new UnsupportedOperationException("Unimplemented method");
+        return new StringBuilder(determineExpr(pixelSelector.xExpr(), arg)).append(",").append(pixelSelector.yExpr());
     }
 
     @Override
     public StringBuilder visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        throw new UnsupportedOperationException("Unimplemented method");
+        /*If Expr.type is Pixel
+        _ChannelSelector_ ( _Expr_ )
+        Otherwise it is an image
+        If PixelSelector != null && ChannelSelector ==null
+        Generate code to get the value of the pixel at the
+        indicated location.
+        ImageOps.getRGB( _Expr_ , _PixelSelector _ )
+        If PixelSelector != null && ChannelSelector != null,
+        generate code to get the value of the pixel at the
+        indicated location and to invoke PixelOps.red,
+        PixelOps.green, or PixelOps.blue. (You may want
+        to visit the ChannelSelector, passing info that this is
+        in the context of an expression as indicated here, or
+        you may want to just get the value from
+        visitPostfixExpr)
+        _ChannelSelector_ (ImageOps.getRGB( _Expr_ ,
+        _PixelSelector_ ))
+         */
+        //Probably not the cleanest implementation
+        //Requires import statement for ImageOps and getRHB I think
+        StringBuilder sb = new StringBuilder();
+        Expr primary = postfixExpr.primary();
+        PixelSelector pixel = postfixExpr.pixel();
+        ChannelSelector chan = postfixExpr.channel();
+        if(postfixExpr.getType() == PIXEL){
+            sb.append(visitChannelSelector(chan, arg)).append("(");
+            sb.append(determineExpr(primary, arg));
+        } else if(chan == null){
+            sb.append("ImageOps.getRGB(").append(determineExpr(primary, arg)).append(",");
+            sb.append(visitPixelSelector(pixel, arg));
+        } else if(pixel != null){
+            sb.append(visitChannelSelector(chan, arg)).append("ImageOps.getRGB(").append(determineExpr(primary, arg)).append(",");
+            sb.append(visitPixelSelector(pixel, arg)).append(")");
+        } else {
+            switch (chan.color()){
+                case RES_red -> sb.append("ImageOps.extractRed(");
+                case RES_blue -> sb.append("ImageOps.extractBlue(");
+                case RES_green -> sb.append("ImageOps.extractGreen(");
+                default -> throw new CodeGenException("Invalid channelselector color type");
+            }
+            sb.append(determineExpr(primary, arg));
+        }
+        return sb.append(")");
     }
-    /*
-     * Should accept a package name as an argument and return a String containing a
-     * java program implementing the semantics of the language. The package name may
-     * be null or an empty string.
-     * If so, the generated program should be in the default package.
-     * public class _IDENT_ {
-     * public static _Type_ apply(
-     * _NameDef*_
-     * ) _Block
-     * }
-     * Note: parameters from _NameDef*_ are separated by commas
-     */
-    /*
-     * How to deal with import statements
-     * • Traverse the entire tree adding code to a StringBuilder
-     * • As you traverse the AST, keep track of methods called by generated
-     * code that would require an import.
-     * TODO: add a table that keeps track of methods that would require an import
-     * • After you return back to Program after visiting its children, you will
-     * have a String containing the body of the class.
-     * • Construct another String containing the necessary imports.
-     * • Concatenate the package name, the import statements, and the class
-     * body to get the complete Java class.
-     */
-    // TODO: implement package name argument
 
     @Override
     public StringBuilder visitProgram(Program program, Object arg) throws PLCCompilerException {
@@ -363,7 +421,7 @@ public class CodeGenVisitor implements ASTVisitor {
             completeJavaClass.append("package ").append(packageName).append(";\n\n");
         }
 
-        if (imports.length() > 0) {
+        if (!imports.isEmpty()) {
             completeJavaClass.append(imports).append("\n");
         }
 
@@ -374,11 +432,11 @@ public class CodeGenVisitor implements ASTVisitor {
 
     private String determineType(Type type) throws CodeGenException {
         return switch (type) {
-            case INT -> "int";
+            case INT, PIXEL -> "int";
             case STRING -> "String";
             case VOID -> "void";
             case BOOLEAN -> "boolean";
-            case IMAGE, PIXEL -> throw new UnsupportedOperationException("Unimplemented method");
+            case IMAGE -> "BufferedImage";
         };
     }
 
@@ -413,10 +471,12 @@ public class CodeGenVisitor implements ASTVisitor {
         // this is such a stupid way to do this but it works
         if (operandString.toString().startsWith("-") && opString.equals("-")) {
             subExprString.append(operandString.substring(1)); // Remove the first negation
-        } else if (opString.equals("-")) {
-            subExprString.append(opString).append(operandString);
-        } else {
-            subExprString.append("(").append(opString).append(operandString).append(")");
+        }
+        switch (opString) {
+            case "-" -> subExprString.append(opString).append(operandString);
+            case "RES_height" -> subExprString.append("(").append(operandString).append(".getHeight()").append(")");
+            case "RES_width" -> subExprString.append("(").append(operandString).append(".getWidth()").append(")");
+            default -> subExprString.append("(").append(opString).append(operandString).append(")");
         }
 
         return subExprString;
@@ -427,10 +487,25 @@ public class CodeGenVisitor implements ASTVisitor {
         /*
          * ConsoleIO.write( _Expr_ )
          * Note: you will need to import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO
+         * The ConsoleIO class includes an overloaded
+        method write for each Java type that represents a
+        PLC Language type. Thus, you can simply
+        generate code to call the write method and let the
+        Java compiler determine which overloaded version
+        to use. The exception is that int and pixel in PLC
+        Language are both represented by a Java int.
+        When the type of Expr is pixel, you need to use the
+        writePixel method.
          */
+
         importSet.add("edu.ufl.cise.cop4020fa23.runtime.ConsoleIO");
         Expr subExpr = writeStatement.getExpr();
-        StringBuilder subString = new StringBuilder("ConsoleIO.write(");
+        StringBuilder subString = new StringBuilder();
+        if(subExpr.getType() == PIXEL){
+            subString.append("ConsoleIO.writePixel(");
+        } else {
+            subString.append("ConsoleIO.write(");
+        }
         subString.append(determineExpr(subExpr, arg));
         subString.append(")");
         return subString;
@@ -450,6 +525,9 @@ public class CodeGenVisitor implements ASTVisitor {
             case "edu.ufl.cise.cop4020fa23.ast.UnaryExpr" -> {
                 subString.append(visitUnaryExpr((UnaryExpr) subExpr, arg));
             }
+            case "edu.ufl.cise.cop4020fa23.ast.PostFixExpr" -> {
+                subString.append(visitPostfixExpr((PostfixExpr) subExpr, arg));
+            }
             case "edu.ufl.cise.cop4020fa23.ast.StringLitExpr" -> {
                 subString.append(visitStringLitExpr((StringLitExpr) subExpr, arg));
             }
@@ -461,6 +539,9 @@ public class CodeGenVisitor implements ASTVisitor {
             }
             case "edu.ufl.cise.cop4020fa23.ast.BooleanLitExpr" -> {
                 subString.append(visitBooleanLitExpr((BooleanLitExpr) subExpr, arg));
+            }
+            case "edu.ufl.cise.cop4020fa23.ast.ConstExpr" -> {
+                subString.append(visitConstExpr((ConstExpr) subExpr, arg));
             }
             default -> throw new CodeGenException("Unexpected subexpression type");
         }
@@ -481,7 +562,41 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitConstExpr(ConstExpr constExpr, Object arg) throws PLCCompilerException {
-        // Implemented in Assignment 5
-        throw new UnsupportedOperationException("Unimplemented method");
+        /*If ConsExpr.name = Z then 255
+        else get hex String literal representing the
+        RGB representation of the corresponding
+        java.awt.Color.
+        Example:
+        Let the PLC Lang constant be BLUE.
+        This corresponds to the java Color constant
+        java.awt.Color.BLUE.
+        Get the packed pixel version of the color with
+        getRGB()
+        Convert to a String with Integer.toHexString
+        Prepend “0x” to make it a Java hex literal.
+        Putting it all together, you get
+        "0x" +
+        Integer.toHexString(Color.BLUE.getRGB())
+        Which is
+        0xff0000ff*/
+        String uwu = constExpr.getName();
+        if(uwu.equals("Z"))
+            return new StringBuilder("255");
+        return new StringBuilder("0x").append(switch(uwu){
+            case "BLACK" -> Integer.toHexString(Color.BLACK.getRGB());
+            case "BLUE" -> Integer.toHexString(Color.BLUE.getRGB());
+            case "CYAN" -> Integer.toHexString(Color.CYAN.getRGB());
+            case "DARK_GRAY" -> Integer.toHexString(Color.DARK_GRAY.getRGB());
+            case "GRAY" -> Integer.toHexString(Color.GRAY.getRGB());
+            case "GREEN" -> Integer.toHexString(Color.GREEN.getRGB());
+            case "LIGHT_GRAY" -> Integer.toHexString(Color.LIGHT_GRAY.getRGB());
+            case "MAGENTA" -> Integer.toHexString(Color.MAGENTA.getRGB());
+            case "ORANGE" -> Integer.toHexString(Color.ORANGE.getRGB());
+            case "PINK" -> Integer.toHexString(Color.PINK.getRGB());
+            case "RED" -> Integer.toHexString(Color.RED.getRGB());
+            case "WHITE" -> Integer.toHexString(Color.WHITE.getRGB());
+            case "YELLOW" -> Integer.toHexString(Color.YELLOW.getRGB());
+            default -> throw new CodeGenException("Unexpected value: " + constExpr.getName());
+        });
     }
 }

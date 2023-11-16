@@ -20,10 +20,9 @@ import edu.ufl.cise.cop4020fa23.exceptions.LexicalException;
 import edu.ufl.cise.cop4020fa23.exceptions.PLCCompilerException;
 import edu.ufl.cise.cop4020fa23.exceptions.TypeCheckException;
 import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO;
-//import edu.ufl.cise.cop4020fa23.runtime.FileURLIO;
-//import edu.ufl.cise.cop4020fa23.runtime.ImageOps;
-//import edu.ufl.cise.cop4020fa23.runtime.PixelOps;
-//TODO: uncomment import statements when you find out how they work
+import edu.ufl.cise.cop4020fa23.runtime.FileURLIO;
+import edu.ufl.cise.cop4020fa23.runtime.ImageOps;
+import edu.ufl.cise.cop4020fa23.runtime.PixelOps;
 
 class CodeGenTest_starter {
 	

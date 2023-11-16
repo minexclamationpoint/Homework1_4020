@@ -10,12 +10,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="&#10;Implementedn basic javaName updating, needs to consider scope. 14/23 passed.">
-      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenTest_starter.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenTest_starter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/Lexer.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/Lexer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/Lexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/Lexer.java" afterDir="false" />
+    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="&#10;Logger purged with extreme prejudice">
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/SymbolTable$ScopeEntry.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/SymbolTable$ScopeEntry.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/SymbolTable.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/SymbolTable.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,7 +88,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
 }</component>
-  <component name="RunManager" selected="JUnit.CodeGenTest_starter">
+  <component name="RunManager" selected="JUnit.HW4_Tests">
     <configuration name="CodeGenTest_starter" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
@@ -107,7 +104,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_starter.cg16" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_starter.nestedComparisonExpressions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -117,13 +114,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
-      <option name="METHOD_NAME" value="cg16" />
+      <option name="METHOD_NAME" value="nestedComparisonExpressions" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_starter.cg18" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_starter.unitTestComparisonExpression5" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -133,13 +130,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
-      <option name="METHOD_NAME" value="cg18" />
+      <option name="METHOD_NAME" value="unitTestComparisonExpression5" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_starter.cg2" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="HW3Test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -148,14 +145,13 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
-      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
-      <option name="METHOD_NAME" value="cg2" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.HW3Test" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="HW1TestSolutions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="HW4_Tests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -164,7 +160,7 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
-      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.HW1TestSolutions" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.HW4_Tests" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -172,11 +168,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.HW4_Tests" />
+        <item itemvalue="JUnit.HW3Test" />
+        <item itemvalue="JUnit.CodeGenTest_starter.unitTestComparisonExpression5" />
         <item itemvalue="JUnit.CodeGenTest_starter" />
-        <item itemvalue="JUnit.CodeGenTest_starter.cg16" />
-        <item itemvalue="JUnit.CodeGenTest_starter.cg18" />
-        <item itemvalue="JUnit.HW1TestSolutions" />
-        <item itemvalue="JUnit.CodeGenTest_starter.cg2" />
+        <item itemvalue="JUnit.CodeGenTest_starter.nestedComparisonExpressions" />
       </list>
     </recent_temporary>
   </component>
@@ -188,30 +184,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1696189596039</updated>
-    </task>
-    <task id="LOCAL-00009" summary="New Test Cases,added HW2 files">
-      <option name="closed" value="true" />
-      <created>1696979037731</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1696979037731</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Fixed minor issue">
-      <option name="closed" value="true" />
-      <created>1696981077329</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1696981077329</updated>
-    </task>
-    <task id="LOCAL-00011" summary="7/15 Tests Passed">
-      <option name="closed" value="true" />
-      <created>1696988497999</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1696988497999</updated>
     </task>
     <task id="LOCAL-00012" summary="7/15 Tests Passed">
       <option name="closed" value="true" />
@@ -581,7 +553,31 @@
       <option name="project" value="LOCAL" />
       <updated>1699918796723</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="&#10;Implementedn basic javaName updating, needs to consider scope. 14/23 passed.">
+      <option name="closed" value="true" />
+      <created>1699933427202</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1699933427202</updated>
+    </task>
+    <task id="LOCAL-00059" summary="&#10;Passed 37/37 test cases. Yippeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee">
+      <option name="closed" value="true" />
+      <created>1699934519669</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1699934519669</updated>
+    </task>
+    <task id="LOCAL-00060" summary="&#10;Logger purged with extreme prejudice">
+      <option name="closed" value="true" />
+      <created>1699934764382</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1699934764383</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -639,8 +635,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Passed 10 more tests after changing one line of code lol" />
-    <MESSAGE value="23 passed 2 failed" />
     <MESSAGE value="24 passed 1 failed" />
     <MESSAGE value="25/25 passed" />
     <MESSAGE value="Expanded test cases added, 31/32 passed" />
@@ -664,7 +658,9 @@
     <MESSAGE value="&#10;Fixed error with nameDef's temp javaName variable, and other minor fixes. 12/23 passed" />
     <MESSAGE value="&#10;Implementedn basic javaName updating, needs to consider scope" />
     <MESSAGE value="&#10;Implementedn basic javaName updating, needs to consider scope. 14/23 passed." />
-    <option name="LAST_COMMIT_MESSAGE" value="&#10;Implementedn basic javaName updating, needs to consider scope. 14/23 passed." />
+    <MESSAGE value="&#10;Passed 37/37 test cases. Yippeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" />
+    <MESSAGE value="&#10;Logger purged with extreme prejudice" />
+    <option name="LAST_COMMIT_MESSAGE" value="&#10;Logger purged with extreme prejudice" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
