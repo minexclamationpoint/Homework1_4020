@@ -30,7 +30,6 @@ public class CodeGenVisitor implements ASTVisitor {
     private SymbolTable st = new SymbolTable();
 
     private HashSet<String> importSet = new HashSet<>();
-    private HashMap<StringBuilder, Integer> javaNameSet = new HashMap<>();
 
     // TODO: Possibly replace function calls with .visit calls?
     @Override
@@ -274,29 +273,11 @@ public class CodeGenVisitor implements ASTVisitor {
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
-    public StringBuilder updateJavaName(NameDef nameDef) throws PLCCompilerException {
-        StringBuilder javaName = new StringBuilder(nameDef.getJavaName());
-        StringBuilder name = new StringBuilder(nameDef.getIdentToken().text());
-        if(!(javaName.compareTo(name) == 0)){
-            return new StringBuilder(javaName);
-        }else if(javaNameSet.containsKey(javaName)){
-            int old = javaNameSet.get(javaName);
-            javaNameSet.replace(javaName, old, old+1);
-            javaName.append("$").append(old+1);
-            nameDef.setJavaName(javaName.toString());
-            return javaName;
-        } else {
-            javaNameSet.put(javaName, 1);
-            javaName.append("$1");
-            nameDef.setJavaName(javaName.toString());
-            return javaName;
-        }
-    }
 
     @Override
     public StringBuilder visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
         // _IdentExpr_.getNameDef().getJavaName()
-        return updateJavaName(identExpr.getNameDef());
+        return new StringBuilder(identExpr.getNameDef().getJavaName());
     }
 
     @Override
@@ -312,7 +293,7 @@ public class CodeGenVisitor implements ASTVisitor {
         /*(PixelSelector and ChannelSelector if present, must
         be visited. It may be easier to invoke this methods
         from the parent AssignmentStatement. )*/
-        return updateJavaName(lValue.getNameDef());
+        return new StringBuilder(lValue.getNameDef().getJavaName());
     }
 
     @Override
@@ -326,7 +307,7 @@ public class CodeGenVisitor implements ASTVisitor {
         //The dimension will be visited in the parent declaration
         StringBuilder sb = new StringBuilder();
         sb.append(determineType(nameDef.getType())).append(" ");
-        sb.append(updateJavaName(nameDef));
+        sb.append(nameDef.getJavaName());
         return sb;
     }
 
@@ -471,12 +452,13 @@ public class CodeGenVisitor implements ASTVisitor {
         // this is such a stupid way to do this but it works
         if (operandString.toString().startsWith("-") && opString.equals("-")) {
             subExprString.append(operandString.substring(1)); // Remove the first negation
-        }
-        switch (opString) {
-            case "-" -> subExprString.append(opString).append(operandString);
-            case "RES_height" -> subExprString.append("(").append(operandString).append(".getHeight()").append(")");
-            case "RES_width" -> subExprString.append("(").append(operandString).append(".getWidth()").append(")");
-            default -> subExprString.append("(").append(opString).append(operandString).append(")");
+        } else {
+            switch (opString) {
+                case "-" -> subExprString.append(opString).append(operandString);
+                case "RES_height" -> subExprString.append("(").append(operandString).append(".getHeight()").append(")");
+                case "RES_width" -> subExprString.append("(").append(operandString).append(".getWidth()").append(")");
+                default -> subExprString.append("(").append(opString).append(operandString).append(")");
+            }
         }
 
         return subExprString;
