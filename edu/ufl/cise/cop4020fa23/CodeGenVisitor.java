@@ -92,6 +92,7 @@ public class CodeGenVisitor implements ASTVisitor {
              * Otherwise
              * _LValue_ = _Expr_
              */
+    //TODO: If LValue has a pixelSelector or channelselector, visit them here
             throws PLCCompilerException {
         try {
             StringBuilder sb = new StringBuilder();
@@ -293,6 +294,7 @@ public class CodeGenVisitor implements ASTVisitor {
         StringBuilder sb = new StringBuilder();
         NameDef nameDef = declaration.getNameDef();
         Expr initializer = declaration.getInitializer();
+        //TODO: if nameDef has a dimension, visit it here
         boolean isImage = (nameDef.getType() == IMAGE);
 
         if (nameDef.getType() == null || nameDef.getIdentToken() == null) {
@@ -302,30 +304,33 @@ public class CodeGenVisitor implements ASTVisitor {
             if(initializer != null){
                 //TODO: isImage && initializer case vvvv
             /*
-                TODO: type image
                 If NameDef.type is an image, there are several
                 options for the type of the Expr.
+                TODO: type image
+                If Expr,type is an image, then the value is determined by
+                whether or not a dimension has been declared.
+                    TODO: type image, no dimension
+                    If Expr.type is an image and the NameDef does not
+                    have a Dimension, then the image being declared
+                    gets its size from the image on the right side. Use
+                    ImageOps.cloneImage.
+                    TODO: type image, has dimension
+                    If Expr.Type is an image and the NameDef does
+                    have a Dimension, then the image being declared
+                    is initialized to a resized version of the image in the
+                    Expr. Use ImageOps.copyAndResize.
                 TODO: type string
                 If Expr.type is string, then the value should be the
                 URL of an image which is used to initialize the
                 declared variable.
-                TODO: has size
-                If the NameDef has a size, then
-                the image is resized to the given size. Otherwise, it
-                takes the size of the loaded image.
-                Use edu.ufl.cise.cop4020fa23.runtime.FileURLIO
-                readImage (with or without length and width
-                parameters as appropriate)
-                TODO: type image, no dimension
-                If Expr.type is an image and the NameDef does not
-                have a Dimension, then the image being declared
-                gets its size from the image on the right side. Use
-                ImageOps.cloneImage.
-                TODO: type image, no dimension
-                If Expr.Type is an image and the NameDef does
-                have a Dimension, then the image being declared
-                is initialized to a resized version of the image in the
-                Expr. Use ImageOps.copyAndResize.
+                    TODO: type string, has size
+                    If the NameDef has a size, then
+                    the image is resized to the given size.
+                    TODO: type string, no size
+                    Otherwise, it takes the size of the loaded image.
+                    Use edu.ufl.cise.cop4020fa23.runtime.FileURLIO
+                    readImage (with or without length and width
+                    parameters as appropriate)
              */
             } else {
                 sb.append("final BufferedImage ").append(nameDef.getJavaName());
@@ -453,7 +458,7 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        return new StringBuilder((StringBuilder) pixelSelector.xExpr().visit(this, arg)).append(",").append(pixelSelector.yExpr());
+        return new StringBuilder((StringBuilder) pixelSelector.xExpr().visit(this, arg)).append(",").append(pixelSelector.yExpr().visit(this, arg));
         //TODO: small mistake in the last append statement?
     }
 
@@ -484,24 +489,26 @@ public class CodeGenVisitor implements ASTVisitor {
         Expr primary = postfixExpr.primary();
         PixelSelector pixel = postfixExpr.pixel();
         ChannelSelector chan = postfixExpr.channel();
-        if(postfixExpr.getType() == PIXEL){
+        if (postfixExpr.getType() == PIXEL) {
             sb.append(chan.visit(this, arg)).append("(");
             sb.append(primary.visit(this, arg));
-        } else if(chan == null){
-            sb.append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
-            sb.append(pixel.visit(this, arg));
-        } else if(pixel != null){
-            sb.append(chan.visit(this, arg)).append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
-            sb.append(pixel.visit(this, arg)).append(")");
         } else {
-            switch (chan.color()){
-                case RES_red -> sb.append("ImageOps.extractRed(");
-                case RES_blue -> sb.append("ImageOps.extractBlue(");
-                case RES_green -> sb.append("ImageOps.extractGreen(");
-                default -> throw new CodeGenException("Invalid channelselector color type");
-            }
+            if (chan == null) {
+                sb.append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
+                sb.append(pixel.visit(this, arg));
+            } else if (pixel != null) {
+                sb.append(chan.visit(this, arg)).append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
+                sb.append(pixel.visit(this, arg)).append(")");
+            } else {
+                switch (chan.color()) {
+                    case RES_red -> sb.append("ImageOps.extractRed(");
+                    case RES_blue -> sb.append("ImageOps.extractBlue(");
+                    case RES_green -> sb.append("ImageOps.extractGreen(");
+                    default -> throw new CodeGenException("Invalid channelselector color type");
+                }
             sb.append(primary.visit(this, arg));
         }
+    }
         return sb.append(")");
     }
 
@@ -592,6 +599,7 @@ public class CodeGenVisitor implements ASTVisitor {
                 case "RES_width" -> subExprString.append("(").append(operandString).append(".getWidth()").append(")");
                 default -> subExprString.append("(").append(opString).append(operandString).append(")");
             }
+            //TODO: may need to invoke bufferedimage
         }
 
         return subExprString;
