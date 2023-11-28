@@ -10,9 +10,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="&#10;Logger purged with extreme prejudice">
-      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/SymbolTable$ScopeEntry.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/SymbolTable$ScopeEntry.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/SymbolTable.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/SymbolTable.class" afterDir="false" />
+    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="Fixed a couple of small errors with Assignment 4. God that was a scare">
+      <change beforePath="$PROJECT_DIR$/HW3_GIT_REPO.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HW4_GIT_REPO.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/bin/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenTest_starter.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenTest_starter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,6 +109,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="CodeGenTest_starter.cg10" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Homework1_4020" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.ufl.cise.cop4020fa23.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_starter" />
+      <option name="METHOD_NAME" value="cg10" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="CodeGenTest_starter.nestedComparisonExpressions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
@@ -136,21 +157,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="HW3Test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="Homework1_4020" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.ufl.cise.cop4020fa23.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
-      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.HW3Test" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="HW4_Tests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
@@ -169,10 +175,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.HW4_Tests" />
-        <item itemvalue="JUnit.HW3Test" />
-        <item itemvalue="JUnit.CodeGenTest_starter.unitTestComparisonExpression5" />
         <item itemvalue="JUnit.CodeGenTest_starter" />
+        <item itemvalue="JUnit.CodeGenTest_starter.cg10" />
         <item itemvalue="JUnit.CodeGenTest_starter.nestedComparisonExpressions" />
+        <item itemvalue="JUnit.CodeGenTest_starter.unitTestComparisonExpression5" />
       </list>
     </recent_temporary>
   </component>
@@ -184,22 +190,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1696189596039</updated>
-    </task>
-    <task id="LOCAL-00012" summary="7/15 Tests Passed">
-      <option name="closed" value="true" />
-      <created>1697422298056</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1697422298056</updated>
-    </task>
-    <task id="LOCAL-00013" summary="7/15 Tests Passed">
-      <option name="closed" value="true" />
-      <created>1697422337466</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1697422337466</updated>
     </task>
     <task id="LOCAL-00014" summary="One more test case">
       <option name="closed" value="true" />
@@ -577,7 +567,23 @@
       <option name="project" value="LOCAL" />
       <updated>1699934764383</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="&#10;Implemented skeleton for the remaining code generation stuff. For this one it seems like reading the pdf is SUUUUUUPER necessary there's a lot of complicated stuff.">
+      <option name="closed" value="true" />
+      <created>1700166965237</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1700166965238</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Fixed a couple of small errors with Assignment 4. God that was a scare">
+      <option name="closed" value="true" />
+      <created>1700508330227</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1700508330229</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -635,8 +641,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="24 passed 1 failed" />
-    <MESSAGE value="25/25 passed" />
     <MESSAGE value="Expanded test cases added, 31/32 passed" />
     <MESSAGE value="Passed 32, broke 8 &amp; 15" />
     <MESSAGE value="Added test 33, passes 33/33. Ready to submit. *Reverted accidental merge with older code. I think." />
@@ -660,7 +664,9 @@
     <MESSAGE value="&#10;Implementedn basic javaName updating, needs to consider scope. 14/23 passed." />
     <MESSAGE value="&#10;Passed 37/37 test cases. Yippeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" />
     <MESSAGE value="&#10;Logger purged with extreme prejudice" />
-    <option name="LAST_COMMIT_MESSAGE" value="&#10;Logger purged with extreme prejudice" />
+    <MESSAGE value="&#10;Implemented skeleton for the remaining code generation stuff. For this one it seems like reading the pdf is SUUUUUUPER necessary there's a lot of complicated stuff." />
+    <MESSAGE value="Fixed a couple of small errors with Assignment 4. God that was a scare" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed a couple of small errors with Assignment 4. God that was a scare" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

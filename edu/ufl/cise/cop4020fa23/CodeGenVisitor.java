@@ -13,23 +13,71 @@ import java.awt.*;
 import java.util.*;
 import java.lang.Math;
 
-/*To work around a mismatch between the scoping rules of our language and Java’s scoping rules,
-implement a way to rename variables in the generated Java code so that every variable has a
-unique name. It is up to you to determine when and how to do this. (See the lecture on 10/31)
- */
-/*Implement an ASTVisitor (CodeGenVisitor) to generate Java code. The visitProgram method of
-this visitor should accept a package name as an argument and return a String containing a Java
-program implementing the semantics of the language. The package name may be null or an
-empty String. In either such case, the generated program should be in the default package (i.e.
-has no package declaration).
+/*
+    Pixels are conceptually a 3-tuple with the red, green, and blue color components. Internally,
+    they are stored in a packed form where the three values are packed into a single integer.
+    Because each color component must fit in 8 bits, the values are in [0, 255]. When the color
+    components are provided in the form of an ExpandedPixelExpr, invoke PixelOps.pack to pack
+    them into an int. To extract individual color components from an int, use methods red, green,
+    and blue in PixelOps. To update individual colors in a pixel, use PixelOps methods setRed,
+    setGreen, and setBlue.
+
+    The image type in PLC Language will be represented using a java.awt.image.BufferedImage.
+    An image object is instantiated when the declaration is elaborated. An image always has a
+    size—either it obtains the size from a Dimension in the NameDef in its declaration, or its
+    declaration has an initializer, and the size is determined from the initializer. If it does not have
+    either a Dimension or an initializer, throw a CodeGenException. Once instantiated, the size of
+    the image does not change.
+    Make sure to add import statements to your generated code for all of the
+    edu.ufl.cise.cop4020fa23.runtime classes that are used in your generated Java code.
  */
 public class CodeGenVisitor implements ASTVisitor {
 
     // Types image and pixel are implemented in Assignment 5
-    private Type currentType;
-    private SymbolTable st = new SymbolTable();
+    private final HashSet<String> importSet = new HashSet<>();
+    //TODO: vvv below expressions & variables are probably not necessary
+    public static final int SELECT_ALPHA = 0xff000000;
+    public static final int SELECT_RED = 0x00ff0000;
+    public static final int SELECT_GREEN = 0x0000ff00;
+    public static final int SELECT_BLUE = 0x000000ff;
+    public static final int SHIFT_ALPHA = 24;
+    public static final int SHIFT_RED = 16;
+    public static final int SHIFT_GREEN = 8;
+    public static final int SHIFT_BLUE = 0;
+    public static int truncate(int val){
+        if(0>val){
+            return 0;
+        }
+        return Math.min(val, 255);
+    }
+    public static int pack(int redVal, int grnVal, int bluVal) {
+        int pixel = ((0xFF << SHIFT_ALPHA) | (truncate(redVal) << SHIFT_RED) |
+                (truncate(grnVal) << SHIFT_GREEN)
+                | (truncate(bluVal) << SHIFT_BLUE));
+        return pixel;
+    }
+    public static int red(int pixel) {
+        return (pixel & SELECT_RED) >> SHIFT_RED;
+    }
+    public static int green(int pixel) {
+        return (pixel & SELECT_GREEN) >> SHIFT_GREEN;
+    }
+    public static int blue(int pixel) {
+        return (pixel & SELECT_BLUE) >> SHIFT_BLUE;
+    }
+    public static int setRed(int pixel, int val) {
+        return pack(val, green(pixel), blue(pixel));
+    }
+    public static int setGreen(int pixel, int val) {
+        return pack(red(pixel), val, blue(pixel));
+    }
+    public static int setBlue(int pixel, int val) {
+        return pack(red(pixel), green(pixel), val);
+    }
+    //TODO: ^^^ above expressions & variables are probably not necessary
 
-    private HashSet<String> importSet = new HashSet<>();
+
+
 
     // TODO: Possibly replace function calls with .visit calls?
     @Override
@@ -46,8 +94,21 @@ public class CodeGenVisitor implements ASTVisitor {
              */
             throws PLCCompilerException {
         try {
-            // _LValue_ = _Expr_
             StringBuilder sb = new StringBuilder();
+            if(assignmentStatement.getlValue().getType() == IMAGE){
+                throw new UnsupportedOperationException("To be implemented: IMAGE assignment statement");
+            }
+            if(assignmentStatement.getlValue().getType() == PIXEL && assignmentStatement.getlValue().getChannelSelector() != null){
+                sb.append(switch(assignmentStatement.getlValue().getChannelSelector().color()){
+                    case RES_red -> "PixelOps.setRed(";
+                    case RES_blue -> "PixelOps.setBlue(";
+                    case RES_green -> "PixelOps.setGreen(";
+                    default -> throw new CodeGenException("Unexpected color kind in channelSelector");
+                });
+                sb.append(assignmentStatement.getlValue().visit(this, arg)).append(" , ").append(assignmentStatement.getE().visit(this, arg));
+                return sb.append(")");
+            }
+            // _LValue_ = _Expr_
             if (assignmentStatement.getlValue() == null) {
                 throw new CodeGenException("LValue in assignment statement is null");
             }
@@ -58,7 +119,7 @@ public class CodeGenVisitor implements ASTVisitor {
                 throw new CodeGenException("Expression in assignment statement is null");
             }
             sb.append(visitLValue(assignmentStatement.getlValue(), arg)).append(" = ");
-            sb.append(determineExpr(assignmentStatement.getE(), arg));
+            sb.append(assignmentStatement.getE().visit(this, arg));
             return sb;
         } catch (Exception e) {
             throw new CodeGenException("Well then we shouldn't be here" + e.getMessage());
@@ -77,8 +138,8 @@ public class CodeGenVisitor implements ASTVisitor {
          * See pdf for handling Pixel and Image types.
          */
 
-        StringBuilder leftSb = determineExpr(binaryExpr.getLeftExpr(), arg);
-        StringBuilder rightSb = determineExpr(binaryExpr.getRightExpr(), arg);
+        StringBuilder leftSb = (StringBuilder) binaryExpr.getLeftExpr().visit(this, arg);
+        StringBuilder rightSb = (StringBuilder) binaryExpr.getRightExpr().visit(this, arg);
 
         Type leftType = binaryExpr.getLeftExpr().getType();
         Kind opKind = binaryExpr.getOpKind();
@@ -168,11 +229,12 @@ public class CodeGenVisitor implements ASTVisitor {
         });
         return sb;
     }
+    //TODO: ^^^^ above statement may not be needed, with revising of .visit commands
 
     @Override
     public StringBuilder visitBlockStatement(StatementBlock statementBlock, Object arg) throws PLCCompilerException {
         // _Block_
-        return visitBlock(statementBlock.getBlock(), arg);
+        return (StringBuilder) statementBlock.getBlock().visit(this, arg);
     }
 
     @Override
@@ -194,11 +256,11 @@ public class CodeGenVisitor implements ASTVisitor {
          */
         StringBuilder sb = new StringBuilder();
 
-        StringBuilder guardExpr = determineExpr(conditionalExpr.getGuardExpr(), arg);
+        StringBuilder guardExpr = (StringBuilder) conditionalExpr.getGuardExpr().visit(this, arg);
 
-        StringBuilder trueExpr = determineExpr(conditionalExpr.getTrueExpr(), arg);
+        StringBuilder trueExpr = (StringBuilder) conditionalExpr.getTrueExpr().visit(this, arg);
 
-        StringBuilder falseExpr = determineExpr(conditionalExpr.getFalseExpr(), arg);
+        StringBuilder falseExpr = (StringBuilder) conditionalExpr.getFalseExpr().visit(this, arg);
 
         // probably right?
         sb.append("(")
@@ -231,29 +293,88 @@ public class CodeGenVisitor implements ASTVisitor {
         StringBuilder sb = new StringBuilder();
         NameDef nameDef = declaration.getNameDef();
         Expr initializer = declaration.getInitializer();
+        boolean isImage = (nameDef.getType() == IMAGE);
 
         if (nameDef.getType() == null || nameDef.getIdentToken() == null) {
             throw new CodeGenException("Invalid type or identifier in declaration.");
         }
-        sb.append(visitNameDef(nameDef, arg));
+        if(isImage){
+            if(initializer != null){
+                //TODO: isImage && initializer case vvvv
+            /*
+                TODO: type image
+                If NameDef.type is an image, there are several
+                options for the type of the Expr.
+                TODO: type string
+                If Expr.type is string, then the value should be the
+                URL of an image which is used to initialize the
+                declared variable.
+                TODO: has size
+                If the NameDef has a size, then
+                the image is resized to the given size. Otherwise, it
+                takes the size of the loaded image.
+                Use edu.ufl.cise.cop4020fa23.runtime.FileURLIO
+                readImage (with or without length and width
+                parameters as appropriate)
+                TODO: type image, no dimension
+                If Expr.type is an image and the NameDef does not
+                have a Dimension, then the image being declared
+                gets its size from the image on the right side. Use
+                ImageOps.cloneImage.
+                TODO: type image, no dimension
+                If Expr.Type is an image and the NameDef does
+                have a Dimension, then the image being declared
+                is initialized to a resized version of the image in the
+                Expr. Use ImageOps.copyAndResize.
+             */
+            } else {
+                sb.append("final BufferedImage ").append(nameDef.getJavaName());
+                sb.append(" = ImageOps.makeImage(").append(nameDef.getDimension().visit(this, arg));
+            }
 
-        if (initializer != null) {
-            sb.append(" = ");
-            sb.append(determineExpr(initializer, arg));
+
+            return sb.append(")");
+
+        } else {
+            sb.append(nameDef.visit(this, arg));
+
+            if (initializer != null) {
+                sb.append(" = ");
+                sb.append(initializer.visit(this, arg));
+            }
         }
         return sb;
     }
 
     @Override
     public StringBuilder visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
-        // Implemented in Assignment 5
-        return new StringBuilder(determineExpr(dimension.getWidth(), arg)).append(",").append(determineExpr(dimension.getHeight(), arg));
+        return new StringBuilder((StringBuilder) dimension.getWidth().visit(this, arg)).append(",").append(dimension.getHeight().visit(this, arg));
     }
 
     @Override
     public StringBuilder visitDoStatement(DoStatement doStatement, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
         //Compilcated, see instructions pdf
+        /*
+            You will need to figure out the details yourself.
+            The semantics are like Dijkstra’s guarded command do-od statement except our version is not
+            non-deterministic (i.e. is deterministic). In each iteration, the guarded blocks are evaluated
+            starting from the top. (Note that this semantic choice was made for ease of implementation in a
+            class project. There are alternatives that would probably be more useful in practice.) The loop
+            terminates when none of the guards are true.
+            In other words, if the guards are G0, G1, .. Gn, and the corresponding blocks are B0, B1,..,Bn,
+            Guards are evaluated in turn, starting with G0. When a guard, say Gi is true, execute the
+            corresponding Block Bi. That is an iteration. Repeat, starting at the top with G0 again, for each
+            iteration. The statement terminates when none of the guards are true.
+         */
+        /*
+        TODO vvv sample implementation of getting a single block for a do statement iteration
+        StringBuilder sb = new StringBuilder();
+        java.util.List<GuardedBlock> blocks = doStatement.getGuardedBlocks();
+        if(determineExpr(blocks.get(0).getGuard(), arg).equals("true")){
+            sb.append(visitBlock(blocks.get(0).getBlock(), arg));
+        }
+        return sb;*/
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
@@ -261,9 +382,9 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
         StringBuilder sb = new StringBuilder("PixelOps.pack(");
-        sb.append(determineExpr(expandedPixelExpr.getRed(), arg)).append(",");
-        sb.append(determineExpr(expandedPixelExpr.getGreen(), arg)).append(",");
-        return sb.append(determineExpr(expandedPixelExpr.getBlue(), arg)).append(")");
+        sb.append(expandedPixelExpr.getRed().visit(this, arg)).append(",");
+        sb.append(expandedPixelExpr.getGreen().visit(this, arg)).append(",");
+        return sb.append(expandedPixelExpr.getBlue().visit(this, arg)).append(")");
     }
 
     @Override
@@ -284,6 +405,17 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitIfStatement(IfStatement ifStatement, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
         //Compilcated, see instructions pdf
+        /*
+            You will need to figure out the details yourself.
+            The semantics are similar to Dijkstra’s guarded command if statement except our version is not
+            non-deterministic (i.e. is deterministic). The guarded blocks are evaluated starting from the
+            top. One other difference is that Dijkstra’s version requires that at least one guard be true. In
+            our version, if none of the guards are true, nothing will happen.
+            In other words, if the guards are G0, G1, .. Gn, and the corresponding blocks are B0, B1,..,Bn,
+            Guards are evaluated in turn, starting with G0. When a guard, say Gi, is true, execute the
+            corresponding Block Bi. That is the end of the if statement. The Java code would look
+            something like “if (G0) {B0;} else if (G1) {B1;}… else if (Gn) {Bn;}”
+         */
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
@@ -321,7 +453,8 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        return new StringBuilder(determineExpr(pixelSelector.xExpr(), arg)).append(",").append(pixelSelector.yExpr());
+        return new StringBuilder((StringBuilder) pixelSelector.xExpr().visit(this, arg)).append(",").append(pixelSelector.yExpr());
+        //TODO: small mistake in the last append statement?
     }
 
     @Override
@@ -352,14 +485,14 @@ public class CodeGenVisitor implements ASTVisitor {
         PixelSelector pixel = postfixExpr.pixel();
         ChannelSelector chan = postfixExpr.channel();
         if(postfixExpr.getType() == PIXEL){
-            sb.append(visitChannelSelector(chan, arg)).append("(");
-            sb.append(determineExpr(primary, arg));
+            sb.append(chan.visit(this, arg)).append("(");
+            sb.append(primary.visit(this, arg));
         } else if(chan == null){
-            sb.append("ImageOps.getRGB(").append(determineExpr(primary, arg)).append(",");
-            sb.append(visitPixelSelector(pixel, arg));
+            sb.append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
+            sb.append(pixel.visit(this, arg));
         } else if(pixel != null){
-            sb.append(visitChannelSelector(chan, arg)).append("ImageOps.getRGB(").append(determineExpr(primary, arg)).append(",");
-            sb.append(visitPixelSelector(pixel, arg)).append(")");
+            sb.append(chan.visit(this, arg)).append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
+            sb.append(pixel.visit(this, arg)).append(")");
         } else {
             switch (chan.color()){
                 case RES_red -> sb.append("ImageOps.extractRed(");
@@ -367,7 +500,7 @@ public class CodeGenVisitor implements ASTVisitor {
                 case RES_green -> sb.append("ImageOps.extractGreen(");
                 default -> throw new CodeGenException("Invalid channelselector color type");
             }
-            sb.append(determineExpr(primary, arg));
+            sb.append(primary.visit(this, arg));
         }
         return sb.append(")");
     }
@@ -380,14 +513,14 @@ public class CodeGenVisitor implements ASTVisitor {
                 .append("\t\t");
         ListIterator<NameDef> listIterator = program.getParams().listIterator();
         while(listIterator.hasNext()){
-            classBody.append(visitNameDef(listIterator.next(), arg));
+            classBody.append(listIterator.next().visit(this, arg));
             if(listIterator.hasNext()){
                 classBody.append(", ");
             } else {
                 classBody.append("\n");
             }
         }
-        classBody.append("\t) ").append(visitBlock(program.getBlock(), arg)).append("\n");
+        classBody.append("\t) ").append(program.getBlock().visit(this, arg)).append("\n");
         classBody.append("}\n");
         //^^^ unsure if the above \n is necessary
 
@@ -425,7 +558,7 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitReturnStatement(ReturnStatement returnStatement, Object arg) throws PLCCompilerException {
         // return _Expr_
         StringBuilder subString = new StringBuilder("return ");
-        subString.append(determineExpr(returnStatement.getE(), arg));
+        subString.append(returnStatement.getE().visit(this, arg));
         return subString;
     }
 
@@ -445,7 +578,7 @@ public class CodeGenVisitor implements ASTVisitor {
 
         StringBuilder subExprString = new StringBuilder();
         String opString = convertOpKind(unaryExpr.getOp());
-        StringBuilder operandString = determineExpr(unaryExpr.getExpr(), arg);
+        StringBuilder operandString = (StringBuilder) unaryExpr.getExpr().visit(this, arg);
 
 
 
@@ -488,46 +621,8 @@ public class CodeGenVisitor implements ASTVisitor {
         } else {
             subString.append("ConsoleIO.write(");
         }
-        subString.append(determineExpr(subExpr, arg));
+        subString.append(subExpr.visit(this, arg));
         subString.append(")");
-        return subString;
-    }
-
-    // Helper method for the various visitors that have to go through the different
-    // versions of Expr
-    private StringBuilder determineExpr(Expr subExpr, Object arg) throws PLCCompilerException {
-        StringBuilder subString = new StringBuilder();
-        switch (subExpr.getClass().getName()) {
-            case "edu.ufl.cise.cop4020fa23.ast.ConditionalExpr" -> {
-                subString.append(visitConditionalExpr((ConditionalExpr) subExpr, arg));
-            }
-            case "edu.ufl.cise.cop4020fa23.ast.BinaryExpr" -> {
-                subString.append(visitBinaryExpr((BinaryExpr) subExpr, arg));
-            }
-            case "edu.ufl.cise.cop4020fa23.ast.UnaryExpr" -> {
-                subString.append(visitUnaryExpr((UnaryExpr) subExpr, arg));
-            }
-            case "edu.ufl.cise.cop4020fa23.ast.PostFixExpr" -> {
-                subString.append(visitPostfixExpr((PostfixExpr) subExpr, arg));
-            }
-            case "edu.ufl.cise.cop4020fa23.ast.StringLitExpr" -> {
-                subString.append(visitStringLitExpr((StringLitExpr) subExpr, arg));
-            }
-            case "edu.ufl.cise.cop4020fa23.ast.NumLitExpr" -> {
-                subString.append(visitNumLitExpr((NumLitExpr) subExpr, arg));
-            }
-            case "edu.ufl.cise.cop4020fa23.ast.IdentExpr" -> {
-                subString.append(visitIdentExpr((IdentExpr) subExpr, arg));
-            }
-            case "edu.ufl.cise.cop4020fa23.ast.BooleanLitExpr" -> {
-                subString.append(visitBooleanLitExpr((BooleanLitExpr) subExpr, arg));
-            }
-            case "edu.ufl.cise.cop4020fa23.ast.ConstExpr" -> {
-                subString.append(visitConstExpr((ConstExpr) subExpr, arg));
-            }
-            default -> throw new CodeGenException("Unexpected subexpression type");
-        }
-        ;
         return subString;
     }
 
