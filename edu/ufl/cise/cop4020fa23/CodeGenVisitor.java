@@ -312,62 +312,95 @@ public class CodeGenVisitor implements ASTVisitor {
          * final BufferedImage NameDef.javaName =
          * ImageOps.makeImage( _Dimension_ )
          */
+        /*
+         * If NameDef.type is an image, there are several
+         * options for the type of the Expr.
+         * TODO: type image
+         * If Expr,type is an image, then the value is determined by
+         * whether or not a dimension has been declared.
+         * TODO: type image, no dimension
+         * If Expr.type is an image and the NameDef does not
+         * have a Dimension, then the image being declared
+         * gets its size from the image on the right side. Use
+         * ImageOps.cloneImage.
+         * TODO: type image, has dimension
+         * If Expr.Type is an image and the NameDef does
+         * have a Dimension, then the image being declared
+         * is initialized to a resized version of the image in the
+         * Expr. Use ImageOps.copyAndResize.
+         * TODO: type string
+         * If Expr.type is string, then the value should be the
+         * URL of an image which is used to initialize the
+         * declared variable.
+         * TODO: type string, has size
+         * If the NameDef has a size, then
+         * the image is resized to the given size.
+         * TODO: type string, no size
+         * Otherwise, it takes the size of the loaded image.
+         * Use edu.ufl.cise.cop4020fa23.runtime.FileURLIO
+         * readImage (with or without length and width
+         * parameters as appropriate)
+         */
         StringBuilder sb = new StringBuilder();
         NameDef nameDef = declaration.getNameDef();
         Expr initializer = declaration.getInitializer();
-        // TODO: if nameDef has a dimension, visit it here
-        boolean isImage = (nameDef.getType() == IMAGE);
+        boolean isImageType = nameDef.getType() == IMAGE;
 
         if (nameDef.getType() == null || nameDef.getIdentToken() == null) {
             throw new CodeGenException("Invalid type or identifier in declaration.");
         }
-        if (isImage) {
+
+        if (isImageType) {
+            sb.append("final BufferedImage ").append(nameDef.getJavaName());
             if (initializer != null) {
-                // TODO: isImage && initializer case vvvv
-                /*
-                 * If NameDef.type is an image, there are several
-                 * options for the type of the Expr.
-                 * TODO: type image
-                 * If Expr,type is an image, then the value is determined by
-                 * whether or not a dimension has been declared.
-                 * TODO: type image, no dimension
-                 * If Expr.type is an image and the NameDef does not
-                 * have a Dimension, then the image being declared
-                 * gets its size from the image on the right side. Use
-                 * ImageOps.cloneImage.
-                 * TODO: type image, has dimension
-                 * If Expr.Type is an image and the NameDef does
-                 * have a Dimension, then the image being declared
-                 * is initialized to a resized version of the image in the
-                 * Expr. Use ImageOps.copyAndResize.
-                 * TODO: type string
-                 * If Expr.type is string, then the value should be the
-                 * URL of an image which is used to initialize the
-                 * declared variable.
-                 * TODO: type string, has size
-                 * If the NameDef has a size, then
-                 * the image is resized to the given size.
-                 * TODO: type string, no size
-                 * Otherwise, it takes the size of the loaded image.
-                 * Use edu.ufl.cise.cop4020fa23.runtime.FileURLIO
-                 * readImage (with or without length and width
-                 * parameters as appropriate)
-                 */
+                // Check the type of the initializer
+                // Tbh idk if this is the best way to do this
+                Type initializerType = initializer.getType();
+
+                if (initializerType == IMAGE) {
+                    // Handle case when initializer is an image
+                    if (nameDef.getDimension() != null) {
+                        // Image with dimension - resize the image
+                        sb.append(" = ImageOps.copyAndResize(")
+                                .append(initializer.visit(this, arg))
+                                .append(", ")
+                                .append(nameDef.getDimension().visit(this, arg))
+                                .append(")");
+                    } else {
+                        // Image without dimension - clone the image
+                        sb.append(" = ImageOps.cloneImage(").append(initializer.visit(this, arg)).append(")");
+                    }
+                } else if (initializerType == STRING) {
+                    // Handle case when initializer is a string (URL)
+                    if (nameDef.getDimension() != null) {
+                        // Image with dimension - load and resize from URL
+                        sb.append(" = FileURLIO.readImage(")
+                                .append(initializer.visit(this, arg))
+                                .append(", ")
+                                .append(nameDef.getDimension().visit(this, arg))
+                                .append(")");
+                    } else {
+                        // Image without dimension - load from URL
+                        sb.append(" = FileURLIO.readImage(").append(initializer.visit(this, arg)).append(")");
+                    }
+                }
             } else {
-                sb.append("final BufferedImage ").append(nameDef.getJavaName());
-                sb.append(" = ImageOps.makeImage(").append(nameDef.getDimension().visit(this, arg));
+                // If there is no initializer
+                if (nameDef.getDimension() != null) {
+                    sb.append(" = ImageOps.makeImage(").append(nameDef.getDimension().visit(this, arg)).append(")");
+                } else {
+                    throw new CodeGenException("Image declaration without dimension or initializer.");
+                }
             }
-
-            return sb.append(")");
-
         } else {
+            // For non-image types
             sb.append(nameDef.visit(this, arg));
-
             if (initializer != null) {
-                sb.append(" = ");
-                sb.append(initializer.visit(this, arg));
+                sb.append(" = ").append(initializer.visit(this, arg));
             }
         }
+
+        sb.append(";\n");
         return sb;
     }
 
@@ -469,9 +502,23 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
-        // Implemented in Assignment 5
-        // Compilcated, see instructions pdf
-        throw new UnsupportedOperationException("Unimplemented method");
+        // Create a StringBuilder to hold the generated code
+        StringBuilder sb = new StringBuilder();
+
+        // Generate code for the guard expression
+        Expr guard = guardedBlock.getGuard();
+        StringBuilder guardCode = (StringBuilder) guard.visit(this, arg);
+        sb.append("if (").append(guardCode).append(") {\n");
+
+        // Generate code for the block to be executed if the guard is true
+        Block block = guardedBlock.getBlock();
+        StringBuilder blockCode = (StringBuilder) block.visit(this, arg);
+        sb.append(blockCode);
+
+        // Close the if block
+        sb.append("}\n");
+
+        return sb;
     }
 
     @Override
