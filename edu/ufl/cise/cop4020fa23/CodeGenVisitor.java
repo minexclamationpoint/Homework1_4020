@@ -35,7 +35,7 @@ public class CodeGenVisitor implements ASTVisitor {
 
     // Types image and pixel are implemented in Assignment 5
     private final HashSet<String> importSet = new HashSet<>();
-    //TODO: vvv below expressions & variables are probably not necessary
+    // TODO: vvv below expressions & variables are probably not necessary
     public static final int SELECT_ALPHA = 0xff000000;
     public static final int SELECT_RED = 0x00ff0000;
     public static final int SELECT_GREEN = 0x0000ff00;
@@ -44,40 +44,45 @@ public class CodeGenVisitor implements ASTVisitor {
     public static final int SHIFT_RED = 16;
     public static final int SHIFT_GREEN = 8;
     public static final int SHIFT_BLUE = 0;
-    public static int truncate(int val){
-        if(0>val){
+
+    public static int truncate(int val) {
+        if (0 > val) {
             return 0;
         }
         return Math.min(val, 255);
     }
+
     public static int pack(int redVal, int grnVal, int bluVal) {
         int pixel = ((0xFF << SHIFT_ALPHA) | (truncate(redVal) << SHIFT_RED) |
                 (truncate(grnVal) << SHIFT_GREEN)
                 | (truncate(bluVal) << SHIFT_BLUE));
         return pixel;
     }
+
     public static int red(int pixel) {
         return (pixel & SELECT_RED) >> SHIFT_RED;
     }
+
     public static int green(int pixel) {
         return (pixel & SELECT_GREEN) >> SHIFT_GREEN;
     }
+
     public static int blue(int pixel) {
         return (pixel & SELECT_BLUE) >> SHIFT_BLUE;
     }
+
     public static int setRed(int pixel, int val) {
         return pack(val, green(pixel), blue(pixel));
     }
+
     public static int setGreen(int pixel, int val) {
         return pack(red(pixel), val, blue(pixel));
     }
+
     public static int setBlue(int pixel, int val) {
         return pack(red(pixel), green(pixel), val);
     }
-    //TODO: ^^^ above expressions & variables are probably not necessary
-
-
-
+    // TODO: ^^^ above expressions & variables are probably not necessary
 
     // TODO: Possibly replace function calls with .visit calls?
     @Override
@@ -92,31 +97,34 @@ public class CodeGenVisitor implements ASTVisitor {
              * Otherwise
              * _LValue_ = _Expr_
              */
-    //TODO: If LValue has a pixelSelector or channelselector, visit them here
+            // TODO: If LValue has a pixelSelector or channelselector, visit them here
             throws PLCCompilerException {
         try {
             StringBuilder sb = new StringBuilder();
-            if(assignmentStatement.getlValue().getType() == IMAGE){
+            if (assignmentStatement.getlValue().getType() == IMAGE) {
                 throw new UnsupportedOperationException("To be implemented: IMAGE assignment statement");
             }
-            if(assignmentStatement.getlValue().getType() == PIXEL && assignmentStatement.getlValue().getChannelSelector() != null){
-                sb.append(switch(assignmentStatement.getlValue().getChannelSelector().color()){
+            if (assignmentStatement.getlValue().getType() == PIXEL
+                    && assignmentStatement.getlValue().getChannelSelector() != null) {
+                sb.append(switch (assignmentStatement.getlValue().getChannelSelector().color()) {
                     case RES_red -> "PixelOps.setRed(";
                     case RES_blue -> "PixelOps.setBlue(";
                     case RES_green -> "PixelOps.setGreen(";
                     default -> throw new CodeGenException("Unexpected color kind in channelSelector");
                 });
-                sb.append(assignmentStatement.getlValue().visit(this, arg)).append(" , ").append(assignmentStatement.getE().visit(this, arg));
+                sb.append(assignmentStatement.getlValue().visit(this, arg)).append(" , ")
+                        .append(assignmentStatement.getE().visit(this, arg));
                 return sb.append(")");
             }
             // _LValue_ = _Expr_
             if (assignmentStatement.getlValue() == null) {
                 throw new CodeGenException("LValue in assignment statement is null");
             }
-            if (assignmentStatement.getlValue().getName() == null || assignmentStatement.getlValue().getName().isEmpty()) {
+            if (assignmentStatement.getlValue().getName() == null
+                    || assignmentStatement.getlValue().getName().isEmpty()) {
                 throw new CodeGenException("Variable name in LValue is null or empty.");
             }
-            if(assignmentStatement.getE() == null){
+            if (assignmentStatement.getE() == null) {
                 throw new CodeGenException("Expression in assignment statement is null");
             }
             sb.append(visitLValue(assignmentStatement.getlValue(), arg)).append(" = ");
@@ -189,7 +197,8 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitBlock(Block block, Object arg) throws PLCCompilerException {
         // { _BlockElem*_ }
         // BlockElem ::= Declaration | Statement
-        //Extended visitBlock into two subexpressions: visitBlockElem and determineStatement
+        // Extended visitBlock into two subexpressions: visitBlockElem and
+        // determineStatement
         StringBuilder blockCode = new StringBuilder("{\n");
         for (Block.BlockElem elem : block.getElems()) {
             try {
@@ -202,11 +211,11 @@ public class CodeGenVisitor implements ASTVisitor {
         return blockCode;
     }
 
-    private StringBuilder visitBlockElem(BlockElem blockElem, Object arg) throws  PLCCompilerException {
+    private StringBuilder visitBlockElem(BlockElem blockElem, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
-        if(blockElem instanceof Declaration){
+        if (blockElem instanceof Declaration) {
             sb.append(visitDeclaration((Declaration) blockElem, arg));
-        } else if (blockElem instanceof Statement){
+        } else if (blockElem instanceof Statement) {
             sb.append(determineStatement((Statement) blockElem, arg));
         } else {
             throw new CodeGenException("Unsupported BlockElem type");
@@ -217,12 +226,14 @@ public class CodeGenVisitor implements ASTVisitor {
 
     private StringBuilder determineStatement(Statement statement, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
-        sb.append(switch (statement.getClass().getName()){
-            case "edu.ufl.cise.cop4020fa23.ast.AssignmentStatement" -> visitAssignmentStatement((AssignmentStatement) statement, arg);
+        sb.append(switch (statement.getClass().getName()) {
+            case "edu.ufl.cise.cop4020fa23.ast.AssignmentStatement" ->
+                visitAssignmentStatement((AssignmentStatement) statement, arg);
             case "edu.ufl.cise.cop4020fa23.ast.WriteStatement" -> visitWriteStatement((WriteStatement) statement, arg);
             case "edu.ufl.cise.cop4020fa23.ast.DoStatement" -> visitDoStatement((DoStatement) statement, arg);
             case "edu.ufl.cise.cop4020fa23.ast.IfStatement" -> visitIfStatement((IfStatement) statement, arg);
-            case "edu.ufl.cise.cop4020fa23.ast.ReturnStatement" -> visitReturnStatement((ReturnStatement) statement, arg);
+            case "edu.ufl.cise.cop4020fa23.ast.ReturnStatement" ->
+                visitReturnStatement((ReturnStatement) statement, arg);
             case "edu.ufl.cise.cop4020fa23.ast.StatementBlock" -> visitBlockStatement((StatementBlock) statement, arg);
             default -> {
                 throw new CodeGenException("Unexpected value: " + statement.getClass().getName());
@@ -230,7 +241,8 @@ public class CodeGenVisitor implements ASTVisitor {
         });
         return sb;
     }
-    //TODO: ^^^^ above statement may not be needed, with revising of .visit commands
+    // TODO: ^^^^ above statement may not be needed, with revising of .visit
+    // commands
 
     @Override
     public StringBuilder visitBlockStatement(StatementBlock statementBlock, Object arg) throws PLCCompilerException {
@@ -240,13 +252,21 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitChannelSelector(ChannelSelector channelSelector, Object arg) throws PLCCompilerException {
-        // Implemented in Assignment 5
-        /*
-         * See PostfixExpr rule for how to handle this in
-         * context of an expression. See LValue for how to
-         * handle in context of an LValue
-         */
-        throw new UnsupportedOperationException("Unimplemented method");
+        StringBuilder sb = new StringBuilder();
+        switch (channelSelector.color()) {
+            case RES_red:
+                sb.append("PixelOps.red(");
+                break;
+            case RES_green:
+                sb.append("PixelOps.green(");
+                break;
+            case RES_blue:
+                sb.append("PixelOps.blue(");
+                break;
+            default:
+                throw new PLCCompilerException("Invalid color channel");
+        }
+        return sb;
     }
 
     @Override
@@ -294,49 +314,48 @@ public class CodeGenVisitor implements ASTVisitor {
         StringBuilder sb = new StringBuilder();
         NameDef nameDef = declaration.getNameDef();
         Expr initializer = declaration.getInitializer();
-        //TODO: if nameDef has a dimension, visit it here
+        // TODO: if nameDef has a dimension, visit it here
         boolean isImage = (nameDef.getType() == IMAGE);
 
         if (nameDef.getType() == null || nameDef.getIdentToken() == null) {
             throw new CodeGenException("Invalid type or identifier in declaration.");
         }
-        if(isImage){
-            if(initializer != null){
-                //TODO: isImage && initializer case vvvv
-            /*
-                If NameDef.type is an image, there are several
-                options for the type of the Expr.
-                TODO: type image
-                If Expr,type is an image, then the value is determined by
-                whether or not a dimension has been declared.
-                    TODO: type image, no dimension
-                    If Expr.type is an image and the NameDef does not
-                    have a Dimension, then the image being declared
-                    gets its size from the image on the right side. Use
-                    ImageOps.cloneImage.
-                    TODO: type image, has dimension
-                    If Expr.Type is an image and the NameDef does
-                    have a Dimension, then the image being declared
-                    is initialized to a resized version of the image in the
-                    Expr. Use ImageOps.copyAndResize.
-                TODO: type string
-                If Expr.type is string, then the value should be the
-                URL of an image which is used to initialize the
-                declared variable.
-                    TODO: type string, has size
-                    If the NameDef has a size, then
-                    the image is resized to the given size.
-                    TODO: type string, no size
-                    Otherwise, it takes the size of the loaded image.
-                    Use edu.ufl.cise.cop4020fa23.runtime.FileURLIO
-                    readImage (with or without length and width
-                    parameters as appropriate)
-             */
+        if (isImage) {
+            if (initializer != null) {
+                // TODO: isImage && initializer case vvvv
+                /*
+                 * If NameDef.type is an image, there are several
+                 * options for the type of the Expr.
+                 * TODO: type image
+                 * If Expr,type is an image, then the value is determined by
+                 * whether or not a dimension has been declared.
+                 * TODO: type image, no dimension
+                 * If Expr.type is an image and the NameDef does not
+                 * have a Dimension, then the image being declared
+                 * gets its size from the image on the right side. Use
+                 * ImageOps.cloneImage.
+                 * TODO: type image, has dimension
+                 * If Expr.Type is an image and the NameDef does
+                 * have a Dimension, then the image being declared
+                 * is initialized to a resized version of the image in the
+                 * Expr. Use ImageOps.copyAndResize.
+                 * TODO: type string
+                 * If Expr.type is string, then the value should be the
+                 * URL of an image which is used to initialize the
+                 * declared variable.
+                 * TODO: type string, has size
+                 * If the NameDef has a size, then
+                 * the image is resized to the given size.
+                 * TODO: type string, no size
+                 * Otherwise, it takes the size of the loaded image.
+                 * Use edu.ufl.cise.cop4020fa23.runtime.FileURLIO
+                 * readImage (with or without length and width
+                 * parameters as appropriate)
+                 */
             } else {
                 sb.append("final BufferedImage ").append(nameDef.getJavaName());
                 sb.append(" = ImageOps.makeImage(").append(nameDef.getDimension().visit(this, arg));
             }
-
 
             return sb.append(")");
 
@@ -353,38 +372,49 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitDimension(Dimension dimension, Object arg) throws PLCCompilerException {
-        return new StringBuilder((StringBuilder) dimension.getWidth().visit(this, arg)).append(",").append(dimension.getHeight().visit(this, arg));
+        return new StringBuilder((StringBuilder) dimension.getWidth().visit(this, arg)).append(",")
+                .append(dimension.getHeight().visit(this, arg));
     }
 
     @Override
     public StringBuilder visitDoStatement(DoStatement doStatement, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        //Compilcated, see instructions pdf
+        // Compilcated, see instructions pdf
         /*
-            You will need to figure out the details yourself.
-            The semantics are like Dijkstra’s guarded command do-od statement except our version is not
-            non-deterministic (i.e. is deterministic). In each iteration, the guarded blocks are evaluated
-            starting from the top. (Note that this semantic choice was made for ease of implementation in a
-            class project. There are alternatives that would probably be more useful in practice.) The loop
-            terminates when none of the guards are true.
-            In other words, if the guards are G0, G1, .. Gn, and the corresponding blocks are B0, B1,..,Bn,
-            Guards are evaluated in turn, starting with G0. When a guard, say Gi is true, execute the
-            corresponding Block Bi. That is an iteration. Repeat, starting at the top with G0 again, for each
-            iteration. The statement terminates when none of the guards are true.
+         * You will need to figure out the details yourself.
+         * The semantics are like Dijkstra’s guarded command do-od statement except our
+         * version is not
+         * non-deterministic (i.e. is deterministic). In each iteration, the guarded
+         * blocks are evaluated
+         * starting from the top. (Note that this semantic choice was made for ease of
+         * implementation in a
+         * class project. There are alternatives that would probably be more useful in
+         * practice.) The loop
+         * terminates when none of the guards are true.
+         * In other words, if the guards are G0, G1, .. Gn, and the corresponding blocks
+         * are B0, B1,..,Bn,
+         * Guards are evaluated in turn, starting with G0. When a guard, say Gi is true,
+         * execute the
+         * corresponding Block Bi. That is an iteration. Repeat, starting at the top
+         * with G0 again, for each
+         * iteration. The statement terminates when none of the guards are true.
          */
         /*
-        TODO vvv sample implementation of getting a single block for a do statement iteration
-        StringBuilder sb = new StringBuilder();
-        java.util.List<GuardedBlock> blocks = doStatement.getGuardedBlocks();
-        if(determineExpr(blocks.get(0).getGuard(), arg).equals("true")){
-            sb.append(visitBlock(blocks.get(0).getBlock(), arg));
-        }
-        return sb;*/
-        throw new UnsupportedOperationException("Unimplemented method");
+         * TODO vvv sample implementation of getting a single block for a do statement
+         * iteration
+         * StringBuilder sb = new StringBuilder();
+         * java.util.List<GuardedBlock> blocks = doStatement.getGuardedBlocks();
+         * if(determineExpr(blocks.get(0).getGuard(), arg).equals("true")){
+         * sb.append(visitBlock(blocks.get(0).getBlock(), arg));
+         * }
+         * return sb;
+         */
+       
     }
 
     @Override
-    public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg) throws PLCCompilerException {
+    public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg)
+            throws PLCCompilerException {
         // Implemented in Assignment 5
         StringBuilder sb = new StringBuilder("PixelOps.pack(");
         sb.append(expandedPixelExpr.getRed().visit(this, arg)).append(",");
@@ -395,10 +425,9 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        //Compilcated, see instructions pdf
+        // Compilcated, see instructions pdf
         throw new UnsupportedOperationException("Unimplemented method");
     }
-
 
     @Override
     public StringBuilder visitIdentExpr(IdentExpr identExpr, Object arg) throws PLCCompilerException {
@@ -409,28 +438,44 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitIfStatement(IfStatement ifStatement, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        //Compilcated, see instructions pdf
+        // Compilcated, see instructions pdf
         /*
-            You will need to figure out the details yourself.
-            The semantics are similar to Dijkstra’s guarded command if statement except our version is not
-            non-deterministic (i.e. is deterministic). The guarded blocks are evaluated starting from the
-            top. One other difference is that Dijkstra’s version requires that at least one guard be true. In
-            our version, if none of the guards are true, nothing will happen.
-            In other words, if the guards are G0, G1, .. Gn, and the corresponding blocks are B0, B1,..,Bn,
-            Guards are evaluated in turn, starting with G0. When a guard, say Gi, is true, execute the
-            corresponding Block Bi. That is the end of the if statement. The Java code would look
-            something like “if (G0) {B0;} else if (G1) {B1;}… else if (Gn) {Bn;}”
+         * You will need to figure out the details yourself.
+         * The semantics are similar to Dijkstra’s guarded command if statement except
+         * our version is not
+         * non-deterministic (i.e. is deterministic). The guarded blocks are evaluated
+         * starting from the
+         * top. One other difference is that Dijkstra’s version requires that at least
+         * one guard be true. In
+         * our version, if none of the guards are true, nothing will happen.
+         * In other words, if the guards are G0, G1, .. Gn, and the corresponding blocks
+         * are B0, B1,..,Bn,
+         * Guards are evaluated in turn, starting with G0. When a guard, say Gi, is
+         * true, execute the
+         * corresponding Block Bi. That is the end of the if statement. The Java code
+         * would look
+         * something like “if (G0) {B0;} else if (G1) {B1;}… else if (Gn) {Bn;}”
          */
         throw new UnsupportedOperationException("Unimplemented method");
     }
 
     @Override
     public StringBuilder visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
-        // _IdentExpr_.getNameDef().getJavaName()
-        /*(PixelSelector and ChannelSelector if present, must
-        be visited. It may be easier to invoke this methods
-        from the parent AssignmentStatement. )*/
-        return new StringBuilder(lValue.getNameDef().getJavaName());
+        StringBuilder sb = new StringBuilder();
+        String varName = lValue.getNameDef().getJavaName();
+
+        if (lValue.getChannelSelector() != null) {
+            sb.append("PixelOps.set");
+            sb.append(visitChannelSelector(lValue.getChannelSelector(), arg));
+            sb.append("(").append(varName).append(", ");
+        } else if (lValue.getPixelSelector() != null) {
+          
+            sb.append(varName).append("[").append(visitPixelSelector(lValue.getPixelSelector(), arg)).append("]");
+        } else {
+            sb.append(varName);
+        }
+
+        return sb;
     }
 
     @Override
@@ -441,7 +486,7 @@ public class CodeGenVisitor implements ASTVisitor {
          * _Type_ _name_
          * Where _name_ is the Java name of the IDENT
          */
-        //The dimension will be visited in the parent declaration
+        // The dimension will be visited in the parent declaration
         StringBuilder sb = new StringBuilder();
         sb.append(determineType(nameDef.getType())).append(" ");
         sb.append(nameDef.getJavaName());
@@ -458,33 +503,35 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        return new StringBuilder((StringBuilder) pixelSelector.xExpr().visit(this, arg)).append(",").append(pixelSelector.yExpr().visit(this, arg));
-        //TODO: small mistake in the last append statement?
+        return new StringBuilder((StringBuilder) pixelSelector.xExpr().visit(this, arg)).append(",")
+                .append(pixelSelector.yExpr().visit(this, arg));
+        // TODO: small mistake in the last append statement?
     }
 
     @Override
     public StringBuilder visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
         // Implemented in Assignment 5
-        /*If Expr.type is Pixel
-        _ChannelSelector_ ( _Expr_ )
-        Otherwise it is an image
-        If PixelSelector != null && ChannelSelector ==null
-        Generate code to get the value of the pixel at the
-        indicated location.
-        ImageOps.getRGB( _Expr_ , _PixelSelector _ )
-        If PixelSelector != null && ChannelSelector != null,
-        generate code to get the value of the pixel at the
-        indicated location and to invoke PixelOps.red,
-        PixelOps.green, or PixelOps.blue. (You may want
-        to visit the ChannelSelector, passing info that this is
-        in the context of an expression as indicated here, or
-        you may want to just get the value from
-        visitPostfixExpr)
-        _ChannelSelector_ (ImageOps.getRGB( _Expr_ ,
-        _PixelSelector_ ))
+        /*
+         * If Expr.type is Pixel
+         * _ChannelSelector_ ( _Expr_ )
+         * Otherwise it is an image
+         * If PixelSelector != null && ChannelSelector ==null
+         * Generate code to get the value of the pixel at the
+         * indicated location.
+         * ImageOps.getRGB( _Expr_ , _PixelSelector _ )
+         * If PixelSelector != null && ChannelSelector != null,
+         * generate code to get the value of the pixel at the
+         * indicated location and to invoke PixelOps.red,
+         * PixelOps.green, or PixelOps.blue. (You may want
+         * to visit the ChannelSelector, passing info that this is
+         * in the context of an expression as indicated here, or
+         * you may want to just get the value from
+         * visitPostfixExpr)
+         * _ChannelSelector_ (ImageOps.getRGB( _Expr_ ,
+         * _PixelSelector_ ))
          */
-        //Probably not the cleanest implementation
-        //Requires import statement for ImageOps and getRHB I think
+        // Probably not the cleanest implementation
+        // Requires import statement for ImageOps and getRHB I think
         StringBuilder sb = new StringBuilder();
         Expr primary = postfixExpr.primary();
         PixelSelector pixel = postfixExpr.pixel();
@@ -497,7 +544,8 @@ public class CodeGenVisitor implements ASTVisitor {
                 sb.append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
                 sb.append(pixel.visit(this, arg));
             } else if (pixel != null) {
-                sb.append(chan.visit(this, arg)).append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
+                sb.append(chan.visit(this, arg)).append("ImageOps.getRGB(").append(primary.visit(this, arg))
+                        .append(",");
                 sb.append(pixel.visit(this, arg)).append(")");
             } else {
                 switch (chan.color()) {
@@ -506,9 +554,9 @@ public class CodeGenVisitor implements ASTVisitor {
                     case RES_green -> sb.append("ImageOps.extractGreen(");
                     default -> throw new CodeGenException("Invalid channelselector color type");
                 }
-            sb.append(primary.visit(this, arg));
+                sb.append(primary.visit(this, arg));
+            }
         }
-    }
         return sb.append(")");
     }
 
@@ -519,9 +567,9 @@ public class CodeGenVisitor implements ASTVisitor {
         classBody.append("\tpublic static ").append(determineType(program.getType())).append(" apply(\n")
                 .append("\t\t");
         ListIterator<NameDef> listIterator = program.getParams().listIterator();
-        while(listIterator.hasNext()){
+        while (listIterator.hasNext()) {
             classBody.append(listIterator.next().visit(this, arg));
-            if(listIterator.hasNext()){
+            if (listIterator.hasNext()) {
                 classBody.append(", ");
             } else {
                 classBody.append("\n");
@@ -529,7 +577,7 @@ public class CodeGenVisitor implements ASTVisitor {
         }
         classBody.append("\t) ").append(program.getBlock().visit(this, arg)).append("\n");
         classBody.append("}\n");
-        //^^^ unsure if the above \n is necessary
+        // ^^^ unsure if the above \n is necessary
 
         for (String importString : importSet) {
             imports.append("import ").append(importString).append(";\n");
@@ -587,8 +635,6 @@ public class CodeGenVisitor implements ASTVisitor {
         String opString = convertOpKind(unaryExpr.getOp());
         StringBuilder operandString = (StringBuilder) unaryExpr.getExpr().visit(this, arg);
 
-
-
         // this is such a stupid way to do this but it works
         if (operandString.toString().startsWith("-") && opString.equals("-")) {
             subExprString.append(operandString.substring(1)); // Remove the first negation
@@ -599,7 +645,7 @@ public class CodeGenVisitor implements ASTVisitor {
                 case "RES_width" -> subExprString.append("(").append(operandString).append(".getWidth()").append(")");
                 default -> subExprString.append("(").append(opString).append(operandString).append(")");
             }
-            //TODO: may need to invoke bufferedimage
+            // TODO: may need to invoke bufferedimage
         }
 
         return subExprString;
@@ -611,20 +657,20 @@ public class CodeGenVisitor implements ASTVisitor {
          * ConsoleIO.write( _Expr_ )
          * Note: you will need to import edu.ufl.cise.cop4020fa23.runtime.ConsoleIO
          * The ConsoleIO class includes an overloaded
-        method write for each Java type that represents a
-        PLC Language type. Thus, you can simply
-        generate code to call the write method and let the
-        Java compiler determine which overloaded version
-        to use. The exception is that int and pixel in PLC
-        Language are both represented by a Java int.
-        When the type of Expr is pixel, you need to use the
-        writePixel method.
+         * method write for each Java type that represents a
+         * PLC Language type. Thus, you can simply
+         * generate code to call the write method and let the
+         * Java compiler determine which overloaded version
+         * to use. The exception is that int and pixel in PLC
+         * Language are both represented by a Java int.
+         * When the type of Expr is pixel, you need to use the
+         * writePixel method.
          */
 
         importSet.add("edu.ufl.cise.cop4020fa23.runtime.ConsoleIO");
         Expr subExpr = writeStatement.getExpr();
         StringBuilder subString = new StringBuilder();
-        if(subExpr.getType() == PIXEL){
+        if (subExpr.getType() == PIXEL) {
             subString.append("ConsoleIO.writePixel(");
         } else {
             subString.append("ConsoleIO.write(");
@@ -647,27 +693,29 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitConstExpr(ConstExpr constExpr, Object arg) throws PLCCompilerException {
-        /*If ConsExpr.name = Z then 255
-        else get hex String literal representing the
-        RGB representation of the corresponding
-        java.awt.Color.
-        Example:
-        Let the PLC Lang constant be BLUE.
-        This corresponds to the java Color constant
-        java.awt.Color.BLUE.
-        Get the packed pixel version of the color with
-        getRGB()
-        Convert to a String with Integer.toHexString
-        Prepend “0x” to make it a Java hex literal.
-        Putting it all together, you get
-        "0x" +
-        Integer.toHexString(Color.BLUE.getRGB())
-        Which is
-        0xff0000ff*/
+        /*
+         * If ConsExpr.name = Z then 255
+         * else get hex String literal representing the
+         * RGB representation of the corresponding
+         * java.awt.Color.
+         * Example:
+         * Let the PLC Lang constant be BLUE.
+         * This corresponds to the java Color constant
+         * java.awt.Color.BLUE.
+         * Get the packed pixel version of the color with
+         * getRGB()
+         * Convert to a String with Integer.toHexString
+         * Prepend “0x” to make it a Java hex literal.
+         * Putting it all together, you get
+         * "0x" +
+         * Integer.toHexString(Color.BLUE.getRGB())
+         * Which is
+         * 0xff0000ff
+         */
         String uwu = constExpr.getName();
-        if(uwu.equals("Z"))
+        if (uwu.equals("Z"))
             return new StringBuilder("255");
-        return new StringBuilder("0x").append(switch(uwu){
+        return new StringBuilder("0x").append(switch (uwu) {
             case "BLACK" -> Integer.toHexString(Color.BLACK.getRGB());
             case "BLUE" -> Integer.toHexString(Color.BLUE.getRGB());
             case "CYAN" -> Integer.toHexString(Color.CYAN.getRGB());
