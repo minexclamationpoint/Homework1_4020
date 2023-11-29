@@ -36,54 +36,6 @@ public class CodeGenVisitor implements ASTVisitor {
 
     // Types image and pixel are implemented in Assignment 5
     private final HashSet<String> importSet = new HashSet<>();
-    // TODO: vvv below expressions & variables are probably not necessary
-    public static final int SELECT_ALPHA = 0xff000000;
-    public static final int SELECT_RED = 0x00ff0000;
-    public static final int SELECT_GREEN = 0x0000ff00;
-    public static final int SELECT_BLUE = 0x000000ff;
-    public static final int SHIFT_ALPHA = 24;
-    public static final int SHIFT_RED = 16;
-    public static final int SHIFT_GREEN = 8;
-    public static final int SHIFT_BLUE = 0;
-
-    public static int truncate(int val) {
-        if (0 > val) {
-            return 0;
-        }
-        return Math.min(val, 255);
-    }
-
-    public static int pack(int redVal, int grnVal, int bluVal) {
-        int pixel = ((0xFF << SHIFT_ALPHA) | (truncate(redVal) << SHIFT_RED) |
-                (truncate(grnVal) << SHIFT_GREEN)
-                | (truncate(bluVal) << SHIFT_BLUE));
-        return pixel;
-    }
-
-    public static int red(int pixel) {
-        return (pixel & SELECT_RED) >> SHIFT_RED;
-    }
-
-    public static int green(int pixel) {
-        return (pixel & SELECT_GREEN) >> SHIFT_GREEN;
-    }
-
-    public static int blue(int pixel) {
-        return (pixel & SELECT_BLUE) >> SHIFT_BLUE;
-    }
-
-    public static int setRed(int pixel, int val) {
-        return pack(val, green(pixel), blue(pixel));
-    }
-
-    public static int setGreen(int pixel, int val) {
-        return pack(red(pixel), val, blue(pixel));
-    }
-
-    public static int setBlue(int pixel, int val) {
-        return pack(red(pixel), green(pixel), val);
-    }
-    // TODO: ^^^ above expressions & variables are probably not necessary
 
     // TODO: Possibly replace function calls with .visit calls?
     @Override
@@ -148,15 +100,67 @@ public class CodeGenVisitor implements ASTVisitor {
          * See pdf for handling Pixel and Image types.
          */
 
+        /*
+        Binary operations on these types are generally carried out component-wise.
+        For example, for images im0 and im1, the expression (e0+e1) yields a new image with the
+        individual pixels added together componentwise. Pixels in turn are also added componentwise.
+        For pixels p0, and p1, the expression (p0 + p1) yields a pixel with individual color channel
+        values added together. Any time the value of a color channel goes out of the range [0,255], it is
+        truncated to the maximum or minimum value.
+        TODO: When a binary operation has one operand with a “larger” type than the other, the value of the
+        TODO: smaller type is replicated. So for example, im0/2 would divide each pixel in im0 by 2. For each
+        TODO: pixel, each individual color channel value is divided by 2.
+        Several routines in edu.ufl.cise.cop4020fa23.ImageOps have been provided to implement
+        binary expressions with images and pixels.
+        See binaryImageIMageOp (combine two images),
+        TODO: image + image
+        binaryImagePixelOp (combine an image with a pixel),
+        TODO: image + pixel
+        binaryImageIntOp (combine an image with an int),
+        TODO: image + int
+        binaryPackedPixelPixelOP (combine two pixels),
+        TODO: pixel + pixel
+        binaryPackedPixelIntOp (combine a pixel with an int) and
+        TODO: pixel + int
+        binaryPackedPixelBooleanOP (compare two pixels Boolean operator).
+        TODO: pixel boolean pixel
+         */
+
         StringBuilder leftSb = (StringBuilder) binaryExpr.getLeftExpr().visit(this, arg);
         StringBuilder rightSb = (StringBuilder) binaryExpr.getRightExpr().visit(this, arg);
 
         Type leftType = binaryExpr.getLeftExpr().getType();
+        Type rightType = binaryExpr.getRightExpr().getType();
         Kind opKind = binaryExpr.getOpKind();
 
         StringBuilder sb = new StringBuilder();
 
-        if (leftType == Type.STRING && opKind == Kind.EQ) {
+        if(leftType == IMAGE){
+            importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
+            sb.append(switch(rightType){
+              case IMAGE -> "binaryImageImageOp(";
+              case PIXEL -> "binaryImagePixelOp(";
+              case INT -> "binaryImageScalarOp(";
+              default -> throw new CodeGenException("invalid right expression type for left type IMAGE");
+            });
+            sb.append(opKind).append(",");
+            sb.append(leftSb).append(",");
+            return sb.append(rightSb).append(")");
+        } else if (leftType == PIXEL){
+            importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
+            if(opKind == BOOLEAN_LIT){
+                sb.append("binaryPackedPixelBooleanOP(");
+            } else {
+                sb.append(switch(rightType){
+                    case PIXEL -> "binaryPackedPixelPixelOp";
+                    case INT -> "binaryPackedPixelScalarOp";
+                    default -> throw new CodeGenException("invalid right expression type for left type PIXEL");
+                });
+            }
+            sb.append(opKind).append(",");
+            sb.append(leftSb).append(",");
+            return sb.append(rightSb).append(")");
+        } else if (leftType == Type.STRING && opKind == Kind.EQ) {
             sb.append(leftSb).append(".equals(").append(rightSb).append(")");
         }
 
@@ -254,6 +258,7 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitChannelSelector(ChannelSelector channelSelector, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
+        importSet.add("edu.ufl.cise.cop4020fa23.runtime.PixelOps");
         switch (channelSelector.color()) {
             case RES_red:
                 sb.append("PixelOps.red(");
@@ -351,7 +356,10 @@ public class CodeGenVisitor implements ASTVisitor {
         }
 
         if (isImageType) {
+            //TODO: import BufferedImage?
+            importSet.add("java.awt.image.BufferedImage");
             sb.append("final BufferedImage ").append(nameDef.getJavaName());
+            importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
             if (initializer != null) {
                 // Check the type of the initializer
                 // Tbh idk if this is the best way to do this
@@ -371,6 +379,7 @@ public class CodeGenVisitor implements ASTVisitor {
                         sb.append(" = ImageOps.cloneImage(").append(initializer.visit(this, arg)).append(")");
                     }
                 } else if (initializerType == STRING) {
+                    importSet.add("edu.ufl.cise.cop4020fa23.runtime.FileURLIO");
                     // Handle case when initializer is a string (URL)
                     if (nameDef.getDimension() != null) {
                         // Image with dimension - load and resize from URL
@@ -399,8 +408,6 @@ public class CodeGenVisitor implements ASTVisitor {
                 sb.append(" = ").append(initializer.visit(this, arg));
             }
         }
-
-        sb.append(";\n");
         return sb;
     }
 
@@ -493,7 +500,7 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitExpandedPixelExpr(ExpandedPixelExpr expandedPixelExpr, Object arg)
             throws PLCCompilerException {
-        // Implemented in Assignment 5
+        importSet.add("edu.ufl.cise.cop4020fa23.runtime.PixelOps");
         StringBuilder sb = new StringBuilder("PixelOps.pack(");
         sb.append(expandedPixelExpr.getRed().visit(this, arg)).append(",");
         sb.append(expandedPixelExpr.getGreen().visit(this, arg)).append(",");
@@ -502,6 +509,8 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
+        // Handling depends on context, so we probably need to pass down an arg to differentiate between do and if statements
+
         // Create a StringBuilder to hold the generated code
         StringBuilder sb = new StringBuilder();
 
@@ -592,19 +601,9 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
         String varName = lValue.getNameDef().getJavaName();
-
-        if (lValue.getChannelSelector() != null) {
-            sb.append("PixelOps.set");
-            sb.append(visitChannelSelector(lValue.getChannelSelector(), arg));
-            sb.append("(").append(varName).append(", ");
-        } else if (lValue.getPixelSelector() != null) {
-
-            sb.append(varName).append("[").append(visitPixelSelector(lValue.getPixelSelector(), arg)).append("]");
-        } else {
-            sb.append(varName);
-        }
-
-        return sb;
+        //removed visiting of pixelselector and channelselector,
+        // they will be visited in the parent assignment statement
+        return sb.append(varName);
     }
 
     @Override
@@ -625,16 +624,13 @@ public class CodeGenVisitor implements ASTVisitor {
     @Override
     public StringBuilder visitNumLitExpr(NumLitExpr numLitExpr, Object arg) throws PLCCompilerException {
         // _NumLitExpr_.getText
-        System.out.println(numLitExpr.getText());
         return new StringBuilder(numLitExpr.getText());
     }
 
     @Override
     public StringBuilder visitPixelSelector(PixelSelector pixelSelector, Object arg) throws PLCCompilerException {
-        // Implemented in Assignment 5
         return new StringBuilder((StringBuilder) pixelSelector.xExpr().visit(this, arg)).append(",")
                 .append(pixelSelector.yExpr().visit(this, arg));
-        // TODO: small mistake in the last append statement?
     }
 
     @Override
@@ -665,10 +661,13 @@ public class CodeGenVisitor implements ASTVisitor {
         Expr primary = postfixExpr.primary();
         PixelSelector pixel = postfixExpr.pixel();
         ChannelSelector chan = postfixExpr.channel();
+        importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
         if (postfixExpr.getType() == PIXEL) {
+            //if type is pixel
             sb.append(chan.visit(this, arg)).append("(");
             sb.append(primary.visit(this, arg));
         } else {
+            //otherwise is an image
             if (chan == null) {
                 sb.append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
                 sb.append(pixel.visit(this, arg));
@@ -729,6 +728,9 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     private String determineType(Type type) throws CodeGenException {
+                if(type == IMAGE){
+                    importSet.add("java.awt.image.BufferedImage");
+                }
         return switch (type) {
             case INT, PIXEL -> "int";
             case STRING -> "String";
@@ -770,11 +772,20 @@ public class CodeGenVisitor implements ASTVisitor {
         } else {
             switch (opString) {
                 case "-" -> subExprString.append(opString).append(operandString);
-                case "RES_height" -> subExprString.append("(").append(operandString).append(".getHeight()").append(")");
-                case "RES_width" -> subExprString.append("(").append(operandString).append(".getWidth()").append(")");
+                case "RES_height" ->
+                {
+                    importSet.add("java.awt.image.BufferedImage");
+                    subExprString.append("(").append(operandString).append(".getHeight()").append(")");
+                }
+                case "RES_width" ->
+                {
+                    importSet.add("java.awt.image.BufferedImage");
+                    subExprString.append("(").append(operandString).append(".getWidth()").append(")");
+                }
                 default -> subExprString.append("(").append(opString).append(operandString).append(")");
             }
             // TODO: may need to invoke bufferedimage
+            // Idk how bufferedimage works really, oh well
         }
 
         return subExprString;
