@@ -11,6 +11,7 @@ import static edu.ufl.cise.cop4020fa23.ast.Type.*;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.lang.Math;
 
 /*
@@ -409,7 +410,51 @@ public class CodeGenVisitor implements ASTVisitor {
          * }
          * return sb;
          */
-       
+
+        StringBuilder sb = new StringBuilder();
+        List<GuardedBlock> blocks = doStatement.getGuardedBlocks();
+
+        sb.append("do {\n");
+        sb.append("boolean anyGuardTrue = false;\n");
+
+        for (GuardedBlock guardedBlock : blocks) {
+            Expr guardExpr = guardedBlock.getGuard();
+            StringBuilder guardExprCode = new StringBuilder();
+
+            // TODO: vvvv this is probably not the best way to do this
+            if (guardExpr instanceof BinaryExpr) {
+                guardExprCode = visitBinaryExpr((BinaryExpr) guardExpr, arg);
+            } else if (guardExpr instanceof UnaryExpr) {
+                guardExprCode = visitUnaryExpr((UnaryExpr) guardExpr, arg);
+            } else if (guardExpr instanceof ConditionalExpr) {
+                guardExprCode = visitConditionalExpr((ConditionalExpr) guardExpr, arg);
+            } else if (guardExpr instanceof IdentExpr) {
+                guardExprCode.append(visitIdentExpr((IdentExpr) guardExpr, arg));
+            } else if (guardExpr instanceof NumLitExpr) {
+                guardExprCode.append(visitNumLitExpr((NumLitExpr) guardExpr, arg));
+            } else if (guardExpr instanceof BooleanLitExpr) {
+                guardExprCode.append(visitBooleanLitExpr((BooleanLitExpr) guardExpr, arg));
+            } else if (guardExpr instanceof StringLitExpr) {
+                guardExprCode.append(visitStringLitExpr((StringLitExpr) guardExpr, arg));
+            } else if (guardExpr instanceof ExpandedPixelExpr) {
+                guardExprCode.append(visitExpandedPixelExpr((ExpandedPixelExpr) guardExpr, arg));
+            } else if (guardExpr instanceof ConstExpr) {
+                guardExprCode.append(visitConstExpr((ConstExpr) guardExpr, arg));
+            }
+
+            sb.append("if (").append(guardExprCode).append(") {\n");
+            sb.append("anyGuardTrue = true;\n");
+
+            Block guardedBlockCode = guardedBlock.getBlock();
+            StringBuilder blockCode = visitBlock(guardedBlockCode, arg);
+            sb.append(blockCode);
+
+            sb.append("}\n");
+        }
+
+        sb.append("} while(anyGuardTrue);\n");
+        return sb;
+
     }
 
     @Override
@@ -456,7 +501,44 @@ public class CodeGenVisitor implements ASTVisitor {
          * would look
          * something like “if (G0) {B0;} else if (G1) {B1;}… else if (Gn) {Bn;}”
          */
-        throw new UnsupportedOperationException("Unimplemented method");
+        StringBuilder sb = new StringBuilder();
+        List<GuardedBlock> guardedBlocks = ifStatement.getGuardedBlocks();
+
+        for (int i = 0; i < guardedBlocks.size(); i++) {
+            GuardedBlock guardedBlock = guardedBlocks.get(i);
+            StringBuilder guardExprCode = generateGuardExpressionCode(guardedBlock.getGuard(), arg);
+
+            sb.append(i == 0 ? "if (" : " else if (");
+            sb.append(guardExprCode);
+            sb.append(") {\n");
+            sb.append(visitBlock(guardedBlock.getBlock(), arg));
+            sb.append("\n}");
+        }
+        return sb;
+    }
+
+    private StringBuilder generateGuardExpressionCode(Expr guardExpr, Object arg) throws PLCCompilerException {
+        StringBuilder guardExprCode = new StringBuilder();
+        if (guardExpr instanceof BinaryExpr) {
+            guardExprCode = visitBinaryExpr((BinaryExpr) guardExpr, arg);
+        } else if (guardExpr instanceof UnaryExpr) {
+            guardExprCode = visitUnaryExpr((UnaryExpr) guardExpr, arg);
+        } else if (guardExpr instanceof ConditionalExpr) {
+            guardExprCode = visitConditionalExpr((ConditionalExpr) guardExpr, arg);
+        } else if (guardExpr instanceof IdentExpr) {
+            guardExprCode.append(visitIdentExpr((IdentExpr) guardExpr, arg));
+        } else if (guardExpr instanceof NumLitExpr) {
+            guardExprCode.append(visitNumLitExpr((NumLitExpr) guardExpr, arg));
+        } else if (guardExpr instanceof BooleanLitExpr) {
+            guardExprCode.append(visitBooleanLitExpr((BooleanLitExpr) guardExpr, arg));
+        } else if (guardExpr instanceof StringLitExpr) {
+            guardExprCode.append(visitStringLitExpr((StringLitExpr) guardExpr, arg));
+        } else if (guardExpr instanceof ExpandedPixelExpr) {
+            guardExprCode.append(visitExpandedPixelExpr((ExpandedPixelExpr) guardExpr, arg));
+        } else if (guardExpr instanceof ConstExpr) {
+            guardExprCode.append(visitConstExpr((ConstExpr) guardExpr, arg));
+        }
+        return guardExprCode;
     }
 
     @Override
@@ -469,7 +551,7 @@ public class CodeGenVisitor implements ASTVisitor {
             sb.append(visitChannelSelector(lValue.getChannelSelector(), arg));
             sb.append("(").append(varName).append(", ");
         } else if (lValue.getPixelSelector() != null) {
-          
+
             sb.append(varName).append("[").append(visitPixelSelector(lValue.getPixelSelector(), arg)).append("]");
         } else {
             sb.append(varName);
