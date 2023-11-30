@@ -144,6 +144,7 @@ public class Lexer implements ILexer {
 				if (pos < input.length())
 				{
 					ch = input.charAt(pos);
+					System.out.println(ch);
 				} else {
 
 					break outer;
@@ -168,7 +169,7 @@ public class Lexer implements ILexer {
 						if (Character.isLetter(ch) || ch == '_') {
 							st = State.IN_IDENT;
 							kind = kind.IDENT;
-							if (sb.toString().equals("Z"))
+							if (sb.toString().equals("Z" )&& input.charAt(pos + 1) == ' ')
 							{
 								kind = mapper(sb.toString());
 								pos++;
