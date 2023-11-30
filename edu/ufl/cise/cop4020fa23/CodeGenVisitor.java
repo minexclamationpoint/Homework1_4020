@@ -41,155 +41,189 @@ public class CodeGenVisitor implements ASTVisitor {
 
     // TODO: Possibly replace function calls with .visit calls?
     @Override
-    public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg) throws PLCCompilerException {
+    public Object visitAssignmentStatement(AssignmentStatement assignmentStatement, Object arg)
+            throws PLCCompilerException {
 
         /*
-             * If LValue.varType == image. See explanation
-             * below.
-             * If LValue.varType == pixel and
-             * LValue.ChannelSelector != null
-             * PixelOps.setRed(_LValue_ , _Expr_)
-             * or setGreen or SetBlue
-             * Otherwise
-             * _LValue_ = _Expr_
-             */
-            // TODO: If LValue has a pixelSelector or channelselector, visit them here
+         * If LValue.varType == image. See explanation
+         * below.
+         * If LValue.varType == pixel and
+         * LValue.ChannelSelector != null
+         * PixelOps.setRed(_LValue_ , _Expr_)
+         * or setGreen or SetBlue
+         * Otherwise
+         * _LValue_ = _Expr_
+         */
+        // TODO: If LValue has a pixelSelector or channelselector, visit them here
         PixelSelector pix = assignmentStatement.getlValue().getPixelSelector();
         ChannelSelector chan = assignmentStatement.getlValue().getChannelSelector();
         LValue val = assignmentStatement.getlValue();
         StringBuilder LVString = new StringBuilder((StringBuilder) val.visit(this, arg));
         Expr ex = assignmentStatement.getE();
-        //try {
-            StringBuilder sb = new StringBuilder();
-            if (assignmentStatement.getlValue().getVarType() == IMAGE) {
+        // try {
+        StringBuilder sb = new StringBuilder();
 
 
-                //• PixelSelector == null and ChannelSelector == null (i.e. something like im0 = expr; )
-                if(pix == null && chan == null){
-                    /*
-                    • If Expr.type = IMAGE, use ImageOps.copyInto to copy the Expr image into the
-                    LValue image
-                    • If Expr.type = PIXEL, use ImageOps.setAllPixels to update each pixel of the LValue
-                    image with the given pixel value
-                    • If Expr.type = STRING, load the image from the URL in the string, and resizing to the
-                    size of the LValue image. Then copy the pixels of the loaded image into the LValue
-                    image. Use FileURLIO.readImage and ImageOps.copyInto
 
-                     */
-                    importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
-                    switch(ex.getType()) {
-                        case IMAGE -> {
-                            sb.append("ImageOps.copyInto(");
-                            sb.append(ex.visit(this, arg)).append(",").append(val.visit(this, arg));
-                        }
-                        case PIXEL -> {
-                            sb.append("ImageOps.setAllPixels(");
-                            sb.append(val.visit(this, arg)).append(",").append(ex.visit(this, arg));
-                        }
-                        case STRING -> {
-                            //TODO: figure out how to resize images properly
-                            importSet.add("edu.ufl.cise.cop4020fa23.FileURLIO");
-                            sb.append("ImageOps.copyInto(FileURLIO.readImage(").append(ex.visit(this, arg)).append("),");
-                            sb.append(val.visit(this, arg));
-                        }
-                        default -> throw new CodeGenException("illegal expression type: " + ex.getType());
-                    };
-                    return sb.append(");");
-                } else {
-                    if(pix == null){
-                      throw new UnsupportedOperationException("Not to be implemented");
-                    }
-                    /*
-                    • PixelSelector != null and ChannelSelector == null (i.e. something like im[x1,x2] =expr)
-                    This is the most interesting part of the language. Recall that we could write statements like
-                    im0[x,y] = expr where x and/or y are not visible in the current scope. In this case, we added a
-                    SyntheticNameDef object for the variable. For each variable whose nameDef is actually a
-                    SyntheticNameDef object, we generate code for an implicit loop over the values of that variable.
-                    For example, suppose we have a statement
-                    Im0[x,y] = im1[y,x]
-                    where x and y are not previously declared and thus their NameDef objects in the AST are
-                    SyntheticNameDef. Generate code to loop over x and y from 0 to im0.getWidth() and from 0 to
-                    im0.getHeight(), respectively and update each pixel with the value of the expression on the right
-                    side.
-                    See the generated code in the starter Junit test cases for example
-                    * package edu.ufl.cise.cop4020fa23;
-	                * import java.awt.image.BufferedImage;
-	                * import edu.ufl.cise.cop4020fa23.runtime.PixelOps;
-	                * import edu.ufl.cise.cop4020fa23.runtime.ImageOps;
-	                * public class example{
-	                * 		public static BufferedImage apply(int w$1, int h$1){
-	                * 			final BufferedImage im$2=ImageOps.makeImage(w$1,h$1);
-	                * 				for (int x$3=0; x$3<im$2.getWidth();x$3++){
-	                * 					for (int y$3=0; y$3<im$2.getHeight();y$3++){
-	                * 						ImageOps.setRGB(im$2,x$3,y$3,PixelOps.pack(x$3,y$3,255));
-	                * 					}
-	                * 				};
-	                * 		return im$2;
-	                * 		}
-	                * }
-                            String source = """
-				    image example(int w, int h) <:
-				    image[w,h] im;
-				    im[x,y] = [x,y,Z];
-				    ^im;
-				    :>
-				    """;
-                 */
-                    StringBuilder pixString = (StringBuilder) pix.visit(this, arg);
-                    StringBuilder lvalString = (StringBuilder) val.visit(this, arg);
-                    StringBuilder JNX = (StringBuilder) pix.xExpr().visit(this, arg);
-                    StringBuilder JNY = (StringBuilder) pix.yExpr().visit(this, arg);
-                    StringBuilder Brackets = new StringBuilder();
-                    if(((IdentExpr) pix.xExpr()).getNameDef() instanceof SyntheticNameDef){
-                        System.out.println("hello");
-                        sb.append("for (int ").append(JNX).append(" = 0; ");
-                        sb.append(JNX).append("<").append(lvalString).append(".getWidth();");
-                        sb.append(JNX).append("++){\n");
-                        Brackets.append("}");
-                    }
-                    if(((IdentExpr) pix.yExpr()).getNameDef() instanceof SyntheticNameDef){
-                        sb.append("for (int ").append(JNY).append(" = 0; ");
-                        sb.append(JNY).append("<").append(lvalString).append(".getHeight();");
-                        sb.append(JNY).append("++){\n");
-                        Brackets.append("}");
-                    }
-                    sb.append("ImageOps.setRGB(").append(lvalString).append(",").append(JNX).append(",");
-                    sb.append(JNY).append(",").append(ex.visit(this, arg)).append(");\n");
-                    sb.append(Brackets);
-                    return sb;
-                }
-            }
-            if (assignmentStatement.getlValue().getVarType() == PIXEL
-                    && assignmentStatement.getlValue().getChannelSelector() != null) {
-                importSet.add("edu.ufl.cise.cop4020fa23.PixelOps");
-                sb.append(switch (assignmentStatement.getlValue().getChannelSelector().color()) {
-                    case RES_red -> "PixelOps.setRed(";
-                    case RES_blue -> "PixelOps.setBlue(";
-                    case RES_green -> "PixelOps.setGreen(";
-                    default -> throw new CodeGenException("Unexpected color kind in channelSelector");
-                });
-                sb.append(assignmentStatement.getlValue().visit(this, arg)).append(" , ")
-                        .append(assignmentStatement.getE().visit(this, arg));
-                return sb.append(")");
-            }
-            // _LValue_ = _Expr_
-            if (assignmentStatement.getlValue() == null) {
-                throw new CodeGenException("LValue in assignment statement is null");
-            }
-            if (assignmentStatement.getlValue().getName() == null
-                    || assignmentStatement.getlValue().getName().isEmpty()) {
-                throw new CodeGenException("Variable name in LValue is null or empty.");
-            }
-            if (assignmentStatement.getE() == null) {
-                throw new CodeGenException("Expression in assignment statement is null");
-            }
-            System.out.println("hello!");
-            sb.append(val.visit(this, arg)).append(" = ");
-            sb.append(assignmentStatement.getE().visit(this, arg));
+        // for test case 6
+        if (val.getVarType() == PIXEL && ex.getType() == INT) {
+            importSet.add("edu.ufl.cise.cop4020fa23.runtime.PixelOps");
+            sb.append(val.visit(this, arg))
+              .append(" = PixelOps.pack(")
+              .append(ex.visit(this, arg)).append(", ")
+              .append(ex.visit(this, arg)).append(", ")
+              .append(ex.visit(this, arg)).append(");");
             return sb;
-        /*} catch (Exception e) {
-            throw new CodeGenException("Well then we shouldn't be here " + e.getMessage());
-        }*/
+        }
+
+        if (assignmentStatement.getlValue().getVarType() == IMAGE) {
+
+            // • PixelSelector == null and ChannelSelector == null (i.e. something like im0
+            // = expr; )
+            if (pix == null && chan == null) {
+                /*
+                 * • If Expr.type = IMAGE, use ImageOps.copyInto to copy the Expr image into the
+                 * LValue image
+                 * • If Expr.type = PIXEL, use ImageOps.setAllPixels to update each pixel of the
+                 * LValue
+                 * image with the given pixel value
+                 * • If Expr.type = STRING, load the image from the URL in the string, and
+                 * resizing to the
+                 * size of the LValue image. Then copy the pixels of the loaded image into the
+                 * LValue
+                 * image. Use FileURLIO.readImage and ImageOps.copyInto
+                 * 
+                 */
+                importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
+                switch (ex.getType()) {
+                    case IMAGE -> {
+                        sb.append("ImageOps.copyInto(");
+                        sb.append(ex.visit(this, arg)).append(",").append(val.visit(this, arg));
+                    }
+                    case PIXEL -> {
+                        sb.append("ImageOps.setAllPixels(");
+                        sb.append(val.visit(this, arg)).append(",").append(ex.visit(this, arg));
+                    }
+                    case STRING -> {
+                        // TODO: figure out how to resize images properly
+                        importSet.add("edu.ufl.cise.cop4020fa23.FileURLIO");
+                        sb.append("ImageOps.copyInto(FileURLIO.readImage(").append(ex.visit(this, arg)).append("),");
+                        sb.append(val.visit(this, arg));
+                    }
+                    default -> throw new CodeGenException("illegal expression type: " + ex.getType());
+                }
+                ;
+                return sb.append(");");
+            } else {
+                if (pix == null) {
+                    throw new UnsupportedOperationException("Not to be implemented");
+                }
+                /*
+                 * • PixelSelector != null and ChannelSelector == null (i.e. something like
+                 * im[x1,x2] =expr)
+                 * This is the most interesting part of the language. Recall that we could write
+                 * statements like
+                 * im0[x,y] = expr where x and/or y are not visible in the current scope. In
+                 * this case, we added a
+                 * SyntheticNameDef object for the variable. For each variable whose nameDef is
+                 * actually a
+                 * SyntheticNameDef object, we generate code for an implicit loop over the
+                 * values of that variable.
+                 * For example, suppose we have a statement
+                 * Im0[x,y] = im1[y,x]
+                 * where x and y are not previously declared and thus their NameDef objects in
+                 * the AST are
+                 * SyntheticNameDef. Generate code to loop over x and y from 0 to im0.getWidth()
+                 * and from 0 to
+                 * im0.getHeight(), respectively and update each pixel with the value of the
+                 * expression on the right
+                 * side.
+                 * See the generated code in the starter Junit test cases for example
+                 * package edu.ufl.cise.cop4020fa23;
+                 * import java.awt.image.BufferedImage;
+                 * import edu.ufl.cise.cop4020fa23.runtime.PixelOps;
+                 * import edu.ufl.cise.cop4020fa23.runtime.ImageOps;
+                 * public class example{
+                 * public static BufferedImage apply(int w$1, int h$1){
+                 * final BufferedImage im$2=ImageOps.makeImage(w$1,h$1);
+                 * for (int x$3=0; x$3<im$2.getWidth();x$3++){
+                 * for (int y$3=0; y$3<im$2.getHeight();y$3++){
+                 * ImageOps.setRGB(im$2,x$3,y$3,PixelOps.pack(x$3,y$3,255));
+                 * }
+                 * };
+                 * return im$2;
+                 * }
+                 * }
+                 * String source = """
+                 * image example(int w, int h) <:
+                 * image[w,h] im;
+                 * im[x,y] = [x,y,Z];
+                 * ^im;
+                 * :>
+                 * """;
+                 */
+                StringBuilder pixString = (StringBuilder) pix.visit(this, arg);
+                StringBuilder lvalString = (StringBuilder) val.visit(this, arg);
+                StringBuilder JNX = (StringBuilder) pix.xExpr().visit(this, arg);
+                StringBuilder JNY = (StringBuilder) pix.yExpr().visit(this, arg);
+                StringBuilder Brackets = new StringBuilder();
+                if (((IdentExpr) pix.xExpr()).getNameDef() instanceof SyntheticNameDef) {
+                    System.out.println("hello");
+                    sb.append("for (int ").append(JNX).append(" = 0; ");
+                    sb.append(JNX).append("<").append(lvalString).append(".getWidth();");
+                    sb.append(JNX).append("++){\n");
+                    Brackets.append("}");
+                }
+                if (((IdentExpr) pix.yExpr()).getNameDef() instanceof SyntheticNameDef) {
+                    sb.append("for (int ").append(JNY).append(" = 0; ");
+                    sb.append(JNY).append("<").append(lvalString).append(".getHeight();");
+                    sb.append(JNY).append("++){\n");
+                    Brackets.append("}");
+                }
+                sb.append("ImageOps.setRGB(").append(lvalString).append(",").append(JNX).append(",");
+                sb.append(JNY).append(",").append(ex.visit(this, arg)).append(");\n");
+                sb.append(Brackets);
+                return sb;
+            }
+        }
+        if (assignmentStatement.getlValue().getVarType() == PIXEL
+                && assignmentStatement.getlValue().getChannelSelector() != null) {
+            importSet.add("edu.ufl.cise.cop4020fa23.PixelOps");
+            sb.append(switch (assignmentStatement.getlValue().getChannelSelector().color()) {
+                case RES_red -> "PixelOps.setRed(";
+                case RES_blue -> "PixelOps.setBlue(";
+                case RES_green -> "PixelOps.setGreen(";
+                default -> throw new CodeGenException("Unexpected color kind in channelSelector");
+            });
+            sb.append(assignmentStatement.getlValue().visit(this, arg)).append(" , ")
+                    .append(assignmentStatement.getE().visit(this, arg));
+            return sb.append(")");
+        }
+        // _LValue_ = _Expr_
+        if (assignmentStatement.getlValue() == null) {
+            throw new CodeGenException("LValue in assignment statement is null");
+        }
+        if (assignmentStatement.getlValue().getName() == null
+                || assignmentStatement.getlValue().getName().isEmpty()) {
+            throw new CodeGenException("Variable name in LValue is null or empty.");
+        }
+        if (assignmentStatement.getE() == null) {
+            throw new CodeGenException("Expression in assignment statement is null");
+        }
+        System.out.println("hello!");
+        sb.append(val.visit(this, arg)).append(" = ");
+        sb.append(assignmentStatement.getE().visit(this, arg));
+
+        
+        return sb;
+
+
+        /*
+         * } catch (Exception e) {
+         * throw new CodeGenException("Well then we shouldn't be here " +
+         * e.getMessage());
+         * }
+         */
     }
 
     @Override
@@ -205,29 +239,36 @@ public class CodeGenVisitor implements ASTVisitor {
          */
 
         /*
-        Binary operations on these types are generally carried out component-wise.
-        For example, for images im0 and im1, the expression (e0+e1) yields a new image with the
-        individual pixels added together componentwise. Pixels in turn are also added componentwise.
-        For pixels p0, and p1, the expression (p0 + p1) yields a pixel with individual color channel
-        values added together. Any time the value of a color channel goes out of the range [0,255], it is
-        truncated to the maximum or minimum value.
-        TODO: When a binary operation has one operand with a “larger” type than the other, the value of the
-        TODO: smaller type is replicated. So for example, im0/2 would divide each pixel in im0 by 2. For each
-        TODO: pixel, each individual color channel value is divided by 2.
-        Several routines in edu.ufl.cise.cop4020fa23.ImageOps have been provided to implement
-        binary expressions with images and pixels.
-        See binaryImageIMageOp (combine two images),
-        TODO: image + image
-        binaryImagePixelOp (combine an image with a pixel),
-        TODO: image + pixel
-        binaryImageIntOp (combine an image with an int),
-        TODO: image + int
-        binaryPackedPixelPixelOP (combine two pixels),
-        TODO: pixel + pixel
-        binaryPackedPixelIntOp (combine a pixel with an int) and
-        TODO: pixel + int
-        binaryPackedPixelBooleanOP (compare two pixels Boolean operator).
-        TODO: pixel boolean pixel
+         * Binary operations on these types are generally carried out component-wise.
+         * For example, for images im0 and im1, the expression (e0+e1) yields a new
+         * image with the
+         * individual pixels added together componentwise. Pixels in turn are also added
+         * componentwise.
+         * For pixels p0, and p1, the expression (p0 + p1) yields a pixel with
+         * individual color channel
+         * values added together. Any time the value of a color channel goes out of the
+         * range [0,255], it is
+         * truncated to the maximum or minimum value.
+         * TODO: When a binary operation has one operand with a “larger” type than the
+         * other, the value of the
+         * TODO: smaller type is replicated. So for example, im0/2 would divide each
+         * pixel in im0 by 2. For each
+         * TODO: pixel, each individual color channel value is divided by 2.
+         * Several routines in edu.ufl.cise.cop4020fa23.ImageOps have been provided to
+         * implement
+         * binary expressions with images and pixels.
+         * See binaryImageIMageOp (combine two images),
+         * TODO: image + image
+         * binaryImagePixelOp (combine an image with a pixel),
+         * TODO: image + pixel
+         * binaryImageIntOp (combine an image with an int),
+         * TODO: image + int
+         * binaryPackedPixelPixelOP (combine two pixels),
+         * TODO: pixel + pixel
+         * binaryPackedPixelIntOp (combine a pixel with an int) and
+         * TODO: pixel + int
+         * binaryPackedPixelBooleanOP (compare two pixels Boolean operator).
+         * TODO: pixel boolean pixel
          */
 
         StringBuilder leftSb = (StringBuilder) binaryExpr.getLeftExpr().visit(this, arg);
@@ -238,38 +279,36 @@ public class CodeGenVisitor implements ASTVisitor {
         Kind opKind = binaryExpr.getOpKind();
 
         StringBuilder sb = new StringBuilder();
-        
-       
-        if(leftType == IMAGE){
+
+        if (leftType == IMAGE) {
             importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
-            sb.append("ImageOps.").append(switch(rightType){
-              case IMAGE -> "binaryImageImageOp(";
-              case PIXEL -> "binaryImagePixelOp(";
-              case INT -> "binaryImageScalarOp(";
-              default -> throw new CodeGenException("invalid right expression type for left type IMAGE");
+            sb.append("ImageOps.").append(switch (rightType) {
+                case IMAGE -> "binaryImageImageOp(";
+                case PIXEL -> "binaryImagePixelOp(";
+                case INT -> "binaryImageScalarOp(";
+                default -> throw new CodeGenException("invalid right expression type for left type IMAGE");
             });
             sb.append(opKindToImageOp(opKind)).append(",");
             sb.append(leftSb).append(",");
             return sb.append(rightSb).append(")");
-        } else if (leftType == PIXEL){
-            importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
-            sb.append("ImageOps.");
-            if(opKind == EQ){
-                sb.append("binaryPackedPixelBooleanOP(");
+        } else if (leftType == PIXEL) {
+            importSet.add("edu.ufl.cise.cop4020fa23.runtime.PixelOps");
+            if (opKind == EQ) {
+                sb.append("PixelOps.binaryPackedPixelBooleanOP(");
             } else {
-                // This is so dumb, but it works
+                // Truncation logic
                 sb.append("PixelOps.pack(");
                 sb.append("Math.min(255, Math.max(0, PixelOps.red(").append(leftSb).append(") ")
-                  .append(convertOpKind(opKind)).append(" PixelOps.red(").append(rightSb).append("))), ");
+                        .append(convertOpKind(opKind)).append(" PixelOps.red(").append(rightSb).append("))), ");
                 sb.append("Math.min(255, Math.max(0, PixelOps.green(").append(leftSb).append(") ")
-                  .append(convertOpKind(opKind)).append(" PixelOps.green(").append(rightSb).append("))), ");
+                        .append(convertOpKind(opKind)).append(" PixelOps.green(").append(rightSb).append("))), ");
                 sb.append("Math.min(255, Math.max(0, PixelOps.blue(").append(leftSb).append(") ")
-                  .append(convertOpKind(opKind)).append(" PixelOps.blue(").append(rightSb).append(")))");
+                        .append(convertOpKind(opKind)).append(" PixelOps.blue(").append(rightSb).append(")))");
                 sb.append(")");
             }
         }
-        
-         else if (leftType == Type.STRING && opKind == Kind.EQ) {
+
+        else if (leftType == Type.STRING && opKind == Kind.EQ) {
             sb.append(leftSb).append(".equals(").append(rightSb).append(")");
         }
 
@@ -285,15 +324,15 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     private String opKindToImageOp(Kind opKind) throws PLCCompilerException {
-                return switch (opKind) {
-                    case PLUS -> "ImageOps.OP.PLUS";
-                    case MINUS -> "ImageOps.OP.MINUS";
-                    case TIMES -> "ImageOps.OP.TIMES";
-                    case DIV -> "ImageOps.OP.DIV";
-                    case MOD -> "ImageOps.OP.MOD";
-                    case EQ -> "ImageOps.BoolOP.EQUALS";
-                    default -> throw new CodeGenException("Operation " + opKind + " not supported.");
-                };
+        return switch (opKind) {
+            case PLUS -> "ImageOps.OP.PLUS";
+            case MINUS -> "ImageOps.OP.MINUS";
+            case TIMES -> "ImageOps.OP.TIMES";
+            case DIV -> "ImageOps.OP.DIV";
+            case MOD -> "ImageOps.OP.MOD";
+            case EQ -> "ImageOps.BoolOP.EQUALS";
+            default -> throw new CodeGenException("Operation " + opKind + " not supported.");
+        };
     }
 
     private String convertOpKind(Kind opKind) throws PLCCompilerException {
@@ -629,7 +668,8 @@ public class CodeGenVisitor implements ASTVisitor {
 
     @Override
     public StringBuilder visitGuardedBlock(GuardedBlock guardedBlock, Object arg) throws PLCCompilerException {
-        // Handling depends on context, so we probably need to pass down an arg to differentiate between do and if statements
+        // Handling depends on context, so we probably need to pass down an arg to
+        // differentiate between do and if statements
 
         // Create a StringBuilder to hold the generated code
         StringBuilder sb = new StringBuilder();
@@ -721,7 +761,7 @@ public class CodeGenVisitor implements ASTVisitor {
     public StringBuilder visitLValue(LValue lValue, Object arg) throws PLCCompilerException {
         StringBuilder sb = new StringBuilder();
         String varName = lValue.getNameDef().getJavaName();
-        //removed visiting of pixelselector and channelselector,
+        // removed visiting of pixelselector and channelselector,
         // they will be visited in the parent assignment statement
         return sb.append(varName);
     }
@@ -782,12 +822,12 @@ public class CodeGenVisitor implements ASTVisitor {
         ChannelSelector chan = postfixExpr.channel();
         importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
         if (postfixExpr.primary().getType() == PIXEL) {
-            //if type is pixel
+            // if type is pixel
             System.out.println("hello");
             sb.append(chan.visit(this, arg)).append("(");
             sb.append(primary.visit(this, arg));
         } else {
-            //otherwise is an image
+            // otherwise is an image
             System.out.println("hello");
             if (chan == null) {
                 sb.append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
@@ -849,9 +889,9 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     private String determineType(Type type) throws CodeGenException {
-                if(type == IMAGE){
-                    importSet.add("java.awt.image.BufferedImage");
-                }
+        if (type == IMAGE) {
+            importSet.add("java.awt.image.BufferedImage");
+        }
         return switch (type) {
             case INT, PIXEL -> "int";
             case STRING -> "String";
@@ -893,13 +933,11 @@ public class CodeGenVisitor implements ASTVisitor {
         } else {
             switch (opString) {
                 case "-" -> subExprString.append(opString).append(operandString);
-                case "RES_height" ->
-                {
+                case "RES_height" -> {
                     importSet.add("java.awt.image.BufferedImage");
                     subExprString.append("(").append(operandString).append(".getHeight()").append(")");
                 }
-                case "RES_width" ->
-                {
+                case "RES_width" -> {
                     importSet.add("java.awt.image.BufferedImage");
                     subExprString.append("(").append(operandString).append(".getWidth()").append(")");
                 }
