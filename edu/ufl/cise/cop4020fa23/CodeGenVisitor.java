@@ -134,7 +134,8 @@ public class CodeGenVisitor implements ASTVisitor {
         Kind opKind = binaryExpr.getOpKind();
 
         StringBuilder sb = new StringBuilder();
-
+        
+       
         if(leftType == IMAGE){
             importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
             sb.append(switch(rightType){
@@ -146,21 +147,24 @@ public class CodeGenVisitor implements ASTVisitor {
             sb.append(opKind).append(",");
             sb.append(leftSb).append(",");
             return sb.append(rightSb).append(")");
-        } else if (leftType == PIXEL){
-            importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
-            if(opKind == BOOLEAN_LIT){
+        } else if (leftType == PIXEL) {
+            importSet.add("edu.ufl.cise.cop4020fa23.runtime.PixelOps");
+            if(opKind == BOOLEAN_LIT) {
                 sb.append("binaryPackedPixelBooleanOP(");
             } else {
-                sb.append(switch(rightType){
-                    case PIXEL -> "binaryPackedPixelPixelOp";
-                    case INT -> "binaryPackedPixelScalarOp";
-                    default -> throw new CodeGenException("invalid right expression type for left type PIXEL");
-                });
+                // This is so dumb, but it works
+                sb.append("PixelOps.pack(");
+                sb.append("Math.min(255, Math.max(0, PixelOps.red(").append(leftSb).append(") ")
+                  .append(convertOpKind(opKind)).append(" PixelOps.red(").append(rightSb).append("))), ");
+                sb.append("Math.min(255, Math.max(0, PixelOps.green(").append(leftSb).append(") ")
+                  .append(convertOpKind(opKind)).append(" PixelOps.green(").append(rightSb).append("))), ");
+                sb.append("Math.min(255, Math.max(0, PixelOps.blue(").append(leftSb).append(") ")
+                  .append(convertOpKind(opKind)).append(" PixelOps.blue(").append(rightSb).append(")))");
+                sb.append(")");
             }
-            sb.append(opKind).append(",");
-            sb.append(leftSb).append(",");
-            return sb.append(rightSb).append(")");
-        } else if (leftType == Type.STRING && opKind == Kind.EQ) {
+        }
+        
+         else if (leftType == Type.STRING && opKind == Kind.EQ) {
             sb.append(leftSb).append(".equals(").append(rightSb).append(")");
         }
 
