@@ -727,28 +727,20 @@ public class TypeCheckVisitor implements ASTVisitor {
                 if (opKind == MINUS) {
                     unaryExpr.setType(INT);
                     return Type.INT;
-
                 }
                 throw new TypeCheckException("Invalid type for unaryExpr with INT Expr type");
             }
             case IMAGE -> {
                 switch (opKind) {
-                    case RES_width -> {
+                    case RES_width, RES_height -> {
                         unaryExpr.setType(INT);
-                        int val = Integer.parseInt(unaryExpr.getExpr().firstToken().text());
                         return INT;
                     }
-                    case RES_height -> {
-                        unaryExpr.setType(INT);
-                        int val = Integer.parseInt(unaryExpr.getExpr().firstToken.text());
-                        return INT;
-                        // not actually sure if this is how height/width are supposed to work
-                    }
+                    // not actually sure if this is how height/width are supposed to work
                     default -> throw new TypeCheckException("Invalid type for unaryExpr with IMAGE Expr type");
                 }
             }
         }
-        ;
         return null;
     }
 

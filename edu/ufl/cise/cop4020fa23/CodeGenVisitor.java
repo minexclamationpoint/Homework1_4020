@@ -38,6 +38,7 @@ public class CodeGenVisitor implements ASTVisitor {
 
     // Types image and pixel are implemented in Assignment 5
     private final HashSet<String> importSet = new HashSet<>();
+    private int numOfDoStatements = 0;
 
     // TODO: Possibly replace function calls with .visit calls?
     @Override
@@ -238,9 +239,11 @@ public class CodeGenVisitor implements ASTVisitor {
             sb.append(leftSb).append(",");
             return sb.append(rightSb).append(")");
         } else if (leftType == PIXEL) {
-            importSet.add("edu.ufl.cise.cop4020fa23.runtime.PixelOps");
             if (opKind == EQ) {
-                sb.append("PixelOps.binaryPackedPixelBooleanOP(");
+                importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
+                sb.append("ImageOps.binaryPackedPixelBooleanOp(").append(opKindToImageOp(opKind)).append(",");
+                sb.append(leftSb).append(",").append(rightSb).append(")");
+                return sb;
             } else {
                 // Truncation logic
                 sb.append("PixelOps.pack(");
@@ -298,6 +301,8 @@ public class CodeGenVisitor implements ASTVisitor {
             case BITAND -> "&";
             case BITOR -> "|";
             case BANG -> "!";
+            case RES_height -> "RES_height";
+            case RES_width -> "RES_width";
             // should be all of them
 
             default -> throw new CodeGenException("Operation " + opKind + " not supported.");
@@ -548,9 +553,11 @@ public class CodeGenVisitor implements ASTVisitor {
 
         StringBuilder sb = new StringBuilder();
         List<GuardedBlock> blocks = doStatement.getGuardedBlocks();
-        sb.append("boolean anyGuardTrue;\n");
+        numOfDoStatements++;
+        StringBuilder guardName = new StringBuilder("anyGuardTrue").append("$").append(numOfDoStatements);
+        sb.append("boolean ").append(guardName).append(" = false;\n");
         sb.append("do {\n");
-        sb.append("anyGuardTrue = false;\n");
+        sb.append(guardName).append(" = false;\n");
         for (GuardedBlock guardedBlock : blocks) {
             Expr guardExpr = guardedBlock.getGuard();
             StringBuilder guardExprCode = new StringBuilder();
@@ -559,7 +566,7 @@ public class CodeGenVisitor implements ASTVisitor {
             guardExprCode.append(guardExpr.visit(this, arg));
 
             sb.append("if (").append(guardExprCode).append(") {\n");
-            sb.append("anyGuardTrue = true;\n");
+            sb.append(guardName).append(" = true;\n");
 
             Block guardedBlockCode = guardedBlock.getBlock();
             StringBuilder blockCode = visitBlock(guardedBlockCode, arg);
@@ -568,7 +575,7 @@ public class CodeGenVisitor implements ASTVisitor {
             sb.append("}\n");
         }
 
-        sb.append("} while(anyGuardTrue);\n");
+        sb.append("} while(").append(guardName).append(");\n");
         return sb;
 
     }
@@ -753,10 +760,11 @@ public class CodeGenVisitor implements ASTVisitor {
                         .append(",");
                 sb.append(pixel.visit(this, arg)).append(")");
             } else {
+                importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
                 switch (chan.color()) {
                     case RES_red -> sb.append("ImageOps.extractRed(");
-                    case RES_blue -> sb.append("ImageOps.extractBlue(");
-                    case RES_green -> sb.append("ImageOps.extractGreen(");
+                    case RES_blue -> sb.append("ImageOps.extractBlu(");
+                    case RES_green -> sb.append("ImageOps.extractGrn(");
                     default -> throw new CodeGenException("Invalid channelselector color type");
                 }
                 sb.append(primary.visit(this, arg));
