@@ -96,7 +96,7 @@ public class CodeGenVisitor implements ASTVisitor {
                     }
                     case STRING -> {
                         // TODO: figure out how to resize images properly
-                        importSet.add("edu.ufl.cise.cop4020fa23.FileURLIO");
+                        importSet.add("edu.ufl.cise.cop4020fa23.runtime.FileURLIO");
                         sb.append("ImageOps.copyInto(FileURLIO.readImage(").append(ex.visit(this, arg)).append("),");
                         sb.append(val.visit(this, arg));
                     }
@@ -112,18 +112,22 @@ public class CodeGenVisitor implements ASTVisitor {
                 StringBuilder JNX = (StringBuilder) pix.xExpr().visit(this, arg);
                 StringBuilder JNY = (StringBuilder) pix.yExpr().visit(this, arg);
                 StringBuilder Brackets = new StringBuilder();
-                if (((IdentExpr) pix.xExpr()).getNameDef() instanceof SyntheticNameDef) {
-                    System.out.println("hello");
-                    sb.append("for (int ").append(JNX).append(" = 0; ");
-                    sb.append(JNX).append("<").append(LVString).append(".getWidth();");
-                    sb.append(JNX).append("++){\n");
-                    Brackets.append("}");
+                if(pix.xExpr() instanceof IdentExpr) {
+                    if (((IdentExpr) pix.xExpr()).getNameDef() instanceof SyntheticNameDef) {
+                        System.out.println("hello");
+                        sb.append("for (int ").append(JNX).append(" = 0; ");
+                        sb.append(JNX).append("<").append(LVString).append(".getWidth();");
+                        sb.append(JNX).append("++){\n");
+                        Brackets.append("}");
+                    }
                 }
-                if (((IdentExpr) pix.yExpr()).getNameDef() instanceof SyntheticNameDef) {
-                    sb.append("for (int ").append(JNY).append(" = 0; ");
-                    sb.append(JNY).append("<").append(LVString).append(".getHeight();");
-                    sb.append(JNY).append("++){\n");
-                    Brackets.append("}");
+                if(pix.yExpr() instanceof IdentExpr) {
+                    if (((IdentExpr) pix.yExpr()).getNameDef() instanceof SyntheticNameDef) {
+                        sb.append("for (int ").append(JNY).append(" = 0; ");
+                        sb.append(JNY).append("<").append(LVString).append(".getHeight();");
+                        sb.append(JNY).append("++){\n");
+                        Brackets.append("}");
+                    }
                 }
                 sb.append("ImageOps.setRGB(").append(LVString).append(",").append(JNX).append(",");
                 sb.append(JNY).append(",").append(ex.visit(this, arg)).append(");\n");
