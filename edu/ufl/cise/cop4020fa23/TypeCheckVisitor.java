@@ -604,7 +604,10 @@ public class TypeCheckVisitor implements ASTVisitor {
     // differences here
     public Object visitPostfixExpr(PostfixExpr postfixExpr, Object arg) throws PLCCompilerException {
         postfixExpr.primary().setType((Type) postfixExpr.primary().visit(this, arg));
-        Type pixelType = (Type) postfixExpr.pixel().visit(this, false); // idk,,,,,
+        if(postfixExpr.pixel() != null) {
+            Type pixelType = (Type) postfixExpr.pixel().visit(this, false); // idk,,,,,
+            //load bearing stupid piece of code ^^^ will come back to it
+        }
         postfixExpr.setType(
                 inferPostfixExprType(postfixExpr.primary().getType(), postfixExpr.pixel(), postfixExpr.channel()));
         return postfixExpr.getType();

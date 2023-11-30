@@ -298,12 +298,12 @@ public class CodeGenVisitor implements ASTVisitor {
             } else {
                 // Truncation logic
                 sb.append("PixelOps.pack(");
-                sb.append("Math.min(255, Math.max(0, PixelOps.red(").append(leftSb).append(") ")
-                        .append(convertOpKind(opKind)).append(" PixelOps.red(").append(rightSb).append("))), ");
-                sb.append("Math.min(255, Math.max(0, PixelOps.green(").append(leftSb).append(") ")
-                        .append(convertOpKind(opKind)).append(" PixelOps.green(").append(rightSb).append("))), ");
-                sb.append("Math.min(255, Math.max(0, PixelOps.blue(").append(leftSb).append(") ")
-                        .append(convertOpKind(opKind)).append(" PixelOps.blue(").append(rightSb).append(")))");
+                sb.append("PixelOps.red(").append(leftSb).append(") ")
+                        .append(convertOpKind(opKind)).append(" PixelOps.red(").append(rightSb).append("), ");
+                sb.append("PixelOps.green(").append(leftSb).append(") ")
+                        .append(convertOpKind(opKind)).append(" PixelOps.green(").append(rightSb).append("), ");
+                sb.append("PixelOps.blue(").append(leftSb).append(") ")
+                        .append(convertOpKind(opKind)).append(" PixelOps.blue(").append(rightSb).append(")");
                 sb.append(")");
             }
         }
@@ -599,47 +599,18 @@ public class CodeGenVisitor implements ASTVisitor {
          * with G0 again, for each
          * iteration. The statement terminates when none of the guards are true.
          */
-        /*
-         * TODO vvv sample implementation of getting a single block for a do statement
-         * iteration
-         * StringBuilder sb = new StringBuilder();
-         * java.util.List<GuardedBlock> blocks = doStatement.getGuardedBlocks();
-         * if(determineExpr(blocks.get(0).getGuard(), arg).equals("true")){
-         * sb.append(visitBlock(blocks.get(0).getBlock(), arg));
-         * }
-         * return sb;
-         */
 
         StringBuilder sb = new StringBuilder();
         List<GuardedBlock> blocks = doStatement.getGuardedBlocks();
-
+        sb.append("boolean anyGuardTrue;\n");
         sb.append("do {\n");
-        sb.append("boolean anyGuardTrue = false;\n");
-
+        sb.append("anyGuardTrue = false;\n");
         for (GuardedBlock guardedBlock : blocks) {
             Expr guardExpr = guardedBlock.getGuard();
             StringBuilder guardExprCode = new StringBuilder();
 
             // TODO: vvvv this is probably not the best way to do this
-            if (guardExpr instanceof BinaryExpr) {
-                guardExprCode = visitBinaryExpr((BinaryExpr) guardExpr, arg);
-            } else if (guardExpr instanceof UnaryExpr) {
-                guardExprCode = visitUnaryExpr((UnaryExpr) guardExpr, arg);
-            } else if (guardExpr instanceof ConditionalExpr) {
-                guardExprCode = visitConditionalExpr((ConditionalExpr) guardExpr, arg);
-            } else if (guardExpr instanceof IdentExpr) {
-                guardExprCode.append(visitIdentExpr((IdentExpr) guardExpr, arg));
-            } else if (guardExpr instanceof NumLitExpr) {
-                guardExprCode.append(visitNumLitExpr((NumLitExpr) guardExpr, arg));
-            } else if (guardExpr instanceof BooleanLitExpr) {
-                guardExprCode.append(visitBooleanLitExpr((BooleanLitExpr) guardExpr, arg));
-            } else if (guardExpr instanceof StringLitExpr) {
-                guardExprCode.append(visitStringLitExpr((StringLitExpr) guardExpr, arg));
-            } else if (guardExpr instanceof ExpandedPixelExpr) {
-                guardExprCode.append(visitExpandedPixelExpr((ExpandedPixelExpr) guardExpr, arg));
-            } else if (guardExpr instanceof ConstExpr) {
-                guardExprCode.append(visitConstExpr((ConstExpr) guardExpr, arg));
-            }
+            guardExprCode.append(guardExpr.visit(this, arg));
 
             sb.append("if (").append(guardExprCode).append(") {\n");
             sb.append("anyGuardTrue = true;\n");
@@ -824,11 +795,10 @@ public class CodeGenVisitor implements ASTVisitor {
         if (postfixExpr.primary().getType() == PIXEL) {
             // if type is pixel
             System.out.println("hello");
-            sb.append(chan.visit(this, arg)).append("(");
+            sb.append(chan.visit(this, arg));
             sb.append(primary.visit(this, arg));
         } else {
             // otherwise is an image
-            System.out.println("hello");
             if (chan == null) {
                 sb.append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
                 sb.append(pixel.visit(this, arg));
