@@ -76,7 +76,7 @@ public class CodeGenVisitor implements ASTVisitor {
                     image. Use FileURLIO.readImage and ImageOps.copyInto
 
                      */
-                    importSet.add("edu.ufl.cise.cop4020fa23.ImageOps");
+                    importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
                     switch(ex.getType()) {
                         case IMAGE -> {
                             sb.append("ImageOps.copyInto(");
@@ -772,18 +772,19 @@ public class CodeGenVisitor implements ASTVisitor {
          * _PixelSelector_ ))
          */
         // Probably not the cleanest implementation
-        // Requires import statement for ImageOps and getRHB I think
         StringBuilder sb = new StringBuilder();
         Expr primary = postfixExpr.primary();
         PixelSelector pixel = postfixExpr.pixel();
         ChannelSelector chan = postfixExpr.channel();
         importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
-        if (postfixExpr.getType() == PIXEL) {
+        if (postfixExpr.primary().getType() == PIXEL) {
             //if type is pixel
+            System.out.println("hello");
             sb.append(chan.visit(this, arg)).append("(");
             sb.append(primary.visit(this, arg));
         } else {
             //otherwise is an image
+            System.out.println("hello");
             if (chan == null) {
                 sb.append("ImageOps.getRGB(").append(primary.visit(this, arg)).append(",");
                 sb.append(pixel.visit(this, arg));
