@@ -10,12 +10,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="Fixes and cleanup, 50/67 passed">
-      <change beforePath="$PROJECT_DIR$/bin/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/bin/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="Fixed all base 24 tests, 51/67 passed">
       <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenTest_Hw5_starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenTest_Hw5_starter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/TypeCheckVisitor$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/TypeCheckVisitor$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,7 +93,7 @@
     &quot;two.files.diff.last.used.file&quot;: &quot;C:/Users/steve/Downloads/ImageOps.java&quot;
   }
 }</component>
-  <component name="RunManager" selected="JUnit.CodeGenTest_Hw5_starter">
+  <component name="RunManager" selected="JUnit.CodeGenTest_Hw5_starter.unaryHeight">
     <configuration name="CodeGenTest_Hw5_starter" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
@@ -108,7 +109,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_Hw5_starter.hw5_16" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_Hw5_starter.extractGreenFromImage" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -118,13 +119,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_Hw5_starter" />
-      <option name="METHOD_NAME" value="hw5_16" />
+      <option name="METHOD_NAME" value="extractGreenFromImage" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_Hw5_starter.hw5_6" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_Hw5_starter.nestedDoStatements" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -134,13 +135,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_Hw5_starter" />
-      <option name="METHOD_NAME" value="hw5_6" />
+      <option name="METHOD_NAME" value="nestedDoStatements" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_Hw5_starter.hw5_9" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_Hw5_starter.pixelsAreNotEqual" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -150,13 +151,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_Hw5_starter" />
-      <option name="METHOD_NAME" value="hw5_9" />
+      <option name="METHOD_NAME" value="pixelsAreNotEqual" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="HW4_Tests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_Hw5_starter.unaryHeight" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -165,19 +166,20 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
-      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.HW4_Tests" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_Hw5_starter" />
+      <option name="METHOD_NAME" value="unaryHeight" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.unaryHeight" />
         <item itemvalue="JUnit.CodeGenTest_Hw5_starter" />
-        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.hw5_6" />
-        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.hw5_9" />
-        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.hw5_16" />
-        <item itemvalue="JUnit.HW4_Tests" />
+        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.extractGreenFromImage" />
+        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.nestedDoStatements" />
+        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.pixelsAreNotEqual" />
       </list>
     </recent_temporary>
   </component>
@@ -189,14 +191,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1696189596039</updated>
-    </task>
-    <task id="LOCAL-00021" summary="h">
-      <option name="closed" value="true" />
-      <created>1698611947158</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1698611947158</updated>
     </task>
     <task id="LOCAL-00022" summary="h">
       <option name="closed" value="true" />
@@ -582,7 +576,15 @@
       <option name="project" value="LOCAL" />
       <updated>1701313215117</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="Fixed all base 24 tests, 51/67 passed">
+      <option name="closed" value="true" />
+      <created>1701314582411</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1701314582411</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -640,7 +642,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added skeleton for the CodeGenVisitor class. Will start to implement methods bottom up, like previous :3" />
     <MESSAGE value="Should be good, think I fixed the dumb problem" />
     <MESSAGE value="Written up to visitReturnStatement(). Created the method determineExpr() which is a good helper method for when Expr needs to be called." />
     <MESSAGE value="Written up to visitIdentExpr(). Will need to revise once I know more about what's going on" />
@@ -665,9 +666,174 @@
     <MESSAGE value="Worked on AssignmentStatement stuff. 15/24 passed." />
     <MESSAGE value="Worked on PostFixExpr stuff, 17/24 passed" />
     <MESSAGE value="Fixes and cleanup, 50/67 passed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixes and cleanup, 50/67 passed" />
+    <MESSAGE value="Fixed all base 24 tests, 51/67 passed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed all base 24 tests, 51/67 passed" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>841</line>
+          <option name="timeStamp" value="127" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>842</line>
+          <option name="timeStamp" value="128" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>843</line>
+          <option name="timeStamp" value="130" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>847</line>
+          <option name="timeStamp" value="131" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>849</line>
+          <option name="timeStamp" value="132" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>848</line>
+          <option name="timeStamp" value="133" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>852</line>
+          <option name="timeStamp" value="135" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>853</line>
+          <option name="timeStamp" value="136" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>857</line>
+          <option name="timeStamp" value="137" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>858</line>
+          <option name="timeStamp" value="138" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>859</line>
+          <option name="timeStamp" value="139" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>860</line>
+          <option name="timeStamp" value="140" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>862</line>
+          <option name="timeStamp" value="141" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>861</line>
+          <option name="timeStamp" value="142" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>863</line>
+          <option name="timeStamp" value="143" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>864</line>
+          <option name="timeStamp" value="144" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>865</line>
+          <option name="timeStamp" value="145" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>855</line>
+          <option name="timeStamp" value="146" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>856</line>
+          <option name="timeStamp" value="147" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
+          <line>854</line>
+          <option name="timeStamp" value="148" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>714</line>
+          <option name="timeStamp" value="150" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>715</line>
+          <option name="timeStamp" value="151" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>716</line>
+          <option name="timeStamp" value="152" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>718</line>
+          <option name="timeStamp" value="153" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>717</line>
+          <option name="timeStamp" value="154" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>719</line>
+          <option name="timeStamp" value="155" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>721</line>
+          <option name="timeStamp" value="156" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>720</line>
+          <option name="timeStamp" value="157" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>722</line>
+          <option name="timeStamp" value="158" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>724</line>
+          <option name="timeStamp" value="159" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>723</line>
+          <option name="timeStamp" value="160" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java</url>
+          <line>725</line>
+          <option name="timeStamp" value="164" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="JUnit">
         <watch expression="type" />
