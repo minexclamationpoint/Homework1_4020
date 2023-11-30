@@ -10,15 +10,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="Mostly added import statements. 10/24 passed">
+    <list default="true" id="b58f3fbb-9c74-454f-a9f7-abc6c9863d2b" name="Changes" comment="Fixes and cleanup, 50/67 passed">
       <change beforePath="$PROJECT_DIR$/bin/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/bin/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenTest_Hw5_starter.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenTest_Hw5_starter.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/CodeGenVisitor.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/runtime/ImageOps.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/edu/ufl/cise/cop4020fa23/runtime/ImageOps.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenTest_Hw5_starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenTest_Hw5_starter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/TypeCheckVisitor.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,7 +108,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_Hw5_starter.hw5_21" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_Hw5_starter.hw5_16" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -121,13 +118,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_Hw5_starter" />
-      <option name="METHOD_NAME" value="hw5_21" />
+      <option name="METHOD_NAME" value="hw5_16" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CodeGenTest_Hw5_starter.hw5_23" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_Hw5_starter.hw5_6" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -137,13 +134,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
       <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_Hw5_starter" />
-      <option name="METHOD_NAME" value="hw5_23" />
+      <option name="METHOD_NAME" value="hw5_6" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="HW3Test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CodeGenTest_Hw5_starter.hw5_9" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Homework1_4020" />
       <extension name="coverage">
         <pattern>
@@ -152,8 +149,9 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="edu.ufl.cise.cop4020fa23" />
-      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.HW3Test" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="MAIN_CLASS_NAME" value="edu.ufl.cise.cop4020fa23.CodeGenTest_Hw5_starter" />
+      <option name="METHOD_NAME" value="hw5_9" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -176,10 +174,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.CodeGenTest_Hw5_starter" />
-        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.hw5_21" />
+        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.hw5_6" />
+        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.hw5_9" />
+        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.hw5_16" />
         <item itemvalue="JUnit.HW4_Tests" />
-        <item itemvalue="JUnit.HW3Test" />
-        <item itemvalue="JUnit.CodeGenTest_Hw5_starter.hw5_23" />
       </list>
     </recent_temporary>
   </component>
@@ -191,30 +189,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1696189596039</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Added skeleton for homework 3">
-      <option name="closed" value="true" />
-      <created>1698261034410</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1698261034410</updated>
-    </task>
-    <task id="LOCAL-00019" summary="Added skeleton for homework 3">
-      <option name="closed" value="true" />
-      <created>1698610436732</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1698610436732</updated>
-    </task>
-    <task id="LOCAL-00020" summary="Added skeleton for homework 3">
-      <option name="closed" value="true" />
-      <created>1698610452754</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1698610452754</updated>
     </task>
     <task id="LOCAL-00021" summary="h">
       <option name="closed" value="true" />
@@ -584,7 +558,31 @@
       <option name="project" value="LOCAL" />
       <updated>1701288826612</updated>
     </task>
-    <option name="localTasksCounter" value="67" />
+    <task id="LOCAL-00067" summary="Worked on AssignmentStatement stuff. 15/24 passed.">
+      <option name="closed" value="true" />
+      <created>1701303135745</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1701303135746</updated>
+    </task>
+    <task id="LOCAL-00068" summary="Worked on PostFixExpr stuff, 17/24 passed">
+      <option name="closed" value="true" />
+      <created>1701304346589</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1701304346589</updated>
+    </task>
+    <task id="LOCAL-00069" summary="Fixes and cleanup, 50/67 passed">
+      <option name="closed" value="true" />
+      <created>1701313215117</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1701313215117</updated>
+    </task>
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -642,9 +640,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added test 33, passes 33/33. Ready to submit. *Reverted accidental merge with older code. I think." />
-    <MESSAGE value="Added test 33, passes 33/33. Ready to submit." />
-    <MESSAGE value="Added files for assignment 4. Will work on thsi more later. :3" />
     <MESSAGE value="Added skeleton for the CodeGenVisitor class. Will start to implement methods bottom up, like previous :3" />
     <MESSAGE value="Should be good, think I fixed the dumb problem" />
     <MESSAGE value="Written up to visitReturnStatement(). Created the method determineExpr() which is a good helper method for when Expr needs to be called." />
@@ -667,48 +662,12 @@
     <MESSAGE value="Fixed a couple of small errors with Assignment 4. God that was a scare" />
     <MESSAGE value="Added the use of .visit() to clean the code up and make it more in line with the type check visitor. Mostly a cosmetic change." />
     <MESSAGE value="Mostly added import statements. 10/24 passed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Mostly added import statements. 10/24 passed" />
+    <MESSAGE value="Worked on AssignmentStatement stuff. 15/24 passed." />
+    <MESSAGE value="Worked on PostFixExpr stuff, 17/24 passed" />
+    <MESSAGE value="Fixes and cleanup, 50/67 passed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixes and cleanup, 50/67 passed" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
-          <line>184</line>
-          <option name="timeStamp" value="24" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
-          <line>182</line>
-          <option name="timeStamp" value="25" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
-          <line>183</line>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
-          <line>185</line>
-          <option name="timeStamp" value="27" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
-          <line>186</line>
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
-          <line>188</line>
-          <option name="timeStamp" value="29" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/edu/ufl/cise/cop4020fa23/CodeGenVisitor.java</url>
-          <line>187</line>
-          <option name="timeStamp" value="30" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="JUnit">
         <watch expression="type" />

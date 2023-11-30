@@ -60,21 +60,10 @@ public class CodeGenVisitor implements ASTVisitor {
         LValue val = assignmentStatement.getlValue();
         StringBuilder LVString = new StringBuilder((StringBuilder) val.visit(this, arg));
         Expr ex = assignmentStatement.getE();
-        // try {
         StringBuilder sb = new StringBuilder();
 
 
 
-        // for test case 6
-        if (val.getVarType() == PIXEL && ex.getType() == INT) {
-            importSet.add("edu.ufl.cise.cop4020fa23.runtime.PixelOps");
-            sb.append(val.visit(this, arg))
-              .append(" = PixelOps.pack(")
-              .append(ex.visit(this, arg)).append(", ")
-              .append(ex.visit(this, arg)).append(", ")
-              .append(ex.visit(this, arg)).append(");");
-            return sb;
-        }
 
         if (assignmentStatement.getlValue().getVarType() == IMAGE) {
 
@@ -118,86 +107,51 @@ public class CodeGenVisitor implements ASTVisitor {
                 if (pix == null) {
                     throw new UnsupportedOperationException("Not to be implemented");
                 }
-                /*
-                 * • PixelSelector != null and ChannelSelector == null (i.e. something like
-                 * im[x1,x2] =expr)
-                 * This is the most interesting part of the language. Recall that we could write
-                 * statements like
-                 * im0[x,y] = expr where x and/or y are not visible in the current scope. In
-                 * this case, we added a
-                 * SyntheticNameDef object for the variable. For each variable whose nameDef is
-                 * actually a
-                 * SyntheticNameDef object, we generate code for an implicit loop over the
-                 * values of that variable.
-                 * For example, suppose we have a statement
-                 * Im0[x,y] = im1[y,x]
-                 * where x and y are not previously declared and thus their NameDef objects in
-                 * the AST are
-                 * SyntheticNameDef. Generate code to loop over x and y from 0 to im0.getWidth()
-                 * and from 0 to
-                 * im0.getHeight(), respectively and update each pixel with the value of the
-                 * expression on the right
-                 * side.
-                 * See the generated code in the starter Junit test cases for example
-                 * package edu.ufl.cise.cop4020fa23;
-                 * import java.awt.image.BufferedImage;
-                 * import edu.ufl.cise.cop4020fa23.runtime.PixelOps;
-                 * import edu.ufl.cise.cop4020fa23.runtime.ImageOps;
-                 * public class example{
-                 * public static BufferedImage apply(int w$1, int h$1){
-                 * final BufferedImage im$2=ImageOps.makeImage(w$1,h$1);
-                 * for (int x$3=0; x$3<im$2.getWidth();x$3++){
-                 * for (int y$3=0; y$3<im$2.getHeight();y$3++){
-                 * ImageOps.setRGB(im$2,x$3,y$3,PixelOps.pack(x$3,y$3,255));
-                 * }
-                 * };
-                 * return im$2;
-                 * }
-                 * }
-                 * String source = """
-                 * image example(int w, int h) <:
-                 * image[w,h] im;
-                 * im[x,y] = [x,y,Z];
-                 * ^im;
-                 * :>
-                 * """;
-                 */
                 StringBuilder pixString = (StringBuilder) pix.visit(this, arg);
-                StringBuilder lvalString = (StringBuilder) val.visit(this, arg);
                 StringBuilder JNX = (StringBuilder) pix.xExpr().visit(this, arg);
                 StringBuilder JNY = (StringBuilder) pix.yExpr().visit(this, arg);
                 StringBuilder Brackets = new StringBuilder();
                 if (((IdentExpr) pix.xExpr()).getNameDef() instanceof SyntheticNameDef) {
                     System.out.println("hello");
                     sb.append("for (int ").append(JNX).append(" = 0; ");
-                    sb.append(JNX).append("<").append(lvalString).append(".getWidth();");
+                    sb.append(JNX).append("<").append(LVString).append(".getWidth();");
                     sb.append(JNX).append("++){\n");
                     Brackets.append("}");
                 }
                 if (((IdentExpr) pix.yExpr()).getNameDef() instanceof SyntheticNameDef) {
                     sb.append("for (int ").append(JNY).append(" = 0; ");
-                    sb.append(JNY).append("<").append(lvalString).append(".getHeight();");
+                    sb.append(JNY).append("<").append(LVString).append(".getHeight();");
                     sb.append(JNY).append("++){\n");
                     Brackets.append("}");
                 }
-                sb.append("ImageOps.setRGB(").append(lvalString).append(",").append(JNX).append(",");
+                sb.append("ImageOps.setRGB(").append(LVString).append(",").append(JNX).append(",");
                 sb.append(JNY).append(",").append(ex.visit(this, arg)).append(");\n");
                 sb.append(Brackets);
                 return sb;
             }
         }
-        if (assignmentStatement.getlValue().getVarType() == PIXEL
-                && assignmentStatement.getlValue().getChannelSelector() != null) {
-            importSet.add("edu.ufl.cise.cop4020fa23.PixelOps");
-            sb.append(switch (assignmentStatement.getlValue().getChannelSelector().color()) {
-                case RES_red -> "PixelOps.setRed(";
-                case RES_blue -> "PixelOps.setBlue(";
-                case RES_green -> "PixelOps.setGreen(";
-                default -> throw new CodeGenException("Unexpected color kind in channelSelector");
-            });
-            sb.append(assignmentStatement.getlValue().visit(this, arg)).append(" , ")
-                    .append(assignmentStatement.getE().visit(this, arg));
-            return sb.append(")");
+        if (assignmentStatement.getlValue().getVarType() == PIXEL){
+            importSet.add("edu.ufl.cise.cop4020fa23.runtime.PixelOps");
+                 if(assignmentStatement.getlValue().getChannelSelector() != null) {
+                     sb.append(LVString).append(" = ");
+                     sb.append(switch (assignmentStatement.getlValue().getChannelSelector().color()) {
+                         case RES_red -> "PixelOps.setRed(";
+                         case RES_blue -> "PixelOps.setBlue(";
+                         case RES_green -> "PixelOps.setGreen(";
+                         default -> throw new CodeGenException("Unexpected color kind in channelSelector");
+                     });
+                     sb.append(LVString).append(" , ")
+                             .append(assignmentStatement.getE().visit(this, arg));
+                     return sb.append(")");
+                 } else if (ex.getType() == INT) {
+                     sb.append(val.visit(this, arg))
+                             .append(" = PixelOps.pack(")
+                             .append(ex.visit(this, arg)).append(", ")
+                             .append(ex.visit(this, arg)).append(", ")
+                             .append(ex.visit(this, arg)).append(");");
+                     return sb;
+                 }
+
         }
         // _LValue_ = _Expr_
         if (assignmentStatement.getlValue() == null) {
@@ -216,14 +170,6 @@ public class CodeGenVisitor implements ASTVisitor {
 
         
         return sb;
-
-
-        /*
-         * } catch (Exception e) {
-         * throw new CodeGenException("Well then we shouldn't be here " +
-         * e.getMessage());
-         * }
-         */
     }
 
     @Override
