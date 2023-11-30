@@ -766,7 +766,7 @@ public class CodeGenVisitor implements ASTVisitor {
     }
 
     @Override
-    public StringBuilder visitProgram(Program program, Object arg) throws PLCCompilerException {
+    public String visitProgram(Program program, Object arg) throws PLCCompilerException {
         StringBuilder imports = new StringBuilder();
         StringBuilder classBody = new StringBuilder("public class ").append(program.getName()).append(" {\n");
         classBody.append("\tpublic static ").append(determineType(program.getType())).append(" apply(\n")
@@ -801,7 +801,7 @@ public class CodeGenVisitor implements ASTVisitor {
 
         completeJavaClass.append(classBody);
 
-        return completeJavaClass;
+        return completeJavaClass.toString();
     }
 
     private String determineType(Type type) throws CodeGenException {
