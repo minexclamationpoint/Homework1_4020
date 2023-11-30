@@ -135,8 +135,10 @@ class CodeGenTest_Hw5_starter {
 	 * 
 	 * package edu.ufl.cise.cop4020fa23; import
 	 * edu.ufl.cise.cop4020fa23.runtime.ImageOps; public class PixelSum{ public
-	 * static int apply(){ int p0$2=0xff0000ff; int p1$2=0xff00ff00; return
-	 * (ImageOps.binaryPackedPixelPixelOp(ImageOps.OP.PLUS,p0$2,p1$2)); } }
+	 * static int apply(){
+	 * int p0$2=0xff0000ff;
+	 * int p1$2=0xff00ff00;
+	 * return (ImageOps.binaryPackedPixelPixelOp(ImageOps.OP.PLUS,p0$2,p1$2)); } }
 	 */
 	@Test
 	void hw5_4() throws Exception {

@@ -239,22 +239,36 @@ public class CodeGenVisitor implements ASTVisitor {
             sb.append(leftSb).append(",");
             return sb.append(rightSb).append(")");
         } else if (leftType == PIXEL) {
+            importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
             if (opKind == EQ) {
-                importSet.add("edu.ufl.cise.cop4020fa23.runtime.ImageOps");
                 sb.append("ImageOps.binaryPackedPixelBooleanOp(").append(opKindToImageOp(opKind)).append(",");
                 sb.append(leftSb).append(",").append(rightSb).append(")");
                 return sb;
-            } else {
-                // Truncation logic
-                sb.append("PixelOps.pack(");
-                sb.append("PixelOps.red(").append(leftSb).append(") ")
-                        .append(convertOpKind(opKind)).append(" PixelOps.red(").append(rightSb).append("), ");
-                sb.append("PixelOps.green(").append(leftSb).append(") ")
-                        .append(convertOpKind(opKind)).append(" PixelOps.green(").append(rightSb).append("), ");
-                sb.append("PixelOps.blue(").append(leftSb).append(") ")
-                        .append(convertOpKind(opKind)).append(" PixelOps.blue(").append(rightSb).append(")");
-                sb.append(")");
             }
+                // Truncation logic
+            switch(rightType){
+                case PIXEL -> {
+                    sb.append("ImageOps.binaryPackedPixelPixelOp(").append(opKindToImageOp(opKind));
+                    sb.append(",").append(leftSb);
+                    sb.append(",").append(rightSb).append(")");
+                    return sb;
+                }
+                case INT -> {
+                    sb.append("ImageOps.binaryPackedPixelScalarOp(").append(opKindToImageOp(opKind));
+                    sb.append(",").append(leftSb);
+                    sb.append(",").append(rightSb).append(")");
+                    return sb;
+                }
+                default -> {}
+            }
+            sb.append("PixelOps.pack(");
+            sb.append("PixelOps.red(").append(leftSb).append(") ")
+                    .append(convertOpKind(opKind)).append(" PixelOps.red(").append(rightSb).append("), ");
+            sb.append("PixelOps.green(").append(leftSb).append(") ")
+                    .append(convertOpKind(opKind)).append(" PixelOps.green(").append(rightSb).append("), ");
+            sb.append("PixelOps.blue(").append(leftSb).append(") ")
+                    .append(convertOpKind(opKind)).append(" PixelOps.blue(").append(rightSb).append(")");
+            sb.append(")");
         }
 
         else if (leftType == Type.STRING && opKind == Kind.EQ) {
