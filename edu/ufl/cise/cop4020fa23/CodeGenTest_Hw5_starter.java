@@ -601,13 +601,20 @@ class CodeGenTest_Hw5_starter {
 
 	/**
 	 * 
-	 * package edu.ufl.cise.cop4020fa23; import java.awt.image.BufferedImage; import
-	 * edu.ufl.cise.cop4020fa23.runtime.PixelOps; import
-	 * edu.ufl.cise.cop4020fa23.runtime.ImageOps; public class example{ public
-	 * static BufferedImage apply(int w$1, int h$1){ final BufferedImage
-	 * im$2=ImageOps.makeImage(w$1,h$1); for (int x$3=0; x$3<im$2.getWidth();x$3++){
-	 * for (int y$3=0; y$3<im$2.getHeight();y$3++){
-	 * ImageOps.setRGB(im$2,x$3,y$3,PixelOps.pack(x$3,y$3,255)); } }; return im$2; }
+	 * package edu.ufl.cise.cop4020fa23;
+	 * import java.awt.image.BufferedImage;
+	 * import edu.ufl.cise.cop4020fa23.runtime.PixelOps;
+	 * import edu.ufl.cise.cop4020fa23.runtime.ImageOps;
+	 * public class example{
+	 * 		public static BufferedImage apply(int w$1, int h$1){
+	 * 			final BufferedImage im$2=ImageOps.makeImage(w$1,h$1);
+	 * 				for (int x$3=0; x$3<im$2.getWidth();x$3++){
+	 * 					for (int y$3=0; y$3<im$2.getHeight();y$3++){
+	 * 						ImageOps.setRGB(im$2,x$3,y$3,PixelOps.pack(x$3,y$3,255));
+	 * 					}
+	 * 				};
+	 * 		return im$2;
+	 * 		}
 	 * }
 	 */
 	@Test

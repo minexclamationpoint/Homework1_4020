@@ -345,20 +345,6 @@ public class TypeCheckVisitor implements ASTVisitor {
         try {
             // Check if we are in a context where the identifiers could be implicitly
             // declared
-            if (st.lookup("x") == null) {
-                SyntheticNameDef nameX = new SyntheticNameDef("x");
-                st.enterScope();
-                st.insert(nameX);
-                scopeEntered = true;
-            }
-            if (st.lookup("y") == null) {
-                SyntheticNameDef nameY = new SyntheticNameDef("y");
-                if (!scopeEntered) {
-                    st.enterScope();
-                }
-                st.insert(nameY);
-                scopeEntered = true;
-            }
 
             // Visit and type-check the red, green, and blue expressions
             Type redType = (Type) expandedPixelExpr.getRed().visit(this, "PixelSelectorContext");
@@ -486,21 +472,41 @@ public class TypeCheckVisitor implements ASTVisitor {
     }
 
     private Type inferLValueType(Type varType, PixelSelector ps, ChannelSelector cs) throws TypeCheckException {
-        if (ps == null && cs == null) {
-            return varType;
-        }
-        if (ps != null && cs == null) {
-            return Type.PIXEL;
-        }
-        if (ps != null && cs != null) {
-            return Type.INT;
-        }
-        if (ps == null && cs != null) {
-            if (varType == Type.IMAGE) {
-                return Type.IMAGE;
+        boolean isCS = (cs == null);
+        boolean isPS = (ps == null);
+        switch(varType){
+            case IMAGE -> {
+                if(isPS){
+                    if(isCS){
+                        //both null
+                        return varType;
+                    }
+                    //only ps null
+                } else {
+                    if(isCS){
+                        //only cs null
+                        return PIXEL;
+                    }
+                    //neither null
+                    return INT;
+                }
+
             }
-            if (varType == Type.PIXEL) {
-                return Type.INT;
+            case PIXEL -> {
+                if(isPS){
+                    if(isCS){
+                        //both null
+                        return varType;
+                    }
+                    //only ps null
+                    return INT;
+                }
+                //only cs null OR both not null
+            }
+            default -> {
+                if(ps == null && cs == null){
+                    return varType;
+                }
             }
         }
         throw new TypeCheckException("Unable to infer LValue type");
@@ -560,6 +566,9 @@ public class TypeCheckVisitor implements ASTVisitor {
                     if (st.lookup(newName) == null) {
                         SyntheticNameDef nameX = new SyntheticNameDef(newName);
                         st.insert(nameX);
+                        String uniqueJavaName = generateUniqueJavaName(nameX.getName(), st.getCurrentNum());
+                        ((IdentExpr) pixelSelector.xExpr()).setNameDef(nameX);
+                        ((IdentExpr) pixelSelector.xExpr()).getNameDef().setJavaName(uniqueJavaName);
                     }
                 } else if (!(pixelSelector.xExpr() instanceof NumLitExpr)) {
                     throw new TypeCheckException("expected IdentExpr or NumLitExpr argument for Expression x");
@@ -569,6 +578,9 @@ public class TypeCheckVisitor implements ASTVisitor {
                     if (st.lookup(newName) == null) {
                         SyntheticNameDef nameY = new SyntheticNameDef(newName);
                         st.insert(nameY);
+                        String uniqueJavaName = generateUniqueJavaName(nameY.getName(), st.getCurrentNum());
+                        ((IdentExpr) pixelSelector.yExpr()).setNameDef(nameY);
+                        ((IdentExpr) pixelSelector.yExpr()).getNameDef().setJavaName(uniqueJavaName);
                     }
                 } else if (!(pixelSelector.yExpr() instanceof NumLitExpr)) {
                     throw new TypeCheckException("expected IdentExpr or NumLitExpr argument for Expression y");
